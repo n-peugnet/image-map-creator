@@ -5,7 +5,7 @@ class Area {
 	 * @param {XY[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
 	 */
-	constructor(shape = "rect", coords = [], href = "") {
+	constructor(shape, coords = [], href = "http://") {
 		this.shape = shape;
 		this.coords = coords;
 		this.href = href;
@@ -55,5 +55,19 @@ class Area {
 
 	firstCoord() {
 		return this.coords[0];
+	}
+
+	isHover(x, y) {
+		switch (this.shape) {
+			case "rect":
+				var fCoord = this.firstCoord();
+				var lCoord = this.coords[1].add(fCoord);
+				return between(x, fCoord.x, lCoord.x) && between(y, fCoord.x, lCoord.y);
+				break;
+		
+			default:
+				return false
+				break;
+		}
 	}
 }

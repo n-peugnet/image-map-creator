@@ -12,4 +12,8 @@ class XY {
 		return !this.x || !this.y
 	}
 
+	add(xy) {
+		return new XY(this.x + xy.x, this.y + xy.y);
+	}
+
 }
