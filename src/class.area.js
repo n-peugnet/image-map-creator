@@ -62,7 +62,7 @@ class Area {
 			case "rect":
 				var fCoord = this.firstCoord();
 				var lCoord = this.coords[1].add(fCoord);
-				return between(x, fCoord.x, lCoord.x) && between(y, fCoord.x, lCoord.y);
+				return between(x, fCoord.x, lCoord.x) && between(y, fCoord.y, lCoord.y);
 				break;
 		
 			default:

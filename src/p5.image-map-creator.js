@@ -2,9 +2,13 @@ var imageMapCreator = function (p) {
 
 	p.map = new ImageMap();
 	var tempArea = new Area();
+	var img = null;
 
 	p.setup = function () {
-		p.createCanvas(400, 300);
+		var canvas = p.createCanvas(400, 300);
+		canvas.dragOver(p.onOver);
+		canvas.dragLeave(p.onLeave);
+		canvas.drop(p.handeFile)
 	};
 
 	p.draw = function () {
@@ -12,7 +16,7 @@ var imageMapCreator = function (p) {
 			tempArea.updateLastCoord(p.mouseX, p.mouseY)
 		}
 
-		p.background(200);
+		p.background(img ? img : 200);
 		p.fill(255, 255, 255, 178);
 		p.strokeWeight(1);
 		p.stroke(0);
@@ -54,5 +58,18 @@ var imageMapCreator = function (p) {
 		return area = allAreas.reverse().find(area => {
 			return area.isHover(p.mouseX, p.mouseY);
 		});
-	}
+	};
+
+	p.onOver = function () {
+		console.log('over');
+	};
+
+	p.onLeave = function () {
+		console.log('leave');
+	};
+
+	p.handeFile = function(file) {
+		if (file.type == "image")
+		img = p.loadImage(file.data);
+	};
 };
