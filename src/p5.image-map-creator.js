@@ -1,6 +1,6 @@
-var mappedImageGen = function (p) {
+var imageMapCreator = function (p) {
 
-	var map = new MappedImage();
+	p.map = new ImageMap();
 	var tempArea = new Area();
 
 	p.setup = function () {
@@ -14,19 +14,25 @@ var mappedImageGen = function (p) {
 
 		p.background(200);
 		p.fill(0);
-		var allAreas = map.areas.concat([tempArea]);
+		var allAreas = p.map.areas.concat([tempArea]);
 		allAreas.forEach(area => {
-			if (area.shapeExists())
+			if (area.isValidShape())
 				p.rect(area.coords[0].x, area.coords[0].y, area.coords[1].x, area.coords[1].y);
 		});
 	};
 
 	p.mousePressed = function () {
-		tempArea.initAs("rect", p.mouseX, p.mouseY);
+		if (p.mouseIsHover())
+			tempArea.initAs("rect", p.mouseX, p.mouseY);
 	}
 
 	p.mouseReleased = function () {
-		map.addArea(tempArea);
+		if (tempArea.isValidShape())
+			p.map.addArea(tempArea);
 		tempArea = new Area();
+	}
+
+	p.mouseIsHover = function () {
+		return p.mouseX <= p.width && p.mouseX >= 0 && p.mouseY <= p.height && p.mouseY >= 0;
 	}
 };

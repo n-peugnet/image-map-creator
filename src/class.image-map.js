@@ -1,4 +1,4 @@
-class MappedImage {
+class ImageMap {
 
 	/**
 	 * 

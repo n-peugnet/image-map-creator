@@ -9,16 +9,21 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 	<script src="../src/class.xy.js"></script>
 	<script src="../src/class.area.js"></script>
-	<script src="../src/class.mapped-image.js"></script>
-	<script src="../src/p5.mapped-image.js"></script>
+	<script src="../src/class.image-map.js"></script>
+	<script src="../src/p5.image-map-creator.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
 </head>
 
 <body>
-	<h1>Mapped-images-generator Demo</h1>
+	<h1>Image-map Creator Demo</h1>
 	<div id="div-1"></div>
+	<button onclick="logMap()">Log Map</button>
 	<script type="text/javascript">
-		var mImage = new p5(mappedImageGen, "div-1");
+		var iMap = new p5(imageMapCreator, "div-1");
+
+		function logMap() {
+			console.log(iMap.map);
+		}
 	</script>
 </body>
 
