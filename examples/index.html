@@ -9,20 +9,15 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 	<script src="../src/class.area.js"></script>
 	<script src="../src/class.mapped-image.js"></script>
-	<style>
-		#example-image-1 {
-			border: solid 1px;
-			width: 500px;
-			height: 400px;
-		}
-	</style>
+	<script src="../src/p5.mapped-image.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
 </head>
 
 <body>
 	<h1>Mapped-images-generator Demo</h1>
-	<div id="example-image-1"></div>
+	<div id="div-1"></div>
 	<script type="text/javascript">
-		var mImage = new MappedImage("example-image-1");
+		var mImage = new p5(mappedImageGen, "div-1");
 	</script>
 </body>
 

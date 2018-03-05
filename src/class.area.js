@@ -5,7 +5,7 @@ class Area {
 	 * @param {int[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
 	 */
-	constructor(shape, coords, href) {
+	constructor(shape = "rect", coords = [], href = "") {
 		this.shape = shape;
 		this.coords = coords;
 		this.href = href;
@@ -15,11 +15,11 @@ class Area {
 		this.coords.push([x, y]);
 	}
 
-	set href(url) {
+	sethref(url) {
 		this.href = url;
 	}
 
-	set shape(type) {
+	setshape(type) {
 		this.shape = type;
 	}
 }

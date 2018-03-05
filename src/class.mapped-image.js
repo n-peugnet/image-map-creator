@@ -2,13 +2,12 @@ class MappedImage {
 
 	/**
 	 * 
-	 * @param {string} image 
 	 * @param {Area[]} areas 
+	 * @param {string} image 
 	 */
-	constructor(id, image, areas) {
-		this.id = id;
-		this.image = image;
+	constructor(areas, image) {
 		this.areas = areas;
+		this.image = image;
 		this.tempA = null;
 	}
 
@@ -21,13 +20,7 @@ class MappedImage {
 			this.tempA = new Area("rect", [x, y]);
 		else
 			this.tempA.addCoord(x, y);
-	}
-
-	setEvents() {
-		var html = document.getElementById(this.id);
-		var self = this;
-		html.onmousedow = function (e) {
-			self.drawArea(e.offsetX, e.offsetY)
-		}
+		console.log(x, y);
+		
 	}
 }
