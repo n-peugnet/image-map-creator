@@ -6,7 +6,7 @@ var imageMapCreator = function (p) {
 	var img = null;
 
 	p.setup = function () {
-		var canvas = p.createCanvas(400, 300);
+		var canvas = p.createCanvas(600, 450);
 		canvas.drop(p.handeFile).dragLeave(p.onLeave).dragOver(p.onOver);
 	}
 
@@ -26,6 +26,8 @@ var imageMapCreator = function (p) {
 				p.rect(area.coords[0].x, area.coords[0].y, area.coords[1].x, area.coords[1].y);
 		});
 	}
+
+	//------------------------------ Events -----------------------------------
 
 	p.mousePressed = function () {
 		if (p.mouseIsHover()) {
@@ -47,7 +49,10 @@ var imageMapCreator = function (p) {
 		if (tempArea.isValidShape())
 			p.map.addArea(tempArea);
 		tempArea = new Area();
+		bgLayer.disappear();
 	}
+
+	//---------------------------- Functions ----------------------------------
 
 	p.mouseIsHover = function () {
 		return p.mouseX <= p.width && p.mouseX >= 0 && p.mouseY <= p.height && p.mouseY >= 0;
@@ -70,16 +75,31 @@ var imageMapCreator = function (p) {
 	}
 
 	p.handeFile = function (file) {
-		if (file.type == "image")
+		if (file.type == "image") {
 			img = p.loadImage(file.data);
+			p.map.image = file.name;
+		}
 		bgLayer.disappear();
 	}
-	
+
+	p.clearAreas = function () {
+		p.map.clearAreas();
+	}
+
+	p.addBgArea = function () {
+		var coords = [new XY(0, 0), new XY(p.width - 1, p.height - 1)];
+		var area = new Area("rect", coords);
+		p.map.addArea(area);
+	}
+
+	//---------------------------- P5 Classes ---------------------------------
+
 	/**
-	 * Class representing the layer which is on top of the background
+	 * Class representing the semi transparent layer which can appear on top of the background
+	 * @param {number} speed the speed of the opacity animation (1-255, default 15)
 	 */
-	function BgLayer() {
-		this.speed = 20;
+	function BgLayer(speed = 15) {
+		this.speed = speed;
 		this.alpha = 0;
 		this.over = false;
 	}

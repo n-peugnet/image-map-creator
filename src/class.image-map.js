@@ -13,4 +13,8 @@ class ImageMap {
 	addArea(area) {
 		this.areas.push(area);
 	}
+
+	clearAreas() {
+		this.areas = [];
+	}
 }
