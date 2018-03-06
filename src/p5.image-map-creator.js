@@ -2,17 +2,13 @@ var imageMapCreator = function (p) {
 
 	p.map = new ImageMap();
 	var tempArea = new Area();
-	var bgLayer = new BgLayer(p);
-	var canvas;
+	var bgLayer = new BgLayer();
 	var img = null;
 
 	p.setup = function () {
-		p.createCanvas(400, 300);
-		canvas = p.select('canvas');
-		canvas.drop(p.handeFile);
-		canvas.dragLeave(p.onLeave);
-		canvas.dragOver(p.onOver);
-	};
+		var canvas = p.createCanvas(400, 300);
+		canvas.drop(p.handeFile).dragLeave(p.onLeave).dragOver(p.onOver);
+	}
 
 	p.draw = function () {
 		if (p.mouseIsPressed) {
@@ -29,7 +25,7 @@ var imageMapCreator = function (p) {
 			if (area.isValidShape())
 				p.rect(area.coords[0].x, area.coords[0].y, area.coords[1].x, area.coords[1].y);
 		});
-	};
+	}
 
 	p.mousePressed = function () {
 		if (p.mouseIsHover()) {
@@ -45,29 +41,29 @@ var imageMapCreator = function (p) {
 				return false;
 			}
 		}
-	};
+	}
 
 	p.mouseReleased = function () {
 		if (tempArea.isValidShape())
 			p.map.addArea(tempArea);
 		tempArea = new Area();
-	};
+	}
 
 	p.mouseIsHover = function () {
 		return p.mouseX <= p.width && p.mouseX >= 0 && p.mouseY <= p.height && p.mouseY >= 0;
-	};
+	}
 
 	p.mouseIsHoverArea = function () {
 		var allAreas = p.map.areas.slice();
 		return area = allAreas.reverse().find(area => {
 			return area.isHover(p.mouseX, p.mouseY);
 		});
-	};
+	}
 
 	p.onOver = function (evt) {
 		bgLayer.appear();
 		evt.preventDefault();
-	};
+	}
 
 	p.onLeave = function () {
 		bgLayer.disappear();
@@ -77,36 +73,35 @@ var imageMapCreator = function (p) {
 		if (file.type == "image")
 			img = p.loadImage(file.data);
 		bgLayer.disappear();
-	};
-};
-
-class BgLayer {
-	constructor(p) {
+	}
+	
+	/**
+	 * Class representing the layer which is on top of the background
+	 */
+	function BgLayer() {
+		this.speed = 20;
 		this.alpha = 0;
 		this.over = false;
-		this.p = p;
 	}
 
-	appear() {
+	BgLayer.prototype.appear = function () {
 		this.over = true;
 	}
 
-	disappear() {
+	BgLayer.prototype.disappear = function () {
 		this.over = false;
-		console.log(this.over);
 	}
 
-	display() {
+	BgLayer.prototype.display = function () {
 		if (this.over) {
 			if (this.alpha < 100)
-				this.alpha += 10;
+				this.alpha += this.speed;
 		} else {
 			if (this.alpha > 0)
-				this.alpha -= 10;
+				this.alpha -= this.speed;
 		}
-		this.p.noStroke();
-		this.p.fill(255, 255, 255, this.alpha);
-		this.p.rect(0, 0, this.p.width, this.p.height);
+		p.noStroke();
+		p.fill(255, 255, 255, this.alpha);
+		p.rect(0, 0, p.width, p.height);
 	}
-
 }
