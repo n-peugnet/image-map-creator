@@ -2,13 +2,16 @@ var imageMapCreator = function (p) {
 
 	p.map = new ImageMap();
 	var tempArea = new Area();
+	var bgLayer = new BgLayer(p);
+	var canvas;
 	var img = null;
 
 	p.setup = function () {
-		var canvas = p.createCanvas(400, 300);
-		canvas.dragOver(p.onOver);
+		p.createCanvas(400, 300);
+		canvas = p.select('canvas');
+		canvas.drop(p.handeFile);
 		canvas.dragLeave(p.onLeave);
-		canvas.drop(p.handeFile)
+		canvas.dragOver(p.onOver);
 	};
 
 	p.draw = function () {
@@ -17,6 +20,7 @@ var imageMapCreator = function (p) {
 		}
 
 		p.background(img ? img : 200);
+		bgLayer.display();
 		p.fill(255, 255, 255, 178);
 		p.strokeWeight(1);
 		p.stroke(0);
@@ -60,16 +64,49 @@ var imageMapCreator = function (p) {
 		});
 	};
 
-	p.onOver = function () {
-		console.log('over');
+	p.onOver = function (evt) {
+		bgLayer.appear();
+		evt.preventDefault();
 	};
 
 	p.onLeave = function () {
-		console.log('leave');
-	};
+		bgLayer.disappear();
+	}
 
-	p.handeFile = function(file) {
+	p.handeFile = function (file) {
 		if (file.type == "image")
-		img = p.loadImage(file.data);
+			img = p.loadImage(file.data);
+		bgLayer.disappear();
 	};
 };
+
+class BgLayer {
+	constructor(p) {
+		this.alpha = 0;
+		this.over = false;
+		this.p = p;
+	}
+
+	appear() {
+		this.over = true;
+	}
+
+	disappear() {
+		this.over = false;
+		console.log(this.over);
+	}
+
+	display() {
+		if (this.over) {
+			if (this.alpha < 100)
+				this.alpha += 10;
+		} else {
+			if (this.alpha > 0)
+				this.alpha -= 10;
+		}
+		this.p.noStroke();
+		this.p.fill(255, 255, 255, this.alpha);
+		this.p.rect(0, 0, this.p.width, this.p.height);
+	}
+
+}
