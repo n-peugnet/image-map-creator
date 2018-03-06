@@ -1,6 +1,6 @@
 class Area {
 	/**
-	 * 
+	 * Constructor
 	 * @param {string} shape the type of area
 	 * @param {XY[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
@@ -16,23 +16,11 @@ class Area {
 	}
 
 	updateLastCoord(x, y) {
-		if (this.shape == "rect") {
-			if (this.coords.length == 2) {
-				var fCoord = this.firstCoord();
-				this.coords[1] = new XY(x - fCoord.x, y - fCoord.y);
-			}
-		}
+		this.coords[this.coords.length - 1] = new XY(x, y);
 	}
 
 	isValidShape() {
-		switch (this.shape) {
-			case "rect":
-				return this.coords.length == 2 && !this.coords[1].oneIsEmpty();
-				break;
-		
-			default:
-				return false
-		}
+		return this.coords.length >= 2;
 	}
 
 	sethref(url) {
@@ -43,31 +31,44 @@ class Area {
 		this.shape = type;
 	}
 
-	initAs(shape, x, y) {
-		switch (shape) {
-			case "rect":
-				this.shape = shape;
-				this.addCoord(x, y);
-				this.addCoord(0, 0);
-				break;
-		}
-	}
-
 	firstCoord() {
 		return this.coords[0];
 	}
+}
+
+class AreaRect extends Area {
+	constructor(coords = [], href = "http://") {
+		super("rect");
+		this.coords = coords.slice(0, 2);
+		if (this.coords.length < 2)
+			this.addCoord(0, 0);
+	}
+
+	updateLastCoord(x, y) {
+		if (this.coords.length == 2) {
+			var fCoord = this.firstCoord();
+			this.coords[1] = new XY(x - fCoord.x, y - fCoord.y);
+		}
+	}
+
+	isValidShape() {
+		return this.coords.length == 2 && !this.coords[1].oneIsEmpty();
+	}
 
 	isHover(x, y) {
-		switch (this.shape) {
-			case "rect":
-				var fCoord = this.firstCoord();
-				var lCoord = this.coords[1].add(fCoord);
-				return between(x, fCoord.x, lCoord.x) && between(y, fCoord.y, lCoord.y);
-				break;
-		
-			default:
-				return false
-				break;
-		}
+		var fCoord = this.firstCoord();
+		var lCoord = this.coords[1].add(fCoord);
+		return between(x, fCoord.x, lCoord.x) && between(y, fCoord.y, lCoord.y);
+	}
+}
+
+class AreaCircle extends Area {
+	constructor(coords = [], href = "http://") {
+		super("circle", coords, href);
+	}
+}
+class AreaPoly extends Area {
+	constructor(coords = [], href = "http://") {
+		super("poly", coords, href);
 	}
 }

@@ -1,6 +1,7 @@
 var imageMapCreator = function (p) {
 
 	p.map = new ImageMap();
+	var areaMode = "rect";
 	var tempArea = new Area();
 	var bgLayer = new BgLayer();
 	var img = null;
@@ -32,7 +33,7 @@ var imageMapCreator = function (p) {
 	p.mousePressed = function () {
 		if (p.mouseIsHover()) {
 			if (p.mouseButton == p.LEFT) {
-				tempArea.initAs("rect", p.mouseX, p.mouseY);
+				p.setTempArea(p.mouseX, p.mouseY);
 			} else if (p.mouseButton == p.RIGHT) {
 				var area = p.mouseIsHoverArea();
 				if (area != undefined) {
@@ -82,13 +83,28 @@ var imageMapCreator = function (p) {
 		bgLayer.disappear();
 	}
 
+	p.setTempArea = function (x, y) {
+		var coords = [new XY(x, y)];
+		switch (areaMode) {
+			case "rect":
+				tempArea = new AreaRect(coords);
+				break;
+			case "circle":
+				tempArea = new AreaCircle(coords);
+				break;
+			case "poly":
+				tempArea = new AreaPoly(coords);
+				break;
+		}
+	}
+
 	p.clearAreas = function () {
 		p.map.clearAreas();
 	}
 
 	p.addBgArea = function () {
 		var coords = [new XY(0, 0), new XY(p.width - 1, p.height - 1)];
-		var area = new Area("rect", coords);
+		var area = new AreaRect(coords);
 		p.map.addArea(area);
 	}
 
