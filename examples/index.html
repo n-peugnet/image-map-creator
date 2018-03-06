@@ -7,6 +7,8 @@
 	<title>Mapped-images-generator Demo</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+	<!-- All you need is these JS libraries -->
 	<script src="../src/functions.js"></script>
 	<script src="../src/class.xy.js"></script>
 	<script src="../src/class.area.js"></script>
@@ -14,19 +16,29 @@
 	<script src="../src/p5.image-map-creator.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.js"></script>
+	<!--  End of JS libraries requierments  -->
 
 </head>
 
 <body>
 	<h1>Image-map Creator Demo</h1>
+
+	<!-- A <div> with an id -->
 	<div id="div-1"></div>
+
+	<!-- Optionnal control buttons -->
 	<button onclick="iMap.addBgArea()">Add Background Area</button>
 	<button onclick="iMap.clearAreas()">Clear</button>
 	<button onclick="logMap()">Log Map</button>
 	<button onclick="logP5()">Log P5</button>
-	<script type="text/javascript">
-		var iMap = new p5(imageMapCreator, "div-1");
 
+	<!-- A <script> to enable the tool on the disired div -->
+	<script type="text/javascript">
+		var iMap = new p5(imageMapCreator, "div-1");    // for more details on the instantiation on a p5 sketch see https://p5js.org/examples/instance-mode-instance-container.html
+	</script>
+
+	<!-- Another <script> (optionnal) for the optionnal buttons -->
+	<script type="text/javascript">
 		function logMap() {
 			console.log(iMap.map);
 		}
