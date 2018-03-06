@@ -5,7 +5,7 @@ class Area {
 	 * @param {XY[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
 	 */
-	constructor(shape, coords = [], href = "http://") {
+	constructor(shape, coords = [], href) {
 		this.shape = shape;
 		this.coords = coords;
 		this.href = href;
@@ -37,7 +37,7 @@ class Area {
 }
 
 class AreaRect extends Area {
-	constructor(coords = [], href = "http://") {
+	constructor(coords = [], href) {
 		super("rect");
 		this.coords = coords.slice(0, 2);
 		if (this.coords.length < 2)
@@ -63,12 +63,12 @@ class AreaRect extends Area {
 }
 
 class AreaCircle extends Area {
-	constructor(coords = [], href = "http://") {
+	constructor(coords = [], href) {
 		super("circle", coords, href);
 	}
 }
 class AreaPoly extends Area {
-	constructor(coords = [], href = "http://") {
+	constructor(coords = [], href) {
 		super("poly", coords, href);
 	}
 }

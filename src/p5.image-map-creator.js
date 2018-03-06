@@ -37,8 +37,8 @@ var imageMapCreator = function (p) {
 			} else if (p.mouseButton == p.RIGHT) {
 				var area = p.mouseIsHoverArea();
 				if (area != undefined) {
-					var input = prompt("Entrez l'url vers laquelle devrait pointer cette zone", area.href);
-					if (input)
+					var input = prompt("Entrez l'url vers laquelle devrait pointer cette zone", area.href ? area.href : "http://" );
+					if (input != null)
 						area.href = input;
 				}
 				return false;
@@ -61,7 +61,7 @@ var imageMapCreator = function (p) {
 
 	p.mouseIsHoverArea = function () {
 		var allAreas = p.map.areas.slice();
-		return area = allAreas.reverse().find(area => {
+		return allAreas.reverse().find(area => {
 			return area.isHover(p.mouseX, p.mouseY);
 		});
 	}
@@ -105,7 +105,7 @@ var imageMapCreator = function (p) {
 	p.addBgArea = function () {
 		var coords = [new XY(0, 0), new XY(p.width - 1, p.height - 1)];
 		var area = new AreaRect(coords);
-		p.map.addArea(area);
+		p.map.unshiftArea(area);
 	}
 
 	//---------------------------- P5 Classes ---------------------------------
