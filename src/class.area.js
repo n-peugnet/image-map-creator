@@ -20,7 +20,7 @@ class Area {
 	}
 
 	isValidShape() {
-		return this.coords.length >= 2;
+		return this.coords.length >= 1;
 	}
 
 	sethref(url) {
@@ -37,6 +37,11 @@ class Area {
 }
 
 class AreaRect extends Area {
+	/**
+	 * Constructor
+	 * @param {XY[]} coords the list of coordinates
+	 * @param {string} href the link this area is going to point to
+	 */
 	constructor(coords = [], href) {
 		super("rect");
 		this.coords = coords.slice(0, 2);
@@ -57,17 +62,35 @@ class AreaRect extends Area {
 
 	isHover(x, y) {
 		var fCoord = this.firstCoord();
-		var lCoord = this.coords[1].add(fCoord);
+		var lCoord = this.coords[1].sum(fCoord);
 		return between(x, fCoord.x, lCoord.x) && between(y, fCoord.y, lCoord.y);
 	}
 }
 
 class AreaCircle extends Area {
-	constructor(coords = [], href) {
+	/**
+	 * Constructor
+	 * @param {XY[]} coords the list of coordinates
+	 * @param {number} radius radius of the circle
+	 * @param {string} href the link this area is going to point to
+	 */
+	constructor(coords = [], radius = 0, href) {
 		super("circle", coords, href);
+		this.radius = radius;
+		this.getCenter = this.firstCoord;
+	}
+
+	updateLastCoord(x, y) {
+		var center = this.getCenter();
+		this.radius = XY.dist(center, new XY(x , y));
 	}
 }
 class AreaPoly extends Area {
+	/**
+	 * Constructor
+	 * @param {XY[]} coords the list of coordinates
+	 * @param {string} href the link this area is going to point to
+	 */
 	constructor(coords = [], href) {
 		super("poly", coords, href);
 	}

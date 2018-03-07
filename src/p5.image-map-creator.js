@@ -1,9 +1,9 @@
 var imageMapCreator = function (p) {
 
-	p.map = new ImageMap();
 	var areaMode = "rect";
 	var tempArea = new Area();
 	var bgLayer = new BgLayer();
+	var map = new ImageMap();
 	var img = null;
 
 	p.setup = function () {
@@ -21,7 +21,7 @@ var imageMapCreator = function (p) {
 		p.fill(255, 255, 255, 178);
 		p.strokeWeight(1);
 		p.stroke(0);
-		var allAreas = p.map.areas.concat([tempArea]);
+		var allAreas = map.areas.concat([tempArea]);
 		allAreas.forEach(area => {
 			if (area.isValidShape())
 				p.rect(area.coords[0].x, area.coords[0].y, area.coords[1].x, area.coords[1].y);
@@ -48,7 +48,7 @@ var imageMapCreator = function (p) {
 
 	p.mouseReleased = function () {
 		if (tempArea.isValidShape())
-			p.map.addArea(tempArea);
+			map.addArea(tempArea);
 		tempArea = new Area();
 		bgLayer.disappear();
 	}
@@ -60,7 +60,7 @@ var imageMapCreator = function (p) {
 	}
 
 	p.mouseIsHoverArea = function () {
-		var allAreas = p.map.areas.slice();
+		var allAreas = map.areas.slice();
 		return allAreas.reverse().find(area => {
 			return area.isHover(p.mouseX, p.mouseY);
 		});
@@ -78,7 +78,7 @@ var imageMapCreator = function (p) {
 	p.handeFile = function (file) {
 		if (file.type == "image") {
 			img = p.loadImage(file.data);
-			p.map.image = file.name;
+			map.image = file.name;
 		}
 		bgLayer.disappear();
 	}
@@ -98,14 +98,18 @@ var imageMapCreator = function (p) {
 		}
 	}
 
+	p.getMap = function () {
+		return map;
+	}
+
 	p.clearAreas = function () {
-		p.map.clearAreas();
+		map.clearAreas();
 	}
 
 	p.addBgArea = function () {
 		var coords = [new XY(0, 0), new XY(p.width - 1, p.height - 1)];
 		var area = new AreaRect(coords);
-		p.map.unshiftArea(area);
+		map.unshiftArea(area);
 	}
 
 	//---------------------------- P5 Classes ---------------------------------
