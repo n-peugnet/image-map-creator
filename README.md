@@ -1,21 +1,23 @@
 # Image Map Creator
-## Features
 
 This is a simple map creator tool made with the p5.js library. I want it
 to be easy to use for both the end user and the developper.
 
-### What you can do
+![demo gif](images/image-map-creator.gif)
 
-- [x] drag&drop a picture on the canvas
-- [x] draw rectangle areas
-- [x] set the desired url of an area
+## Features
 
-### What you will be able to do (maybe)
-
-- [ ] draw circular areas
-- [ ] draw polygon areas
-- [ ] show a area-menu by right clicking on an area
-- [ ] export the result as a usable html map
+-   [x] drag&drop a picture on the canvas
+-   [x] draw rectangle areas
+-   [x] set the desired url of an area
+-   [ ] draw circular areas
+-   [ ] draw polygon areas
+-   [ ] show an area-menu by right clicking on an area with these options:
+    -   [ ] set url
+	-   [ ] delete
+	-   [ ] move forward
+	-   [ ] move backwards
+-   [ ] export the result as a usable html map
 
 ## How to Integrate it
 
