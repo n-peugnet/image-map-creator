@@ -8,6 +8,8 @@ class ImageMap {
 	constructor(areas = [], image) {
 		this.areas = areas;
 		this.image = image;
+		this.lastId = 0;
+		this.undoManager = new UndoManager();
 	}
 
 	/**
@@ -24,6 +26,27 @@ class ImageMap {
 	 */
 	addArea(area) {
 		return this.areas.push(area);
+	}
+
+	rmvArea(id) {
+		var index = this.areas.findIndex(a => { return a.id == id; });
+		this.areas.splice(index);
+	}
+
+	createArea(area) {
+		this.lastId++;
+		var id = this.lastId;
+		area.id = id;
+		this.addArea(area);
+		var self = this;
+		this.undoManager.add({
+			undo: function () {
+				self.rmvArea(id);
+			},
+			redo: function () {
+				self.addArea(area);
+			}
+		})
 	}
 
 	/** Removes avery areas from the areas array */

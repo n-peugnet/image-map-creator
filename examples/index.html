@@ -14,6 +14,7 @@
 	<script src="../src/class.area.js"></script>
 	<script src="../src/class.image-map.js"></script>
 	<script src="../src/p5.image-map-creator.js"></script>
+	<script src="https://cdn.rawgit.com/ArthurClemens/Javascript-Undo-Manager/a5bb2d29/lib/undomanager.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.js"></script>
 	<!--  End of JS libraries requierments  -->
@@ -29,6 +30,8 @@
 	<!-- Optionnal control buttons -->
 	<button onclick="iMap.addDefaultArea()">Add Default Area</button>
 	<button onclick="iMap.clearAreas()">Clear</button>
+	<button onclick="undo()">Undo</button>
+	<button onclick="redo()">Redo</button>
 	<button onclick="logMap()">Log Map</button>
 	<button onclick="logP5()">Log P5</button>
 
@@ -39,6 +42,13 @@
 
 	<!-- Another <script> (optionnal) for the optionnal buttons -->
 	<script type="text/javascript">
+		function undo() {
+			iMap.getMap().undoManager.undo();
+		}
+		function redo() {
+			iMap.getMap().undoManager.redo();
+		}
+
 		function logMap() {
 			console.log(iMap.getMap());
 		}

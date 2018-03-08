@@ -1,6 +1,7 @@
 var imageMapCreator = function (p) {
 
-	var areaMode = "rect";
+	var mouseMode = "draw";
+	var shapeMode = "rect";
 	var tempArea = new Area();
 	var bgLayer = new BgLayer();
 	var map = new ImageMap();
@@ -15,6 +16,7 @@ var imageMapCreator = function (p) {
 		if (p.mouseIsPressed) {
 			tempArea.updateLastCoord(p.mouseX, p.mouseY)
 		}
+		p.setCursor();
 
 		p.background(img ? img : 200);
 		bgLayer.display();
@@ -49,19 +51,19 @@ var imageMapCreator = function (p) {
 	p.mouseDragged = function () {
 		var fCoord = tempArea.firstCoord();
 		if (fCoord) {
-			var preVAreaMode = areaMode
+			var preVAreaMode = shapeMode;
 			if (p.mouseIsDraggedLeft())
-				areaMode = "circle";
+				shapeMode = "circle";
 			else
-				areaMode = "rect";
-			if (preVAreaMode != areaMode)
+				shapeMode = "rect";
+			if (preVAreaMode != shapeMode)
 				p.setTempArea(fCoord.x, fCoord.y);
 		}
 	}
 
 	p.mouseReleased = function () {
 		if (tempArea.isValidShape())
-			map.addArea(tempArea);
+			map.createArea(tempArea);
 		tempArea = new Area();
 		bgLayer.disappear();
 	}
@@ -101,9 +103,20 @@ var imageMapCreator = function (p) {
 		bgLayer.disappear();
 	}
 
+	p.setCursor = function () {
+		switch (mouseMode) {
+			case "draw":
+				p.cursor(p.CROSS);
+				break;
+			default:
+				p.cursor(p.ARROW);
+				break;
+		}
+	}
+
 	p.setTempArea = function (x, y) {
 		var coords = [new XY(x, y)];
-		switch (areaMode) {
+		switch (shapeMode) {
 			case "rect":
 				tempArea = new AreaRect(coords);
 				break;

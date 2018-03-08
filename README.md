@@ -15,9 +15,8 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 -   [x] draw rectangular areas
 -   [x] draw circular areas (by dragging left)
 -   [ ] draw polygon areas
--   [x] set the desired url for an area
 -   [ ] show a menu by right-clicking on an area with these options :
-	-   [ ] set url
+	-   [x] set url
 	-   [ ] delete
 	-   [ ] move forward
 	-   [ ] move backwards
@@ -34,9 +33,11 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 -   [ ] differents drawing modes for circles :
 	-   [ ] draw from edges
 	-   [x] draw from center
--   [ ] gui with these options :
+-   [ ] gui with these features :
 	-   [ ] select mouse mode
 	-   [ ] select shape mode
+	-   [x] undo
+	-   [x] redo
 	-   [ ] export the result as a usable html map
 	-   [ ] export the result as a usable svg map
 

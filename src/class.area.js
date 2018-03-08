@@ -8,6 +8,7 @@ class Area {
 		this.shape = shape;
 		this.coords = coords;
 		this.href = href;
+		this.id = 0;
 	}
 
 	/**
