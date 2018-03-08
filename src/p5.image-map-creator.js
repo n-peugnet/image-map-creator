@@ -1,7 +1,8 @@
 var imageMapCreator = function (p) {
 
-	var mouseMode = "draw";
-	var shapeMode = "rect";
+	var tool = "rectangle";
+	var drawingTools = ["rectangle", "circle", "polygon"];
+	var settings;
 	var tempArea = new Area();
 	var bgLayer = new BgLayer();
 	var map = new ImageMap();
@@ -10,6 +11,13 @@ var imageMapCreator = function (p) {
 	p.setup = function () {
 		var canvas = p.createCanvas(600, 450);
 		canvas.drop(p.handeFile).dragLeave(p.onLeave).dragOver(p.onOver);
+		settings = QuickSettings.create(p.width + 5, 0, "Image-map Creator", p.canvas.parentElement)
+			.addText("Map Name", "", v => { map.setName(v) })
+			.addDropDown("Tool", ["rectangle", "circle", "inspect"], v => { tool = v.value })
+			.addButton("Undo", map.undoManager.undo)
+			.addButton("Redo", map.undoManager.redo)
+			.addButton("Generate Html", function () { settings.setValue("Html Output", map.toHtml()) })
+			.addTextArea("Html Output");
 	}
 
 	p.draw = function () {
@@ -48,18 +56,7 @@ var imageMapCreator = function (p) {
 		}
 	}
 
-	p.mouseDragged = function () {
-		var fCoord = tempArea.firstCoord();
-		if (fCoord) {
-			var preVAreaMode = shapeMode;
-			if (p.mouseIsDraggedLeft())
-				shapeMode = "circle";
-			else
-				shapeMode = "rect";
-			if (preVAreaMode != shapeMode)
-				p.setTempArea(fCoord.x, fCoord.y);
-		}
-	}
+	p.mouseDragged = function () { }
 
 	p.mouseReleased = function () {
 		if (tempArea.isValidShape())
@@ -81,10 +78,10 @@ var imageMapCreator = function (p) {
 		});
 	}
 
-	p.mouseIsDraggedLeft = function () {
-		var fCoord = tempArea.firstCoord();
-		return fCoord.x > p.mouseX;
-	}
+	// p.mouseIsDraggedLeft = function () {
+	// 	var fCoord = tempArea.firstCoord();
+	// 	return fCoord.x > p.mouseX;
+	// }
 
 	p.onOver = function (evt) {
 		bgLayer.appear();
@@ -98,32 +95,38 @@ var imageMapCreator = function (p) {
 	p.handeFile = function (file) {
 		if (file.type == "image") {
 			img = p.loadImage(file.data);
-			map.image = file.name;
+			if (!map.name) {
+				map.setName(file.name);
+				settings.setValue("Map Name", map.name);
+			}
 		}
 		bgLayer.disappear();
 	}
 
 	p.setCursor = function () {
-		switch (mouseMode) {
-			case "draw":
-				p.cursor(p.CROSS);
+		switch (tool) {
+			case "inspect":
+				if (p.mouseIsHoverArea())
+					p.cursor(p.HAND)
+				else
+					p.cursor(p.ARROW);
 				break;
 			default:
-				p.cursor(p.ARROW);
+				p.cursor(p.CROSS);
 				break;
 		}
 	}
 
 	p.setTempArea = function (x, y) {
 		var coords = [new XY(x, y)];
-		switch (shapeMode) {
-			case "rect":
+		switch (tool) {
+			case "rectangle":
 				tempArea = new AreaRect(coords);
 				break;
 			case "circle":
 				tempArea = new AreaCircle(coords);
 				break;
-			case "poly":
+			case "polygon":
 				tempArea = new AreaPoly(coords);
 				break;
 		}

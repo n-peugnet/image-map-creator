@@ -35,6 +35,16 @@ class Area {
 	firstCoord() {
 		return this.coords[0];
 	}
+
+	strCoords(dec) {
+		return this.coords.map(c => {
+			return c.toString(dec);
+		}).join(',');
+	}
+
+	toHtml() {
+		return '<area shape="' + this.shape + '" coords="' + this.strCoords(0) + '" href="' + this.href + '"/>';
+	}
 }
 
 class AreaRect extends Area {
@@ -100,6 +110,10 @@ class AreaCircle extends Area {
 	display(p5) {
 		p5.ellipse(this.getCenter().x, this.getCenter().y, this.radius*2);
 	}
+
+	strCoords(dec) {
+		return this.getCenter().toString(dec) + "," + round(this.radius, dec);
+	}
 }
 class AreaPoly extends Area {
 	/**
@@ -118,6 +132,7 @@ class AreaDefault extends Area {
 	 */
 	constructor(href) {
 		super("default", [], href);
+		this.isDefault = true;
 	}
 
 	isValidShape() {

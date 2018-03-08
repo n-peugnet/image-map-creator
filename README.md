@@ -12,19 +12,18 @@ Here is the list of all the features of this app :
 _The checked ones are implemented, the others are the ones I plan to add in the future_
 
 -   [x] drag&drop a picture on the canvas
--   [x] draw rectangular areas
--   [x] draw circular areas (by dragging left)
--   [ ] draw polygon areas
 -   [ ] show a menu by right-clicking on an area with these options :
 	-   [x] set url
 	-   [ ] delete
 	-   [ ] move forward
 	-   [ ] move backwards
--   [ ] differents mouse modes :
-	-   [x] draw mode
-	-   [ ] move mode
-	-   [ ] select mode
+-   [x] differents tools :
+	-   [x] draw rectangular areas
+	-   [x] draw circular areas (by dragging left)
+	-   [ ] draw polygon areas
+	-   [ ] move mode 
 	-   [ ] inspect mode
+	-   [ ] select mode
 	-   [ ] resize mode ?
 	-   [ ] erase mode ?
 -   [ ] differents drawing modes for rectangles :
@@ -35,8 +34,7 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 	-   [ ] draw from edges
 	-   [x] draw from center
 -   [ ] gui with these features :
-	-   [ ] select mouse mode
-	-   [ ] select shape mode
+	-   [ ] select tool mode
 	-   [x] undo
 	-   [x] redo
 	-   [ ] export the result as a usable html map

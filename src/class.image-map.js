@@ -3,13 +3,17 @@ class ImageMap {
 	/**
 	 * Contructor
 	 * @param {Area[]} areas 
-	 * @param {string} image 
+	 * @param {string} name 
 	 */
-	constructor(areas = [], image) {
+	constructor(areas = [], name) {
 		this.areas = areas;
-		this.image = image;
+		this.name = name;
 		this.lastId = 0;
 		this.undoManager = new UndoManager();
+	}
+
+	setName(name) {
+		this.name = name.replace(/\s+/g, "");
 	}
 
 	/**
@@ -71,6 +75,15 @@ class ImageMap {
 				self.unshiftArea(area);
 			}
 		})
+	}
+
+	toHtml() {
+		var areas = [];
+		this.areas.forEach(a => {
+			if (a.isValidShape())
+				areas.push('\t' + a.toHtml());
+		});
+		return '<map name="' + this.name + '" id="map-id">\n' + areas.reverse().join('\n') + '\n</map>';
 	}
 
 	/** Removes avery areas from the areas array */

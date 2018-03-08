@@ -32,4 +32,8 @@ class XY {
 		return new XY(this.x + xy.x, this.y + xy.y);
 	}
 
+	toString(dec) {
+		return round(this.x, dec) + "," + round(this.y, dec);
+	}
+
 }
