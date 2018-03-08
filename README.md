@@ -24,6 +24,7 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 	-   [x] draw mode
 	-   [ ] move mode
 	-   [ ] select mode
+	-   [ ] inspect mode
 	-   [ ] resize mode ?
 	-   [ ] erase mode ?
 -   [ ] differents drawing modes for rectangles :

@@ -137,11 +137,6 @@ var imageMapCreator = function (p) {
 		map.clearAreas();
 	}
 
-	p.addDefaultArea = function () {
-		var area = new AreaDefault();
-		map.unshiftArea(area);
-	}
-
 	//---------------------------- P5 Classes ---------------------------------
 
 	/**

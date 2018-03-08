@@ -28,10 +28,10 @@
 	<div id="div-1"></div>
 
 	<!-- Optionnal control buttons -->
-	<button onclick="iMap.addDefaultArea()">Add Default Area</button>
+	<button onclick="iMap.getMap().addDefaultArea()">Add Default Area</button>
 	<button onclick="iMap.clearAreas()">Clear</button>
-	<button onclick="undo()">Undo</button>
-	<button onclick="redo()">Redo</button>
+	<button onclick="iMap.getMap().undoManager.undo()">Undo</button>
+	<button onclick="iMap.getMap().undoManager.redo()">Redo</button>
 	<button onclick="logMap()">Log Map</button>
 	<button onclick="logP5()">Log P5</button>
 
@@ -42,13 +42,6 @@
 
 	<!-- Another <script> (optionnal) for the optionnal buttons -->
 	<script type="text/javascript">
-		function undo() {
-			iMap.getMap().undoManager.undo();
-		}
-		function redo() {
-			iMap.getMap().undoManager.redo();
-		}
-
 		function logMap() {
 			console.log(iMap.getMap());
 		}

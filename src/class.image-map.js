@@ -29,22 +29,46 @@ class ImageMap {
 	}
 
 	rmvArea(id) {
-		var index = this.areas.findIndex(a => { return a.id == id; });
-		this.areas.splice(index);
+		var index = this.areaIndex(id);
+		this.areas.splice(index, 1);
+	}
+
+	areaIndex(id) {
+		return this.areas.findIndex(a => {
+			return a.id == id;
+		});
+	}
+
+	getNewId() {
+		this.lastId++;
+		return this.lastId;
 	}
 
 	createArea(area) {
-		this.lastId++;
-		var id = this.lastId;
-		area.id = id;
+		area.id = this.getNewId();
 		this.addArea(area);
 		var self = this;
 		this.undoManager.add({
 			undo: function () {
-				self.rmvArea(id);
+				self.rmvArea(area.id);
 			},
 			redo: function () {
 				self.addArea(area);
+			}
+		})
+	}
+	
+	addDefaultArea() {
+		var area = new AreaDefault();
+		area.id = this.getNewId();
+		this.unshiftArea(area);
+		var self = this;
+		this.undoManager.add({
+			undo: function () {
+				self.rmvArea(area.id);
+			},
+			redo: function () {
+				self.unshiftArea(area);
 			}
 		})
 	}
