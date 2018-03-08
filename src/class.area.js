@@ -1,6 +1,5 @@
 class Area {
 	/**
-	 * Constructor
 	 * @param {string} shape the type of area
 	 * @param {XY[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
@@ -11,8 +10,13 @@ class Area {
 		this.href = href;
 	}
 
+	/**
+	 * Adds a coordinate to the coords array, and returns it's new length
+	 * @param {number} x the x val of the coordinate
+	 * @param {number} y the y val of the coordinate
+	 */
 	addCoord(x, y) {
-		this.coords.push(new XY(x, y));
+		return this.coords.push(new XY(x, y));
 	}
 
 	updateLastCoord(x, y) {
@@ -27,10 +31,6 @@ class Area {
 		this.href = url;
 	}
 
-	setshape(type) {
-		this.shape = type;
-	}
-
 	firstCoord() {
 		return this.coords[0];
 	}
@@ -38,7 +38,6 @@ class Area {
 
 class AreaRect extends Area {
 	/**
-	 * Constructor
 	 * @param {XY[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
 	 */
@@ -73,7 +72,6 @@ class AreaRect extends Area {
 
 class AreaCircle extends Area {
 	/**
-	 * Constructor
 	 * @param {XY[]} coords the list of coordinates
 	 * @param {number} radius radius of the circle
 	 * @param {string} href the link this area is going to point to
@@ -104,7 +102,6 @@ class AreaCircle extends Area {
 }
 class AreaPoly extends Area {
 	/**
-	 * Constructor
 	 * @param {XY[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
 	 */

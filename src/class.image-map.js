@@ -10,14 +10,23 @@ class ImageMap {
 		this.image = image;
 	}
 
+	/**
+	 * Adds an Area at the begining of the areas array, and returns it's new length
+	 * @param {Area} area an area
+	 */
 	unshiftArea(area) {
-		this.areas.unshift(area);
+		return this.areas.unshift(area);
 	}
 
+	/**
+	 * Adds an Area at the end of the areas array, and returns it's new length
+	 * @param {Area} area an area
+	 */
 	addArea(area) {
-		this.areas.push(area);
+		return this.areas.push(area);
 	}
 
+	/** Removes avery areas from the areas array */
 	clearAreas() {
 		this.areas = [];
 	}

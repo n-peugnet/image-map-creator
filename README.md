@@ -7,17 +7,38 @@ to be easy to use for both the end user and the developper.
 
 ## Features
 
+Here is the list of all the features of this app :
+
+_The checked ones are implemented, the others are the ones I plan to add in the future_
+
 -   [x] drag&drop a picture on the canvas
--   [x] draw rectangle areas
--   [x] set the desired url of an area
--   [ ] draw circular areas
+-   [x] draw rectangular areas
+-   [x] draw circular areas (by dragging left)
 -   [ ] draw polygon areas
--   [ ] show an area-menu by right clicking on an area with these options:
-    -   [ ] set url
+-   [x] set the desired url for an area
+-   [ ] show a menu by right-clicking on an area with these options :
+	-   [ ] set url
 	-   [ ] delete
 	-   [ ] move forward
 	-   [ ] move backwards
--   [ ] export the result as a usable html map
+-   [ ] differents mouse modes :
+	-   [x] draw mode
+	-   [ ] move mode
+	-   [ ] select mode
+	-   [ ] resize mode ?
+	-   [ ] erase mode ?
+-   [ ] differents drawing modes for rectangles :
+	-   [x] dram from edges
+	-   [ ] draw from center (with `alt`)
+	-   [ ] draw square (with `shift`)
+-   [ ] differents drawing modes for circles :
+	-   [ ] draw from edges
+	-   [x] draw from center
+-   [ ] gui with these options :
+	-   [ ] select mouse mode
+	-   [ ] select shape mode
+	-   [ ] export the result as a usable html map
+	-   [ ] export the result as a usable svg map
 
 ## How to Integrate it
 

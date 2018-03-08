@@ -37,12 +37,25 @@ var imageMapCreator = function (p) {
 			} else if (p.mouseButton == p.RIGHT) {
 				var area = p.mouseIsHoverArea();
 				if (area != undefined) {
-					var input = prompt("Entrez l'url vers laquelle devrait pointer cette zone", area.href ? area.href : "http://" );
+					var input = prompt("Entrez l'url vers laquelle devrait pointer cette zone", area.href ? area.href : "http://");
 					if (input != null)
 						area.href = input;
 				}
 				return false;
 			}
+		}
+	}
+
+	p.mouseDragged = function () {
+		var fCoord = tempArea.firstCoord();
+		if (fCoord) {
+			var preVAreaMode = areaMode
+			if (p.mouseIsDraggedLeft())
+				areaMode = "circle";
+			else
+				areaMode = "rect";
+			if (preVAreaMode != areaMode)
+				p.setTempArea(fCoord.x, fCoord.y);
 		}
 	}
 
@@ -64,6 +77,11 @@ var imageMapCreator = function (p) {
 		return allAreas.reverse().find(area => {
 			return area.isHover(p.mouseX, p.mouseY);
 		});
+	}
+
+	p.mouseIsDraggedLeft = function () {
+		var fCoord = tempArea.firstCoord();
+		return fCoord.x > p.mouseX;
 	}
 
 	p.onOver = function (evt) {
