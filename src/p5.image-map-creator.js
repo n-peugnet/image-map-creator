@@ -24,7 +24,7 @@ var imageMapCreator = function (p) {
 		var allAreas = map.areas.concat([tempArea]);
 		allAreas.forEach(area => {
 			if (area.isValidShape())
-				p.rect(area.coords[0].x, area.coords[0].y, area.coords[1].x, area.coords[1].y);
+				area.display(p);
 		});
 	}
 
@@ -106,9 +106,8 @@ var imageMapCreator = function (p) {
 		map.clearAreas();
 	}
 
-	p.addBgArea = function () {
-		var coords = [new XY(0, 0), new XY(p.width - 1, p.height - 1)];
-		var area = new AreaRect(coords);
+	p.addDefaultArea = function () {
+		var area = new AreaDefault();
 		map.unshiftArea(area);
 	}
 
