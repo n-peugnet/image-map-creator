@@ -12,12 +12,13 @@ var imageMapCreator = function (p) {
 		var canvas = p.createCanvas(600, 450);
 		canvas.drop(p.handeFile).dragLeave(p.onLeave).dragOver(p.onOver);
 		settings = QuickSettings.create(p.width + 5, 0, "Image-map Creator", p.canvas.parentElement)
+			.setDraggable(false)
 			.addText("Map Name", "", v => { map.setName(v) })
 			.addDropDown("Tool", ["rectangle", "circle", "inspect"], v => { tool = v.value })
 			.addButton("Undo", map.undoManager.undo)
 			.addButton("Redo", map.undoManager.redo)
-			.addButton("Generate Html", function () { settings.setValue("Html Output", map.toHtml()) })
-			.addTextArea("Html Output");
+			.addButton("Generate Html", function () { settings.setValue("Output", map.toHtml()) })
+			.addTextArea("Output");
 	}
 
 	p.draw = function () {
@@ -25,14 +26,12 @@ var imageMapCreator = function (p) {
 			tempArea.updateLastCoord(p.mouseX, p.mouseY)
 		}
 		p.setCursor();
-
 		p.background(img ? img : 200);
 		bgLayer.display();
-		p.fill(255, 255, 255, 178);
-		p.strokeWeight(1);
-		p.stroke(0);
+		
 		var allAreas = map.areas.concat([tempArea]);
 		allAreas.forEach(area => {
+			p.setAreaStyle(area);
 			if (area.isValidShape())
 				area.display(p);
 		});
@@ -115,6 +114,15 @@ var imageMapCreator = function (p) {
 				p.cursor(p.CROSS);
 				break;
 		}
+	}
+
+	p.setAreaStyle = function (area) {
+		var color = p.color(255, 255, 255, 178);
+		if (tool == "inspect" && area == p.mouseIsHoverArea())
+			color = p.color(255, 200, 200, 178);
+		p.fill(color);
+		p.strokeWeight(1);
+		p.stroke(0);
 	}
 
 	p.setTempArea = function (x, y) {
