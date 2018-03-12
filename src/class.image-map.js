@@ -4,16 +4,29 @@ class ImageMap {
 	 * Contructor
 	 * @param {Area[]} areas 
 	 * @param {string} name 
+	* @param {boolean} hasDefaultArea
 	 */
-	constructor(areas = [], name) {
+	constructor(areas = [], name, hasDefaultArea = false) {
 		this.areas = areas;
+		this.dArea = new AreaDefault();
 		this.name = name;
+		this.hasDefaultArea = hasDefaultArea;
 		this.lastId = 0;
 		this.undoManager = new UndoManager();
 	}
 
 	setName(name) {
 		this.name = name.replace(/\s+/g, "");
+	}
+
+	setDefaultArea(bool) {
+		this.hasDefaultArea = bool;
+	}
+
+	getAreas() {
+		var areas = this.areas.slice();
+		if (this.hasDefaultArea) areas.unshift(this.dArea);
+		return areas;
 	}
 
 	/**
@@ -61,7 +74,7 @@ class ImageMap {
 			}
 		})
 	}
-	
+
 	addDefaultArea() {
 		var area = new AreaDefault();
 		area.id = this.getNewId();

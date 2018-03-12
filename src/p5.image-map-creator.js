@@ -15,6 +15,7 @@ var imageMapCreator = function (p) {
 			.setDraggable(false)
 			.addText("Map Name", "", v => { map.setName(v) })
 			.addDropDown("Tool", ["rectangle", "circle", "inspect"], v => { tool = v.value })
+			.addBoolean("Default Area", map.defaultArea, v => { map.setDefaultArea(v)})
 			.addButton("Undo", map.undoManager.undo)
 			.addButton("Redo", map.undoManager.redo)
 			.addButton("Generate Html", function () { settings.setValue("Output", map.toHtml()) })
@@ -28,13 +29,7 @@ var imageMapCreator = function (p) {
 		p.setCursor();
 		p.background(img ? img : 200);
 		bgLayer.display();
-		
-		var allAreas = map.areas.concat([tempArea]);
-		allAreas.forEach(area => {
-			p.setAreaStyle(area);
-			if (area.isValidShape())
-				area.display(p);
-		});
+		p.drawAreas();
 	}
 
 	//------------------------------ Events -----------------------------------
@@ -71,7 +66,7 @@ var imageMapCreator = function (p) {
 	}
 
 	p.mouseIsHoverArea = function () {
-		var allAreas = map.areas.slice();
+		var allAreas = map.getAreas();
 		return allAreas.reverse().find(area => {
 			return area.isHover(p.mouseX, p.mouseY);
 		});
@@ -102,6 +97,15 @@ var imageMapCreator = function (p) {
 		bgLayer.disappear();
 	}
 
+	p.drawAreas = function () {
+		var allAreas = map.getAreas().concat([tempArea]);
+		allAreas.forEach(area => {
+			p.setAreaStyle(area);
+			if (area.isValidShape())
+				area.display(p);
+		});
+	}
+
 	p.setCursor = function () {
 		switch (tool) {
 			case "inspect":
@@ -118,7 +122,7 @@ var imageMapCreator = function (p) {
 
 	p.setAreaStyle = function (area) {
 		var color = p.color(255, 255, 255, 178);
-		if (tool == "inspect" && area == p.mouseIsHoverArea())
+		if (tool == "inspect" && area == p.mouseIsHoverArea() && p.mouseIsHover())
 			color = p.color(255, 200, 200, 178);
 		p.fill(color);
 		p.strokeWeight(1);

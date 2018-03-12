@@ -22,7 +22,7 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 	-   [x] draw circular areas (by dragging left)
 	-   [ ] draw polygon areas
 	-   [ ] move mode 
-	-   [ ] inspect mode
+	-   [x] inspect mode
 	-   [ ] select mode
 	-   [ ] resize mode ?
 	-   [ ] erase mode ?
@@ -33,8 +33,8 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 -   [ ] differents drawing modes for circles :
 	-   [ ] draw from edges
 	-   [x] draw from center
--   [ ] gui with these features :
-	-   [ ] select tool mode
+-   [x] gui with these features :
+	-   [x] select tool mode
 	-   [x] undo
 	-   [x] redo
 	-   [ ] export the result as a usable html map
