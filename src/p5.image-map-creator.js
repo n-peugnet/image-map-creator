@@ -6,6 +6,7 @@ var imageMapCreator = function (p) {
 	var tempArea = new Area();
 	var bgLayer = new BgLayer();
 	var map = new ImageMap();
+	var undoManager = new UndoManager();
 	var img = null;
 
 	p.setup = function () {
@@ -15,9 +16,10 @@ var imageMapCreator = function (p) {
 			.setDraggable(false)
 			.addText("Map Name", "", v => { map.setName(v) })
 			.addDropDown("Tool", ["rectangle", "circle", "inspect"], v => { tool = v.value })
-			.addBoolean("Default Area", map.defaultArea, v => { map.setDefaultArea(v)})
-			.addButton("Undo", map.undoManager.undo)
-			.addButton("Redo", map.undoManager.redo)
+			.addBoolean("Default Area", map.hasDefaultArea, v => { p.setDefaultArea(v) })
+			.addButton("Undo", undoManager.undo)
+			.addButton("Redo", undoManager.redo)
+			.addButton("Clear", p.clearAreas)
 			.addButton("Generate Html", function () { settings.setValue("Output", map.toHtml()) })
 			.addTextArea("Output");
 	}
@@ -54,7 +56,7 @@ var imageMapCreator = function (p) {
 
 	p.mouseReleased = function () {
 		if (tempArea.isValidShape())
-			map.createArea(tempArea);
+			p.createArea(tempArea);
 		tempArea = new Area();
 		bgLayer.disappear();
 	}
@@ -148,8 +150,43 @@ var imageMapCreator = function (p) {
 		return map;
 	}
 
+	p.createArea = function (area) {
+		map.addArea(area);
+		undoManager.add({
+			undo: function () {
+				area = map.popArea();
+			},
+			redo: function () {
+				map.addArea(area, false);
+			}
+		})
+	}
+
+	p.setDefaultArea = function (bool) {
+		map.setDefaultArea(bool);
+		undoManager.add({
+			undo: function () {
+				map.setDefaultArea(!bool);
+				settings.setValue("Default Area", !bool)
+			},
+			redo: function () {
+				map.setDefaultArea(bool);
+				settings.setValue("Default Area", bool)
+			}
+		})
+	}
+
 	p.clearAreas = function () {
+		let areas = map.getAreas(false);
 		map.clearAreas();
+		undoManager.add({
+			undo: function () {
+				map.setAreas(areas);
+			},
+			redo: function () {
+				map.clearAreas();
+			}
+		})
 	}
 
 	//---------------------------- P5 Classes ---------------------------------
