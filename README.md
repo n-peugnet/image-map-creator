@@ -37,7 +37,7 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 	-   [x] select tool mode
 	-   [x] undo
 	-   [x] redo
-	-   [ ] export the result as a usable html map
+	-   [x] export the result as a valid html map
 	-   [ ] export the result as a usable svg map
 
 ## How to Integrate it

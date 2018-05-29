@@ -77,7 +77,16 @@ class ImageMap {
 			if (a.isValidShape())
 				areas.push('\t' + a.toHtml(this.scale));
 		});
-		return '<map name="' + this.name + '" id="map-id">\n' + areas.reverse().join('\n') + '\n</map>';
+		return '<map name="' + this.name + '" id="' + this.name + '">\n' + areas.reverse().join('\n') + '\n</map>';
+	}
+
+	toSvg() {
+		var areas = [];
+		this.getAreas().forEach(a => {
+			if (a.isValidShape())
+				areas.push('\t' + a.toSvg(this.scale));
+		});
+		return '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="' + this.width + '" height="' + this.height + '">\n' + areas.reverse().join('\n') + '\n</svg>';
 	}
 
 	/** Removes avery areas from the areas array */

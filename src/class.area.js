@@ -59,17 +59,21 @@ class Area {
 		return this.coords[0];
 	}
 
-	strCoords(scale, dec) {
+	htmlCoords(scale, dec) {
 		return this.getCoords("html").map(c => {
-			return c.toString(scale, dec);
+			return c.toHtml(scale, dec);
 		}).join(',');
 	}
 
 	toHtml(scale) {
-		let strCoords = this.strCoords(scale, 0);
-		if (strCoords != "")
-			strCoords = 'coords="' + strCoords + '" ';
-		return '<area shape="' + this.shape + '" ' + strCoords + 'href="' + this.href + '"/>';
+		let htmlCoords = this.htmlCoords(scale, 0);
+		if (htmlCoords != "")
+			htmlCoords = 'coords="' + htmlCoords + '" ';
+		return '<area shape="' + this.shape + '" ' + htmlCoords + 'href="' + this.href + '" alt="' + this.href + '"/>';
+	}
+
+	toSvg(scale) {
+		return '<a xlink:href="' + this.href + '"></a>';
 	}
 }
 
@@ -117,7 +121,10 @@ class AreaRect extends Area {
 			default:
 				return super.getCoords(mode);
 		}
+	}
 
+	toSvg(scale) {
+		return '<rect x="' + this.coords[0].toString(scale, 0, x) + '" y="' + this.coords[0].toString(scale, 0, y) + '" width="' + this.coords[1].toString(scale, 0, x) + '" height="' + this.coords[1].toString(scale, 0, y) + '" />'
 	}
 }
 
@@ -151,8 +158,8 @@ class AreaCircle extends Area {
 		p5.ellipse(this.getCenter().x, this.getCenter().y, this.radius * 2);
 	}
 
-	strCoords(scale, dec) {
-		return this.getCenter().toString(scale, dec) + "," + round(this.radius / scale, dec);
+	htmlCoords(scale, dec) {
+		return this.getCenter().toHtml(scale, dec) + "," + round(this.radius / scale, dec);
 	}
 }
 class AreaPoly extends Area {
