@@ -21,7 +21,7 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 	-   [x] draw rectangular areas
 	-   [x] draw circular areas (by dragging left)
 	-   [ ] draw polygon areas
-	-   [ ] move mode 
+	-   [X] move mode
 	-   [x] inspect mode
 	-   [ ] select mode
 	-   [ ] resize mode ?
@@ -32,7 +32,7 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 	-   [ ] draw square (with `shift`)
 -   [ ] differents drawing modes for circles :
 	-   [ ] draw from edges
-	-   [x] draw from center
+	-   [x] draw from center (later with `shift`)
 -   [x] gui with these features :
 	-   [x] select tool mode
 	-   [x] undo

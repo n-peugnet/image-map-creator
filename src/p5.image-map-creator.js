@@ -5,6 +5,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	var settings;
 	var tempArea = new Area();
 	var selected;
+	var hovered;
 	var bgLayer = new BgLayer();
 	var map = new ImageMap();
 	var undoManager = new UndoManager();
@@ -27,10 +28,9 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	}
 
 	p.draw = function () {
-		if (p.mouseIsPressed) {
-			tempArea.updateLastCoord(p.mouseX, p.mouseY)
-		}
+		p.setHovered();
 		p.setCursor();
+		p.setOutput();
 		p.background(200);
 		p.drawImage();
 		bgLayer.display();
@@ -41,7 +41,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 
 	p.mousePressed = function () {
 		if (p.mouseIsHover()) {
-			selected = p.mouseIsHoverArea();
+			selected = hovered;
 			if (p.mouseButton == p.LEFT) {
 				p.setTempArea(p.mouseX, p.mouseY);
 			} else if (p.mouseButton == p.RIGHT) {
@@ -49,6 +49,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 					var input = prompt("Entrez l'url vers laquelle devrait pointer cette zone", selected.href ? selected.href : "http://");
 					if (input != null)
 						selected.href = input;
+					selected = undefined;
 				}
 				return false;
 			}
@@ -56,12 +57,18 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	}
 
 	p.mouseDragged = function () {
-		if (tool == "move") {
-			if (selected != undefined) {
-				let mvmt = new XY(p.mouseX - p.pmouseX, p.mouseY - p.pmouseY);
-				selected.move(mvmt);
-				console.log(mvmt);
-			}
+		switch (tool) {
+			case "move":
+				if (selected != undefined) {
+					let mvmt = new XY(p.mouseX - p.pmouseX, p.mouseY - p.pmouseY);
+					selected.move(mvmt);
+					console.log(mvmt);
+				}
+				break;
+			case "rectangle":
+			case "circle":
+				tempArea.updateLastCoord(p.mouseX, p.mouseY)
+				break;
 		}
 	}
 
@@ -140,11 +147,15 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		});
 	}
 
+	p.setHovered = function () {
+		hovered = p.mouseIsHoverArea();
+	}
+
 	p.setCursor = function () {
 		switch (tool) {
 			case "inspect":
 			case "move":
-				if (p.mouseIsHoverArea())
+				if (hovered != undefined)
 					p.cursor(p.HAND)
 				else
 					p.cursor(p.ARROW);
@@ -155,17 +166,34 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		}
 	}
 
+	p.setOutput = function () {
+		switch (tool) {
+			case "inspect":
+				if (p.mouseIsHover()) {
+					let href = hovered != undefined ? hovered.href : "none";
+					settings.setValue("Output", href);
+				}
+				break;
+		}
+	}
+
 	p.setAreaStyle = function (area) {
 		var color = p.color(255, 255, 255, 178);
+		if (tool == "inspect")
+			color = p.color(255, 0);
 		if (
-			((tool == "inspect" || tool == "move") && selected == undefined && area == p.mouseIsHoverArea() && p.mouseIsHover()) ||
+			(tool == "inspect" && area == hovered && p.mouseIsHover()) ||
+			(tool == "move" && selected == undefined && area == hovered && p.mouseIsHover()) ||
 			(tool == "move" && selected == area)
 		) {
 			color = p.color(255, 200, 200, 178);
 		}
 		p.fill(color);
 		p.strokeWeight(1);
-		p.stroke(0);
+		if (tool == "inspect")
+			p.noStroke();
+		else
+			p.stroke(0);
 	}
 
 	p.setTempArea = function (x, y) {
