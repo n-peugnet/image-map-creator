@@ -16,6 +16,18 @@ class XY {
 		return Math.sqrt(Math.pow(xy1.x - xy2.x, 2) + Math.pow(xy1.y - xy2.y, 2));
 	}
 
+	/**
+	 *exchange a value between two xy coordinates
+	 * @param {XY} xy1 
+	 * @param {XY} xy2 
+	 * @param {string} val
+	 */
+	static swap(xy1, xy2, val) {
+		let tmp = xy1[val];
+		xy1[val] = xy2[val];
+		xy2[val] = tmp;
+	}
+
 	isEmpty() {
 		return !this.x && !this.y;
 	}

@@ -20,6 +20,22 @@ class Area {
 		return this.coords.push(new XY(x, y));
 	}
 
+	getCoords(mode = "default") {
+		switch (mode) {
+			case "default":
+			default:
+				return this.coords;
+		}
+	}
+
+	copyCoords() {
+		let copy = [];
+		this.coords.forEach((val, index) => {
+			copy[index] = new XY(val.x, val.y);
+		});
+		return copy;
+	}
+
 	updateLastCoord(x, y) {
 		this.coords[this.coords.length - 1] = new XY(x, y);
 	}
@@ -44,7 +60,7 @@ class Area {
 	}
 
 	strCoords(scale, dec) {
-		return this.coords.map(c => {
+		return this.getCoords("html").map(c => {
 			return c.toString(scale, dec);
 		}).join(',');
 	}
@@ -88,6 +104,20 @@ class AreaRect extends Area {
 
 	display(p5) {
 		p5.rect(this.coords[0].x, this.coords[0].y, this.coords[1].x, this.coords[1].y);
+	}
+
+	getCoords(mode = "default") {
+		switch (mode) {
+			case "html":
+				let coords = this.copyCoords();
+				coords[1] = coords[1].sum(coords[0]);
+				if (coords[0].x > coords[1].x) XY.swap(coords[0], coords[1], "x")
+				if (coords[0].y > coords[1].y) XY.swap(coords[0], coords[1], "y")
+				return coords;
+			default:
+				return super.getCoords(mode);
+		}
+
 	}
 }
 
