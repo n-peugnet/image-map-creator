@@ -36,14 +36,17 @@ class Area {
 		return this.coords[0];
 	}
 
-	strCoords(dec) {
+	strCoords(scale, dec) {
 		return this.coords.map(c => {
-			return c.toString(dec);
+			return c.toString(scale, dec);
 		}).join(',');
 	}
 
-	toHtml() {
-		return '<area shape="' + this.shape + '" coords="' + this.strCoords(0) + '" href="' + this.href + '"/>';
+	toHtml(scale) {
+		let strCoords = this.strCoords(scale, 0);
+		if (strCoords != "")
+			strCoords = 'coords="' + strCoords + '" ';
+		return '<area shape="' + this.shape + '" ' + strCoords + 'href="' + this.href + '"/>';
 	}
 }
 
@@ -104,15 +107,15 @@ class AreaCircle extends Area {
 
 	updateLastCoord(x, y) {
 		var center = this.getCenter();
-		this.radius = XY.dist(center, new XY(x , y));
+		this.radius = XY.dist(center, new XY(x, y));
 	}
 
 	display(p5) {
-		p5.ellipse(this.getCenter().x, this.getCenter().y, this.radius*2);
+		p5.ellipse(this.getCenter().x, this.getCenter().y, this.radius * 2);
 	}
 
-	strCoords(dec) {
-		return this.getCenter().toString(dec) + "," + round(this.radius, dec);
+	strCoords(scale, dec) {
+		return this.getCenter().toString(scale, dec) + "," + round(this.radius / scale, dec);
 	}
 }
 class AreaPoly extends Area {

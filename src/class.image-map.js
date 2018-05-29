@@ -7,15 +7,27 @@ class ImageMap {
 	* @param {boolean} hasDefaultArea
 	 */
 	constructor(areas = [], name, hasDefaultArea = false) {
+		this.name = name;
+		this.width = 0;
+		this.height = 0;
+		this.scale = 1;
 		this.areas = areas;
 		this.dArea = new AreaDefault();
-		this.name = name;
 		this.hasDefaultArea = hasDefaultArea;
 		this.lastId = 0;
 	}
 
 	setName(name) {
 		this.name = name.replace(/\s+/g, "");
+	}
+
+	setSize(width, height) {
+		this.width = width;
+		this.height = height;
+	}
+
+	setScale(scale) {
+		this.scale = scale;
 	}
 
 	setDefaultArea(bool) {
@@ -61,9 +73,9 @@ class ImageMap {
 
 	toHtml() {
 		var areas = [];
-		this.areas.forEach(a => {
+		this.getAreas().forEach(a => {
 			if (a.isValidShape())
-				areas.push('\t' + a.toHtml());
+				areas.push('\t' + a.toHtml(this.scale));
 		});
 		return '<map name="' + this.name + '" id="map-id">\n' + areas.reverse().join('\n') + '\n</map>';
 	}

@@ -1,4 +1,4 @@
-var imageMapCreator = function (p) {
+var imageMapCreator = function (p, width = 600, height = 450) {
 
 	var tool = "rectangle";
 	var drawingTools = ["rectangle", "circle", "polygon"];
@@ -8,9 +8,10 @@ var imageMapCreator = function (p) {
 	var map = new ImageMap();
 	var undoManager = new UndoManager();
 	var img = null;
+	var scale = 1;
 
 	p.setup = function () {
-		var canvas = p.createCanvas(600, 450);
+		var canvas = p.createCanvas(width, height);
 		canvas.drop(p.handeFile).dragLeave(p.onLeave).dragOver(p.onOver);
 		settings = QuickSettings.create(p.width + 5, 0, "Image-map Creator", p.canvas.parentElement)
 			.setDraggable(false)
@@ -29,7 +30,8 @@ var imageMapCreator = function (p) {
 			tempArea.updateLastCoord(p.mouseX, p.mouseY)
 		}
 		p.setCursor();
-		p.background(img ? img : 200);
+		p.background(200);
+		p.drawImage();
 		bgLayer.display();
 		p.drawAreas();
 	}
@@ -90,13 +92,30 @@ var imageMapCreator = function (p) {
 
 	p.handeFile = function (file) {
 		if (file.type == "image") {
-			img = p.loadImage(file.data);
+			img = p.loadImage(file.data, img => p.setScale(img));
+			map.setSize(img.width, img.height);
 			if (!map.name) {
 				map.setName(file.name);
 				settings.setValue("Map Name", map.name);
 			}
 		}
 		bgLayer.disappear();
+	}
+
+	p.setScale = function (img) {
+		scale = 1;
+		let xScale = p.width / img.width;
+		let yScale = p.height / img.height;
+		if (xScale < scale)
+			scale = xScale;
+		if (yScale < scale)
+			scale = yScale;
+		map.setScale(scale);
+	}
+
+	p.drawImage = function () {
+		if (img)
+			p.image(img, 0, 0, img.width * scale, img.height * scale);
 	}
 
 	p.drawAreas = function () {

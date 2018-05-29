@@ -13,7 +13,7 @@ class XY {
 	 * @param {XY} xy2 
 	 */
 	static dist(xy1, xy2) {
-		return Math.sqrt( Math.pow(xy1.x - xy2.x, 2) + Math.pow(xy1.y - xy2.y, 2) );
+		return Math.sqrt(Math.pow(xy1.x - xy2.x, 2) + Math.pow(xy1.y - xy2.y, 2));
 	}
 
 	isEmpty() {
@@ -32,8 +32,8 @@ class XY {
 		return new XY(this.x + xy.x, this.y + xy.y);
 	}
 
-	toString(dec) {
-		return round(this.x, dec) + "," + round(this.y, dec);
+	toString(scale, dec) {
+		return round(this.x / scale, dec) + "," + round(this.y / scale, dec);
 	}
 
 }
