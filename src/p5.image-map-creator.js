@@ -4,6 +4,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	var drawingTools = ["rectangle", "circle", "polygon"];
 	var settings;
 	var tempArea = new Area();
+	var selected;
 	var bgLayer = new BgLayer();
 	var map = new ImageMap();
 	var undoManager = new UndoManager();
@@ -16,7 +17,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		settings = QuickSettings.create(p.width + 5, 0, "Image-map Creator", p.canvas.parentElement)
 			.setDraggable(false)
 			.addText("Map Name", "", v => { map.setName(v) })
-			.addDropDown("Tool", ["rectangle", "circle", "inspect"], v => { tool = v.value })
+			.addDropDown("Tool", ["rectangle", "circle", "inspect", "move"], v => { tool = v.value })
 			.addBoolean("Default Area", map.hasDefaultArea, v => { p.setDefaultArea(v) })
 			.addButton("Undo", undoManager.undo)
 			.addButton("Redo", undoManager.redo)
@@ -40,27 +41,36 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 
 	p.mousePressed = function () {
 		if (p.mouseIsHover()) {
+			selected = p.mouseIsHoverArea();
 			if (p.mouseButton == p.LEFT) {
 				p.setTempArea(p.mouseX, p.mouseY);
 			} else if (p.mouseButton == p.RIGHT) {
-				var area = p.mouseIsHoverArea();
-				if (area != undefined) {
-					var input = prompt("Entrez l'url vers laquelle devrait pointer cette zone", area.href ? area.href : "http://");
+				if (selected != undefined) {
+					var input = prompt("Entrez l'url vers laquelle devrait pointer cette zone", selected.href ? selected.href : "http://");
 					if (input != null)
-						area.href = input;
+						selected.href = input;
 				}
 				return false;
 			}
 		}
 	}
 
-	p.mouseDragged = function () { }
+	p.mouseDragged = function () {
+		if (tool == "move") {
+			if (selected != undefined) {
+				let mvmt = new XY(p.mouseX - p.pmouseX, p.mouseY - p.pmouseY);
+				selected.move(mvmt);
+				console.log(mvmt);
+			}
+		}
+	}
 
 	p.mouseReleased = function () {
 		if (tempArea.isValidShape())
 			p.createArea(tempArea);
 		tempArea = new Area();
 		bgLayer.disappear();
+		selected = undefined;
 	}
 
 	//---------------------------- Functions ----------------------------------
@@ -69,6 +79,9 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		return p.mouseX <= p.width && p.mouseX >= 0 && p.mouseY <= p.height && p.mouseY >= 0;
 	}
 
+	/**
+	 * @returns {Area|undefined}
+	 */
 	p.mouseIsHoverArea = function () {
 		var allAreas = map.getAreas();
 		return allAreas.reverse().find(area => {
@@ -130,6 +143,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	p.setCursor = function () {
 		switch (tool) {
 			case "inspect":
+			case "move":
 				if (p.mouseIsHoverArea())
 					p.cursor(p.HAND)
 				else
@@ -143,8 +157,12 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 
 	p.setAreaStyle = function (area) {
 		var color = p.color(255, 255, 255, 178);
-		if (tool == "inspect" && area == p.mouseIsHoverArea() && p.mouseIsHover())
+		if (
+			((tool == "inspect" || tool == "move") && selected == undefined && area == p.mouseIsHoverArea() && p.mouseIsHover()) ||
+			(tool == "move" && selected == area)
+		) {
 			color = p.color(255, 200, 200, 178);
+		}
 		p.fill(color);
 		p.strokeWeight(1);
 		p.stroke(0);

@@ -24,6 +24,13 @@ class Area {
 		this.coords[this.coords.length - 1] = new XY(x, y);
 	}
 
+	move(xy) {
+		let coord = this.firstCoord();
+		if (coord != undefined) {
+			this.coords[0] = coord.sum(xy);
+		}
+	}
+
 	isValidShape() {
 		return this.coords.length >= 1;
 	}
