@@ -28,6 +28,10 @@ class Area {
 		}
 	}
 
+	empty() {
+		return this.coords.length == 0;
+	}
+
 	copyCoords() {
 		let copy = [];
 		this.coords.forEach((val, index) => {
@@ -85,8 +89,6 @@ class AreaRect extends Area {
 	constructor(coords = [], href) {
 		super("rect");
 		this.coords = coords.slice(0, 2);
-		if (this.coords.length < 2)
-			this.addCoord(0, 0);
 	}
 
 	updateLastCoord(x, y) {
@@ -193,6 +195,16 @@ class AreaPoly extends Area {
 		}
 
 		return oddNodes;
+	}
+
+	move(xy) {
+		this.coords = this.coords.map(c => c.sum(xy));
+	}
+
+	display(p5) {
+		p5.beginShape();
+		this.coords.forEach(c => p5.vertex(c.x, c.y));
+		p5.endShape();
 	}
 }
 
