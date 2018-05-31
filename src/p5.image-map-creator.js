@@ -18,7 +18,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		settings = QuickSettings.create(p.width + 5, 0, "Image-map Creator", p.canvas.parentElement)
 			.setDraggable(false)
 			.addText("Map Name", "", v => { map.setName(v) })
-			.addDropDown("Tool", ["rectangle", "circle", "inspect", "move"], v => { tool = v.value })
+			.addDropDown("Tool", ["rectangle", "circle", "polygon", "inspect", "move"], v => { tool = v.value })
 			.addBoolean("Default Area", map.hasDefaultArea, v => { p.setDefaultArea(v) })
 			.addButton("Undo", undoManager.undo)
 			.addButton("Redo", undoManager.redo)
@@ -28,6 +28,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	}
 
 	p.draw = function () {
+		p.updateTempArea();
 		p.setHovered();
 		p.setCursor();
 		p.setOutput();
@@ -43,7 +44,20 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		if (p.mouseIsHover()) {
 			selected = hovered;
 			if (p.mouseButton == p.LEFT) {
-				p.setTempArea(p.mouseX, p.mouseY);
+				if (tool == "circle" || tool == "rectangle") {
+					p.setTempArea(p.mouseX, p.mouseY);
+				} else if (tool == "polygon") {
+					if (tempArea.empty()) {
+						p.setTempArea(p.mouseX, p.mouseY);
+					} else if (tempArea.isClosable(p.mouseX, p.mouseY)) {
+						tempArea.close();
+						if (tempArea.isValidShape())
+							p.createArea(tempArea);
+						tempArea = new Area();
+					} else {
+						tempArea.addCoord(p.mouseX, p.mouseY);
+					}
+				}
 			} else if (p.mouseButton == p.RIGHT) {
 				if (selected != undefined) {
 					var input = prompt("Entrez l'url vers laquelle devrait pointer cette zone", selected.href ? selected.href : "http://");
@@ -65,17 +79,15 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 					console.log(mvmt);
 				}
 				break;
-			case "rectangle":
-			case "circle":
-				tempArea.updateLastCoord(p.mouseX, p.mouseY)
-				break;
 		}
 	}
 
 	p.mouseReleased = function () {
-		if (tempArea.isValidShape())
-			p.createArea(tempArea);
-		tempArea = new Area();
+		if (tool == "rectangle" || tool == "circle") {
+			if (tempArea.isValidShape())
+				p.createArea(tempArea);
+			tempArea = new Area();
+		}
 		bgLayer.disappear();
 		selected = undefined;
 	}
@@ -142,7 +154,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		var allAreas = map.getAreas().concat([tempArea]);
 		allAreas.forEach(area => {
 			p.setAreaStyle(area);
-			if (area.isValidShape())
+			if (!area.empty())
 				area.display(p);
 		});
 	}
@@ -152,17 +164,28 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	}
 
 	p.setCursor = function () {
-		switch (tool) {
-			case "inspect":
-			case "move":
-				if (hovered != undefined)
-					p.cursor(p.HAND)
-				else
-					p.cursor(p.ARROW);
-				break;
-			default:
-				p.cursor(p.CROSS);
-				break;
+		if (drawingTools.includes(tool)) {
+			switch (tool) {
+				case "polygon":
+					if (!tempArea.empty() && tempArea.isClosable(p.mouseX, p.mouseY)) {
+						p.cursor(p.ARROW);
+						break;
+					}
+				default:
+					p.cursor(p.CROSS);
+			}
+		} else {
+			p.cursor(p.ARROW);
+			if (hovered != undefined) {
+				switch (tool) {
+					case "inspect":
+						p.cursor(p.HAND);
+						break;
+					case "move":
+						p.cursor(p.MOVE);
+						break;
+				}
+			}
 		}
 	}
 
@@ -201,13 +224,21 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		switch (tool) {
 			case "rectangle":
 				tempArea = new AreaRect(coords);
+				tempArea.addCoord(0, 0);
 				break;
 			case "circle":
 				tempArea = new AreaCircle(coords);
 				break;
 			case "polygon":
 				tempArea = new AreaPoly(coords);
+				tempArea.addCoord(x, y);
 				break;
+		}
+	}
+
+	p.updateTempArea = function () {
+		if (!tempArea.empty()) {
+			tempArea.updateLastCoord(p.mouseX, p.mouseY);
 		}
 	}
 

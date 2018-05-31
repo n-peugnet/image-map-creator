@@ -28,6 +28,10 @@ class Area {
 		}
 	}
 
+	empty() {
+		return this.coords.length == 0;
+	}
+
 	copyCoords() {
 		let copy = [];
 		this.coords.forEach((val, index) => {
@@ -59,6 +63,11 @@ class Area {
 		return this.coords[0];
 	}
 
+	distToFirstCoord(x, y) {
+		let coord = new XY(x, y);
+		return XY.dist(coord, this.firstCoord());
+	}
+
 	htmlCoords(scale, dec) {
 		return this.getCoords("html").map(c => {
 			return c.toHtml(scale, dec);
@@ -85,8 +94,6 @@ class AreaRect extends Area {
 	constructor(coords = [], href) {
 		super("rect");
 		this.coords = coords.slice(0, 2);
-		if (this.coords.length < 2)
-			this.addCoord(0, 0);
 	}
 
 	updateLastCoord(x, y) {
@@ -169,6 +176,48 @@ class AreaPoly extends Area {
 	 */
 	constructor(coords = [], href) {
 		super("poly", coords, href);
+	}
+
+	isValidShape() {
+		return this.coords.length >= 4;
+	}
+
+	isHover(x, y) {
+		var cornersX = this.coords.map(c => { return c.x });
+		var cornersY = this.coords.map(c => { return c.y });
+
+		var i, j = cornersX.length - 1;
+		var oddNodes = false;
+
+		var polyX = cornersX;
+		var polyY = cornersY;
+
+		for (i = 0; i < cornersX.length; i++) {
+			if ((polyY[i] < y && polyY[j] >= y || polyY[j] < y && polyY[i] >= y) && (polyX[i] <= x || polyX[j] <= x)) {
+				oddNodes ^= (polyX[i] + (y - polyY[i]) / (polyY[j] - polyY[i]) * (polyX[j] - polyX[i]) < x);
+			}
+			j = i;
+		}
+
+		return oddNodes;
+	}
+
+	isClosable(x, y, dist = 5) {
+		return this.isValidShape() && this.distToFirstCoord(x, y) < dist;
+	}
+
+	close() {
+		this.coords[this.coords.length - 1] = this.firstCoord();
+	}
+
+	move(xy) {
+		this.coords = this.coords.map(c => c.sum(xy));
+	}
+
+	display(p5) {
+		p5.beginShape();
+		this.coords.forEach(c => p5.vertex(c.x, c.y));
+		p5.endShape();
 	}
 }
 
