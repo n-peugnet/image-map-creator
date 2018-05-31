@@ -47,10 +47,16 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 				if (tool == "circle" || tool == "rectangle") {
 					p.setTempArea(p.mouseX, p.mouseY);
 				} else if (tool == "polygon") {
-					if (tempArea.empty())
+					if (tempArea.empty()) {
 						p.setTempArea(p.mouseX, p.mouseY);
-					else
+					} else if (tempArea.isClosable(p.mouseX, p.mouseY)) {
+						tempArea.close();
+						if (tempArea.isValidShape())
+							p.createArea(tempArea);
+						tempArea = new Area();
+					} else {
 						tempArea.addCoord(p.mouseX, p.mouseY);
+					}
 				}
 			} else if (p.mouseButton == p.RIGHT) {
 				if (selected != undefined) {
@@ -84,14 +90,6 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		}
 		bgLayer.disappear();
 		selected = undefined;
-	}
-
-	p.doubleClicked = function () {
-		if (tool == "polygon") {
-			if (tempArea.isValidShape())
-				p.createArea(tempArea);
-			tempArea = new Area();
-		}
 	}
 
 	//---------------------------- Functions ----------------------------------
@@ -156,7 +154,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		var allAreas = map.getAreas().concat([tempArea]);
 		allAreas.forEach(area => {
 			p.setAreaStyle(area);
-			if (area.isValidShape())
+			if (!area.empty())
 				area.display(p);
 		});
 	}
@@ -166,17 +164,28 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	}
 
 	p.setCursor = function () {
-		switch (tool) {
-			case "inspect":
-			case "move":
-				if (hovered != undefined)
-					p.cursor(p.HAND)
-				else
-					p.cursor(p.ARROW);
-				break;
-			default:
-				p.cursor(p.CROSS);
-				break;
+		if (drawingTools.includes(tool)) {
+			switch (tool) {
+				case "polygon":
+					if (!tempArea.empty() && tempArea.isClosable(p.mouseX, p.mouseY)) {
+						p.cursor(p.ARROW);
+						break;
+					}
+				default:
+					p.cursor(p.CROSS);
+			}
+		} else {
+			p.cursor(p.ARROW);
+			if (hovered != undefined) {
+				switch (tool) {
+					case "inspect":
+						p.cursor(p.HAND);
+						break;
+					case "move":
+						p.cursor(p.MOVE);
+						break;
+				}
+			}
 		}
 	}
 

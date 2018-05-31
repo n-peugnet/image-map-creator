@@ -63,6 +63,11 @@ class Area {
 		return this.coords[0];
 	}
 
+	distToFirstCoord(x, y) {
+		let coord = new XY(x, y);
+		return XY.dist(coord, this.firstCoord());
+	}
+
 	htmlCoords(scale, dec) {
 		return this.getCoords("html").map(c => {
 			return c.toHtml(scale, dec);
@@ -174,7 +179,7 @@ class AreaPoly extends Area {
 	}
 
 	isValidShape() {
-		return this.coords.length >= 3;
+		return this.coords.length >= 4;
 	}
 
 	isHover(x, y) {
@@ -195,6 +200,14 @@ class AreaPoly extends Area {
 		}
 
 		return oddNodes;
+	}
+
+	isClosable(x, y, dist = 5) {
+		return this.isValidShape() && this.distToFirstCoord(x, y) < dist;
+	}
+
+	close() {
+		this.coords[this.coords.length - 1] = this.firstCoord();
 	}
 
 	move(xy) {
