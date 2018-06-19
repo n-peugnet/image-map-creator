@@ -18,7 +18,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		settings = QuickSettings.create(p.width + 5, 0, "Image-map Creator", p.canvas.parentElement)
 			.setDraggable(false)
 			.addText("Map Name", "", v => { map.setName(v) })
-			.addDropDown("Tool", ["rectangle", "circle", "polygon", "inspect", "move"], v => { tool = v.value })
+			.addDropDown("Tool", ["rectangle", "circle", "polygon", "inspect", "move", "delete"], v => { tool = v.value })
 			.addBoolean("Default Area", map.hasDefaultArea, v => { p.setDefaultArea(v) })
 			.addButton("Undo", undoManager.undo)
 			.addButton("Redo", undoManager.redo)
@@ -45,19 +45,26 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		if (p.mouseIsHover()) {
 			selected = hovered;
 			if (p.mouseButton == p.LEFT) {
-				if (tool == "circle" || tool == "rectangle") {
-					p.setTempArea(p.mouseX, p.mouseY);
-				} else if (tool == "polygon") {
-					if (tempArea.empty()) {
+				switch (tool) {
+					case "circle":
+					case "rectangle":
 						p.setTempArea(p.mouseX, p.mouseY);
-					} else if (tempArea.isClosable(p.mouseX, p.mouseY)) {
-						tempArea.close();
-						if (tempArea.isValidShape())
-							p.createArea(tempArea);
-						tempArea = new Area();
-					} else {
-						tempArea.addCoord(p.mouseX, p.mouseY);
-					}
+						break;
+					case "polygon":
+						if (tempArea.empty()) {
+							p.setTempArea(p.mouseX, p.mouseY);
+						} else if (tempArea.isClosable(p.mouseX, p.mouseY)) {
+							tempArea.close();
+							if (tempArea.isValidShape())
+								p.createArea(tempArea);
+							tempArea = new Area();
+						} else {
+							tempArea.addCoord(p.mouseX, p.mouseY);
+						}
+						break;
+					case "delete":
+						p.deleteArea(hovered);
+						break;
 				}
 			} else if (p.mouseButton == p.RIGHT) {
 				if (selected != undefined) {
@@ -180,6 +187,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 			if (hovered != undefined) {
 				switch (tool) {
 					case "inspect":
+					case "delete":
 						p.cursor(p.HAND);
 						break;
 					case "move":
@@ -206,11 +214,11 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		if (tool == "inspect")
 			color = p.color(255, 0);
 		if (
-			(tool == "inspect" && area == hovered && p.mouseIsHover()) ||
+			(p.mouseIsHover() && (tool == "inspect" || tool == "delete") && area == hovered) ||
 			(tool == "move" && selected == undefined && area == hovered && p.mouseIsHover()) ||
 			(tool == "move" && selected == area)
 		) {
-			color = p.color(255, 200, 200, 178);
+			color = p.color(255, 200, 200, 178); // highlight (set color red)
 		}
 		p.fill(color);
 		p.strokeWeight(1);
@@ -255,6 +263,19 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 			},
 			redo: function () {
 				map.addArea(area, false);
+			}
+		})
+	}
+
+	p.deleteArea = function (area) {
+		let id = area.id;
+		let index = map.rmvArea(id);
+		undoManager.add({
+			undo: function () {
+				map.insertArea(area, index);
+			},
+			redo: function () {
+				map.rmvArea(id);
 			}
 		})
 	}

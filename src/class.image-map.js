@@ -54,10 +54,15 @@ class ImageMap {
 	rmvArea(id) {
 		var index = this.areaIndex(id);
 		this.areas.splice(index, 1);
+		return index;
 	}
 
 	popArea() {
-		return this.areas.pop()
+		return this.areas.pop();
+	}
+
+	insertArea(area, index) {
+		this.areas.splice(index, 0, area);
 	}
 
 	areaIndex(id) {
