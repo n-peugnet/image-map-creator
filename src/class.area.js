@@ -81,8 +81,10 @@ class Area {
 		return '<area shape="' + this.shape + '" ' + htmlCoords + 'href="' + this.href + '" alt="' + this.href + '"/>';
 	}
 
+	svgArea(scale) { }
+
 	toSvg(scale) {
-		return '<a xlink:href="' + this.href + '"></a>';
+		return '<a xlink:href="' + this.href + '">' + this.svgArea(scale) + '</a>';
 	}
 }
 
@@ -130,8 +132,8 @@ class AreaRect extends Area {
 		}
 	}
 
-	toSvg(scale) {
-		return '<rect x="' + this.coords[0].toString(scale, 0, x) + '" y="' + this.coords[0].toString(scale, 0, y) + '" width="' + this.coords[1].toString(scale, 0, x) + '" height="' + this.coords[1].toString(scale, 0, y) + '" />'
+	svgArea(scale) {
+		return '<rect x="' + this.coords[0].toString(scale, 0, 'x') + '" y="' + this.coords[0].toString(scale, 0, 'y') + '" width="' + this.coords[1].toString(scale, 0, 'x') + '" height="' + this.coords[1].toString(scale, 0, 'y') + '" />'
 	}
 }
 
@@ -167,6 +169,10 @@ class AreaCircle extends Area {
 
 	htmlCoords(scale, dec) {
 		return this.getCenter().toHtml(scale, dec) + "," + round(this.radius / scale, dec);
+	}
+
+	svgArea(scale) {
+		return '<circle cx="' + this.coords[0].toString(scale, 0, 'x') + '" cy="' + this.coords[0].toString(scale, 0, 'y') + '" r="' + round(this.radius / scale, 0) + '" />'
 	}
 }
 class AreaPoly extends Area {
@@ -218,6 +224,13 @@ class AreaPoly extends Area {
 		p5.beginShape();
 		this.coords.forEach(c => p5.vertex(c.x, c.y));
 		p5.endShape();
+	}
+
+	svgArea(scale) {
+		let points = this.coords.map(c => {
+			return c.toString(scale, 0, 'x') + ',' + c.toString(scale, 0, 'y');
+		}).join(' ');
+		return '<polygon points="' + points + '" />'
 	}
 }
 

@@ -24,6 +24,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 			.addButton("Redo", undoManager.redo)
 			.addButton("Clear", p.clearAreas)
 			.addButton("Generate Html", function () { settings.setValue("Output", map.toHtml()) })
+			.addButton("Generate Svg", function () { settings.setValue("Output", map.toSvg()) })
 			.addTextArea("Output");
 	}
 

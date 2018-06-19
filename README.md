@@ -20,7 +20,7 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 -   [x] differents tools :
 	-   [x] draw rectangular areas
 	-   [x] draw circular areas (by dragging left)
-	-   [ ] draw polygon areas
+	-   [x] draw polygon areas
 	-   [X] move mode
 	-   [x] inspect mode
 	-   [ ] select mode

@@ -82,11 +82,14 @@ class ImageMap {
 
 	toSvg() {
 		var areas = [];
-		this.getAreas().forEach(a => {
+		this.getAreas(false).forEach(a => {
 			if (a.isValidShape())
 				areas.push('\t' + a.toSvg(this.scale));
 		});
-		return '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="' + this.width + '" height="' + this.height + '">\n' + areas.reverse().join('\n') + '\n</svg>';
+		var str = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="' + this.width + '" height="' + this.height + '">\n';
+		str += areas.reverse().join('\n');
+		str += '\n</svg>';
+		return str;
 	}
 
 	/** Removes avery areas from the areas array */
