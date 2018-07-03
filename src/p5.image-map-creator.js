@@ -4,6 +4,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	var drawingTools = ["rectangle", "circle", "polygon"];
 	var settings;
 	var tempArea = new Area();
+	var origin = new XY();
 	var selected;
 	var hovered;
 	var bgLayer = new BgLayer();
@@ -18,7 +19,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		settings = QuickSettings.create(p.width + 5, 0, "Image-map Creator", p.canvas.parentElement)
 			.setDraggable(false)
 			.addText("Map Name", "", v => { map.setName(v) })
-			.addDropDown("Tool", ["rectangle", "circle", "polygon", "inspect", "move", "delete"], v => { tool = v.value })
+			.addDropDown("Tool", ["rectangle", "circle", "polygon", "inspect", "move", "delete"], v => { p.setTool(v.value) })
 			.addBoolean("Default Area", map.hasDefaultArea, v => { p.setDefaultArea(v) })
 			.addButton("Undo", undoManager.undo)
 			.addButton("Redo", undoManager.redo)
@@ -62,6 +63,11 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 							tempArea.addCoord(p.mouseX, p.mouseY);
 						}
 						break;
+					case "move":
+						if (selected != undefined) {
+							origin = selected.firstCoord();
+						}
+						break;
 					case "delete":
 						p.deleteArea(hovered);
 						break;
@@ -91,10 +97,27 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	}
 
 	p.mouseReleased = function () {
-		if (tool == "rectangle" || tool == "circle") {
-			if (tempArea.isValidShape())
-				p.createArea(tempArea);
-			tempArea = new Area();
+		switch (tool) {
+			case "rectangle":
+			case "circle":
+				if (tempArea.isValidShape())
+					p.createArea(tempArea);
+				tempArea = new Area();
+				break;
+			case "move":
+				if (selected != undefined) {
+					let area = selected;
+					let move = area.firstCoord().diff(origin);
+					undoManager.add({
+						undo: function () {
+							area.move(move.invert());
+						},
+						redo: function () {
+							area.move(move);
+						}
+					});
+				}
+				break;
 		}
 		bgLayer.disappear();
 		selected = undefined;
@@ -169,6 +192,11 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 
 	p.setHovered = function () {
 		hovered = p.mouseIsHoverArea();
+	}
+
+	p.setTool = function (value) {
+		tool = value;
+		tempArea = new Area();
 	}
 
 	p.setCursor = function () {

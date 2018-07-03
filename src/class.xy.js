@@ -3,6 +3,10 @@
 */
 class XY {
 	constructor(x, y) {
+		this.set(x, y);
+	}
+
+	set(x, y) {
 		this.x = x;
 		this.y = y;
 	}
@@ -42,6 +46,18 @@ class XY {
 	 */
 	sum(xy) {
 		return new XY(this.x + xy.x, this.y + xy.y);
+	}
+
+	/**
+	 * returns the difference of two xy coordinates
+	 * @param {XY} xy 
+	 */
+	diff(xy) {
+		return new XY(this.x - xy.x, this.y - xy.y);
+	}
+
+	invert() {
+		return new XY(- this.x, -this.y);
 	}
 
 	toString(scale, dec, val) {
