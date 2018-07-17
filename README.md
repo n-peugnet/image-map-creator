@@ -5,6 +5,10 @@ to be easy to use for both the end user and the developper.
 
 ![demo gif](images/image-map-creator.gif)
 
+## Live demo
+
+the live demos can be tried thanks to [rawgit](https://rawgit.com/): https://rawgit.com/n-peugnet/image-map-creator/master/demos/
+
 ## Features
 
 Here is the list of all the features of this app :
@@ -12,7 +16,7 @@ Here is the list of all the features of this app :
 _The checked ones are implemented, the others are the ones I plan to add in the future_
 
 -   [x] drag&drop a picture on the canvas
--   [ ] show a menu by right-clicking on an area with these options :
+-   [x] show a menu by right-clicking on an area with these options :
 	-   [x] set url
 	-   [x] delete
 	-   [ ] move forward
@@ -25,7 +29,7 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 	-   [x] inspect mode
 	-   [ ] select mode
 	-   [ ] resize mode ?
-	-   [ ] erase mode ?
+	-   [x] delete mode
 -   [ ] differents drawing modes for rectangles :
 	-   [x] dram from edges
 	-   [ ] draw from center (with `alt`)
@@ -50,4 +54,4 @@ var iMap = new p5(imageMapCreator, "div-1");
 ```
 For more details on the instance mode of p5 see [the p5 documentation](https://p5js.org/examples/instance-mode-instance-container.html)
 
-You can also see the detailled example in the `/examples` folder.
+You can also see the detailled example in the `/demos` folder.

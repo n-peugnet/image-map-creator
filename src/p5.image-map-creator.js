@@ -3,6 +3,14 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	var tool = "rectangle";
 	var drawingTools = ["rectangle", "circle", "polygon"];
 	var settings;
+	var menu = {
+		SetUrl: {
+			onSelect: (target, key, item, area) => { p.setAreaUrl(area); },
+			label: "Set url",
+			title: "Click here to set the url of this area"
+		},
+		Delete: (target, key, item, area) => { p.deleteArea(area); }
+	};
 	var tempArea = new Area();
 	var origin = new XY();
 	var selected;
@@ -42,7 +50,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 
 	//------------------------------ Events -----------------------------------
 
-	p.mousePressed = function () {
+	p.mousePressed = function (e) {
 		if (p.mouseIsHover()) {
 			selected = hovered;
 			if (p.mouseButton == p.LEFT) {
@@ -74,12 +82,13 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 				}
 			} else if (p.mouseButton == p.RIGHT) {
 				if (selected != undefined) {
-					var input = prompt("Entrez l'url vers laquelle devrait pointer cette zone", selected.href ? selected.href : "http://");
-					if (input != null)
-						selected.href = input;
+					ContextMenu.display(e, menu, {
+						position: "click",
+						data: selected
+					});
 					selected = undefined;
 				}
-				return false;
+				return false; // doesen't work as expected
 			}
 		}
 	}
@@ -90,7 +99,6 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 				if (selected != undefined) {
 					let mvmt = new XY(p.mouseX - p.pmouseX, p.mouseY - p.pmouseY);
 					selected.move(mvmt);
-					console.log(mvmt);
 				}
 				break;
 		}
@@ -308,6 +316,22 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		})
 	}
 
+	p.setAreaUrl = function (area) {
+		var href = area.href;
+		var input = prompt("Entrez l'url vers laquelle devrait pointer cette zone", href ? href : "http://");
+		if (input != null) {
+			area.sethref(input);
+			undoManager.add({
+				undo: function () {
+					area.sethref(href);
+				},
+				redo: function () {
+					area.sethref(input);
+				}
+			})
+		}
+	}
+
 	p.setDefaultArea = function (bool) {
 		map.setDefaultArea(bool);
 		undoManager.add({
@@ -368,3 +392,6 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		p.rect(0, 0, p.width, p.height);
 	}
 }
+
+// Fix for oncontextmenu
+window.addEventListener("contextmenu", function (e) { e.preventDefault(); });
