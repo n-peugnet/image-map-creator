@@ -7,9 +7,18 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		SetUrl: {
 			onSelect: (target, key, item, area) => { p.setAreaUrl(area); },
 			label: "Set url",
-			title: "Click here to set the url of this area"
 		},
-		Delete: (target, key, item, area) => { p.deleteArea(area); }
+		Delete: (target, key, item, area) => { p.deleteArea(area); },
+		MoveUp: {
+			onSelect: (target, key, item, area) => { p.moveArea(area, 1); },
+			enabled: true,
+			label: "Move Forward",
+		},
+		MoveDown: {
+			onSelect: (target, key, item, area) => { p.moveArea(area, -1); },
+			enabled: true,
+			label: "Move Backward",
+		}
 	};
 	var tempArea = new Area();
 	var tempCoord = new XY();
@@ -35,6 +44,8 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 			.addButton("Generate Html", function () { settings.setValue("Output", map.toHtml()) })
 			.addButton("Generate Svg", function () { settings.setValue("Output", map.toSvg()) })
 			.addTextArea("Output");
+		// Fix for oncontextmenu
+		p.canvas.addEventListener("contextmenu", function (e) { e.preventDefault(); });
 	}
 
 	p.draw = function () {
@@ -50,7 +61,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 
 	//------------------------------ Events -----------------------------------
 
-	p.mousePressed = function (e) {
+	p.mousePressed = function () {
 		if (p.mouseIsHover()) {
 			if (p.mouseButton == p.LEFT && !ContextMenu.isOpen()) {
 				hovered.shape != "default" ? selected = hovered : false;
@@ -82,14 +93,6 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 						}
 						break;
 				}
-			} else if (p.mouseButton == p.RIGHT) {
-				if (hovered) {
-					ContextMenu.display(e, menu, {
-						position: "click",
-						data: hovered
-					});
-				}
-				return false; // doesen't work as expected
 			}
 		}
 	}
@@ -105,7 +108,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		}
 	}
 
-	p.mouseReleased = function () {
+	p.mouseReleased = function (e) {
 		switch (tool) {
 			case "rectangle":
 			case "circle":
@@ -130,6 +133,17 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		}
 		bgLayer.disappear();
 		selected = false;
+		if (p.mouseButton == p.RIGHT) {
+			if (hovered) {
+				menu.MoveUp.enabled = !map.isLastArea(hovered.id);
+				menu.MoveDown.enabled = !map.isFirstArea(hovered.id);
+				ContextMenu.display(e, menu, {
+					position: "click",
+					data: hovered
+				});
+			}
+			return false; // doesen't work as expected
+		}
 	}
 
 	//---------------------------- Functions ----------------------------------
@@ -318,6 +332,19 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		}
 	}
 
+	p.moveArea = function (area, direction) {
+		if (map.moveArea(area.id, direction) !== false) {
+			undoManager.add({
+				undo: function () {
+					map.moveArea(area.id, -direction);
+				},
+				redo: function () {
+					map.moveArea(area.id, direction);
+				}
+			});
+		}
+	}
+
 	p.setAreaUrl = function (area) {
 		var href = area.href;
 		var input = prompt("Entrez l'url vers laquelle devrait pointer cette zone", href ? href : "http://");
@@ -330,7 +357,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 				redo: function () {
 					area.sethref(input);
 				}
-			})
+			});
 		}
 	}
 
@@ -345,7 +372,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 				map.setDefaultArea(bool);
 				settings.setValue("Default Area", bool)
 			}
-		})
+		});
 	}
 
 	p.clearAreas = function () {
@@ -358,7 +385,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 			redo: function () {
 				map.clearAreas();
 			}
-		})
+		});
 	}
 
 	//---------------------------- P5 Classes ---------------------------------
@@ -394,6 +421,3 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		p.rect(0, 0, p.width, p.height);
 	}
 }
-
-// Fix for oncontextmenu
-window.addEventListener("contextmenu", function (e) { e.preventDefault(); });

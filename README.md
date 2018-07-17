@@ -1,4 +1,4 @@
-# Image Map Creator
+# [Image Map Creator](https://rawgit.com/n-peugnet/image-map-creator/master/demos/)
 
 This is a simple map creator tool made with the p5.js library. I want it
 to be easy to use for both the end user and the developper.
@@ -19,8 +19,8 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 -   [x] show a menu by right-clicking on an area with these options :
 	-   [x] set url
 	-   [x] delete
-	-   [ ] move forward
-	-   [ ] move backwards
+	-   [x] move forward
+	-   [x] move backwards
 -   [x] differents tools :
 	-   [x] draw rectangular areas
 	-   [x] draw circular areas (by dragging left)
@@ -43,6 +43,8 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 	-   [x] redo
 	-   [x] export the result as a valid html map
 	-   [ ] export the result as a usable svg map
+	-   [ ] export the result as JSON
+	-   [ ] import from JSON
 
 ## How to Integrate it
 

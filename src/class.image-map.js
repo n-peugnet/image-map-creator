@@ -52,9 +52,25 @@ class ImageMap {
 	}
 
 	rmvArea(id) {
-		var index = this.areaIndex(id);
+		let index = this.areaIndex(id);
 		this.areas.splice(index, 1);
 		return index;
+	}
+
+	/**
+	 * 
+	 * @param {number} id 
+	 * @param {number} direction 
+	 */
+	moveArea(id, direction) {
+		let index = this.areaIndex(id);
+		let area = this.areas[index];
+		let nextIndex = index + direction;
+		if (nextIndex < 0 || nextIndex >= this.areas.length)
+			return false;
+		this.rmvArea(id);
+		this.insertArea(area, nextIndex);
+		return nextIndex;
 	}
 
 	popArea() {
@@ -69,6 +85,14 @@ class ImageMap {
 		return this.areas.findIndex(a => {
 			return a.id == id;
 		});
+	}
+
+	isFirstArea(id) {
+		return this.areaIndex(id) == 0;
+	}
+
+	isLastArea(id) {
+		return this.areaIndex(id) == this.areas.length - 1;
 	}
 
 	getNewId() {
