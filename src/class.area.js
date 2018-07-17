@@ -51,8 +51,12 @@ class Area {
 		}
 	}
 
-	isValidShape() {
+	isDrawable() {
 		return this.coords.length >= 1;
+	}
+
+	isValidShape() {
+		return this.isDrawable();
 	}
 
 	sethref(url) {
@@ -105,7 +109,7 @@ class AreaRect extends Area {
 		}
 	}
 
-	isValidShape() {
+	isDrawable() {
 		return this.coords.length == 2 && !this.coords[1].oneIsEmpty();
 	}
 
@@ -244,7 +248,7 @@ class AreaDefault extends Area {
 		this.isDefault = true;
 	}
 
-	isValidShape() {
+	isDrawable() {
 		return true;
 	}
 

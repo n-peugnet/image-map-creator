@@ -12,9 +12,9 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		Delete: (target, key, item, area) => { p.deleteArea(area); }
 	};
 	var tempArea = new Area();
-	var origin = new XY();
-	var selected;
-	var hovered;
+	var tempCoord = new XY();
+	var selected = false;
+	var hovered = false;
 	var bgLayer = new BgLayer();
 	var map = new ImageMap();
 	var undoManager = new UndoManager();
@@ -39,7 +39,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 
 	p.draw = function () {
 		p.updateTempArea();
-		p.setHovered();
+		hovered = p.mouseIsHoverArea();
 		p.setCursor();
 		p.setOutput();
 		p.background(200);
@@ -52,8 +52,8 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 
 	p.mousePressed = function (e) {
 		if (p.mouseIsHover()) {
-			selected = hovered;
-			if (p.mouseButton == p.LEFT) {
+			if (p.mouseButton == p.LEFT && !ContextMenu.isOpen()) {
+				hovered.shape != "default" ? selected = hovered : false;
 				switch (tool) {
 					case "circle":
 					case "rectangle":
@@ -72,21 +72,22 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 						}
 						break;
 					case "move":
-						if (selected != undefined) {
-							origin = selected.firstCoord();
+						if (selected) {
+							tempCoord = selected.firstCoord();
 						}
 						break;
 					case "delete":
-						p.deleteArea(hovered);
+						if (hovered) {
+							p.deleteArea(hovered);
+						}
 						break;
 				}
 			} else if (p.mouseButton == p.RIGHT) {
-				if (selected != undefined) {
+				if (hovered) {
 					ContextMenu.display(e, menu, {
 						position: "click",
-						data: selected
+						data: hovered
 					});
-					selected = undefined;
 				}
 				return false; // doesen't work as expected
 			}
@@ -96,7 +97,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	p.mouseDragged = function () {
 		switch (tool) {
 			case "move":
-				if (selected != undefined) {
+				if (selected) {
 					let mvmt = new XY(p.mouseX - p.pmouseX, p.mouseY - p.pmouseY);
 					selected.move(mvmt);
 				}
@@ -113,9 +114,9 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 				tempArea = new Area();
 				break;
 			case "move":
-				if (selected != undefined) {
+				if (selected) {
 					let area = selected;
-					let move = area.firstCoord().diff(origin);
+					let move = area.firstCoord().diff(tempCoord);
 					undoManager.add({
 						undo: function () {
 							area.move(move.invert());
@@ -128,7 +129,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 				break;
 		}
 		bgLayer.disappear();
-		selected = undefined;
+		selected = false;
 	}
 
 	//---------------------------- Functions ----------------------------------
@@ -138,13 +139,14 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	}
 
 	/**
-	 * @returns {Area|undefined}
+	 * @returns {Area|false}
 	 */
 	p.mouseIsHoverArea = function () {
-		var allAreas = map.getAreas();
-		return allAreas.reverse().find(area => {
+		let allAreas = map.getAreas();
+		let area = allAreas.reverse().find(area => {
 			return area.isHover(p.mouseX, p.mouseY);
 		});
+		return area != undefined ? area : false;
 	}
 
 	// p.mouseIsDraggedLeft = function () {
@@ -193,13 +195,9 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		var allAreas = map.getAreas().concat([tempArea]);
 		allAreas.forEach(area => {
 			p.setAreaStyle(area);
-			if (!area.empty())
+			if (area.isDrawable())
 				area.display(p);
 		});
-	}
-
-	p.setHovered = function () {
-		hovered = p.mouseIsHoverArea();
 	}
 
 	p.setTool = function (value) {
@@ -212,7 +210,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 			switch (tool) {
 				case "polygon":
 					if (!tempArea.empty() && tempArea.isClosable(p.mouseX, p.mouseY)) {
-						p.cursor(p.ARROW);
+						p.cursor(p.HAND);
 						break;
 					}
 				default:
@@ -220,7 +218,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 			}
 		} else {
 			p.cursor(p.ARROW);
-			if (hovered != undefined) {
+			if (hovered) {
 				switch (tool) {
 					case "inspect":
 					case "delete":
@@ -238,7 +236,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		switch (tool) {
 			case "inspect":
 				if (p.mouseIsHover()) {
-					let href = hovered != undefined ? hovered.href : "none";
+					let href = hovered ? hovered.href : "none";
 					settings.setValue("Output", href);
 				}
 				break;
@@ -251,7 +249,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 			color = p.color(255, 0);
 		if (
 			(p.mouseIsHover() && (tool == "inspect" || tool == "delete") && area == hovered) ||
-			(tool == "move" && selected == undefined && area == hovered && p.mouseIsHover()) ||
+			(tool == "move" && selected == false && area == hovered && p.mouseIsHover()) ||
 			(tool == "move" && selected == area)
 		) {
 			color = p.color(255, 200, 200, 178); // highlight (set color red)
@@ -305,15 +303,19 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 
 	p.deleteArea = function (area) {
 		let id = area.id;
-		let index = map.rmvArea(id);
-		undoManager.add({
-			undo: function () {
-				map.insertArea(area, index);
-			},
-			redo: function () {
-				map.rmvArea(id);
-			}
-		})
+		if (id === 0) {
+			settings.setValue("Default Area", false);
+		} else {
+			let index = map.rmvArea(id);
+			undoManager.add({
+				undo: function () {
+					map.insertArea(area, index);
+				},
+				redo: function () {
+					map.rmvArea(id);
+				}
+			});
+		}
 	}
 
 	p.setAreaUrl = function (area) {
