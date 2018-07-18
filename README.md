@@ -16,7 +16,7 @@ Here is the list of all the features of this app :
 _The checked ones are implemented, the others are the ones I plan to add in the future_
 
 -   [x] drag&drop a picture on the canvas
--   [ ] zoom in & out
+-   [x] zoom in & out
 -   [x] show a menu by right-clicking on an area with these options :
 	-   [x] set url
 	-   [x] delete

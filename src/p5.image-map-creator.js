@@ -28,12 +28,15 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	var map = new ImageMap(width, height);
 	var undoManager = new UndoManager();
 	var img = null;
-	var scale = 1;
-	var iScale = 1;
+	var w = {
+		scale: 1,
+		transX: 0,
+		transY: 0
+	}
 	var zoom = {
-		min: 0.05,
+		min: 0.03,
 		max: 3,
-		sensativity: 0.005
+		sensativity: 0.001
 	}
 
 	p.setup = function () {
@@ -60,7 +63,8 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		p.setCursor();
 		p.setOutput();
 		p.background(200);
-		p.scale(scale);
+		p.translate(w.transX, w.transY);
+		p.scale(w.scale);
 		p.drawImage();
 		bgLayer.display();
 		p.drawAreas();
@@ -80,7 +84,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 					case "polygon":
 						if (tempArea.empty()) {
 							p.setTempArea(p.mX(), p.mY());
-						} else if (tempArea.isClosable(p.mX(), p.mY(), 5 * iScale)) {
+						} else if (tempArea.isClosable(p.mX(), p.mY(), 5 / w.scale)) {
 							tempArea.close();
 							if (tempArea.isValidShape())
 								p.createArea(tempArea);
@@ -108,7 +112,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		switch (tool) {
 			case "move":
 				if (selected) {
-					let mvmt = new XY(p.mX() - p.pmouseX * (iScale), p.mY() - p.pmouseY * (iScale));
+					let mvmt = new XY(p.mX() - p.trueX(p.pmouseX), p.mY() - p.trueY(p.pmouseY));
 					selected.move(mvmt);
 				}
 				break;
@@ -155,18 +159,27 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 
 	p.mouseWheel = function (e) {
 		if (p.mouseIsHover()) {
-			p.updateScale(scale - zoom.sensativity * e.delta);
+			let coefZoom = w.scale * zoom.sensativity * - e.delta;
+			p.zoom(coefZoom);
 		}
 	}
 
 	//---------------------------- Functions ----------------------------------
 
 	p.mX = function () {
-		return p.mouseX * iScale;
+		return p.trueX(p.mouseX);
 	}
 
 	p.mY = function () {
-		return p.mouseY * iScale;
+		return p.trueY(p.mouseY);
+	}
+
+	p.trueX = function (coord) {
+		return (coord - w.transX) / w.scale;
+	}
+
+	p.trueY = function (coord) {
+		return (coord - w.transY) / w.scale;
 	}
 
 	p.mouseIsHover = function () {
@@ -210,20 +223,31 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	}
 
 	p.setScale = function (img) {
-		p.updateScale(1);
+		w.scale = 1;
+		w.transX = 0;
+		w.transY = 0;
 		let xScale = p.width / img.width;
 		let yScale = p.height / img.height;
-		if (xScale < scale)
-			p.updateScale(xScale);
-		if (yScale < scale)
-			p.updateScale(yScale);
+		if (xScale < w.scale)
+			w.scale = xScale;
+		if (yScale < w.scale)
+			w.scale = yScale;
 		map.setSize(img.width, img.height);
 	}
 
-	p.updateScale = function (newScale) {
-		scale = newScale;
-		scale = p.constrain(scale, zoom.min, zoom.max);
-		iScale = 1 / scale;
+	p.zoom = function (coef) {
+
+		let newScale = w.scale + coef;
+		if (newScale > zoom.min && newScale < zoom.max) {
+			let mouseXToOrigin = p.mX();
+			let mouseYToOrigin = p.mY();
+			let transX = mouseXToOrigin * coef;
+			let transY = mouseYToOrigin * coef;
+
+			w.scale = newScale;
+			w.transX -= transX;
+			w.transY -= transY;
+		}
 	}
 
 	p.drawImage = function () {
@@ -249,7 +273,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		if (drawingTools.includes(tool)) {
 			switch (tool) {
 				case "polygon":
-					if (!tempArea.empty() && tempArea.isClosable(p.mX(), p.mY(), 5 * iScale)) {
+					if (!tempArea.empty() && tempArea.isClosable(p.mX(), p.mY(), 5 / w.scale)) {
 						p.cursor(p.HAND);
 						break;
 					}
@@ -295,7 +319,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 			color = p.color(255, 200, 200, 178); // highlight (set color red)
 		}
 		p.fill(color);
-		p.strokeWeight(1 * iScale);
+		p.strokeWeight(1 / w.scale);
 		if (tool == "inspect")
 			p.noStroke();
 		else
@@ -444,6 +468,6 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		}
 		p.noStroke();
 		p.fill(255, 255, 255, this.alpha);
-		p.rect(0, 0, p.width * iScale, p.height * iScale);
+		p.rect(p.trueX(0), p.trueY(0), p.width / w.scale, p.height / w.scale);
 	}
 }
