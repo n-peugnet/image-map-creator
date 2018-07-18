@@ -6,11 +6,10 @@ class ImageMap {
 	 * @param {string} name 
 	* @param {boolean} hasDefaultArea
 	 */
-	constructor(areas = [], name, hasDefaultArea = false) {
+	constructor(width, height, areas = [], name, hasDefaultArea = false) {
 		this.name = name;
-		this.width = 0;
-		this.height = 0;
-		this.scale = 1;
+		this.width = width;
+		this.height = height;
 		this.areas = areas;
 		this.dArea = new AreaDefault();
 		this.hasDefaultArea = hasDefaultArea;
@@ -24,10 +23,6 @@ class ImageMap {
 	setSize(width, height) {
 		this.width = width;
 		this.height = height;
-	}
-
-	setScale(scale) {
-		this.scale = scale;
 	}
 
 	setDefaultArea(bool) {
@@ -104,7 +99,7 @@ class ImageMap {
 		var areas = [];
 		this.getAreas().forEach(a => {
 			if (a.isValidShape())
-				areas.push('\t' + a.toHtml(this.scale));
+				areas.push('\t' + a.toHtml());
 		});
 		return '<map name="' + this.name + '" id="' + this.name + '">\n' + areas.reverse().join('\n') + '\n</map>';
 	}
@@ -113,7 +108,7 @@ class ImageMap {
 		var areas = [];
 		this.getAreas(false).forEach(a => {
 			if (a.isValidShape())
-				areas.push('\t' + a.toSvg(this.scale));
+				areas.push('\t' + a.toSvg());
 		});
 		var str = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="' + this.width + '" height="' + this.height + '">\n';
 		str += areas.reverse().join('\n');

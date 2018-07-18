@@ -60,12 +60,12 @@ class XY {
 		return new XY(- this.x, -this.y);
 	}
 
-	toString(scale, dec, val) {
-		return round(this[val] / scale, dec)
+	toString(dec, val) {
+		return round(this[val], dec)
 	}
 
-	toHtml(scale, dec) {
-		return this.toString(scale, dec, "x") + "," + this.toString(scale, dec, "y");
+	toHtml(dec) {
+		return this.toString(dec, "x") + "," + this.toString(dec, "y");
 	}
 
 }

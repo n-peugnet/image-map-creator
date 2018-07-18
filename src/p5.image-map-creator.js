@@ -25,10 +25,16 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	var selected = false;
 	var hovered = false;
 	var bgLayer = new BgLayer();
-	var map = new ImageMap();
+	var map = new ImageMap(width, height);
 	var undoManager = new UndoManager();
 	var img = null;
 	var scale = 1;
+	var iScale = 1;
+	var zoom = {
+		min: 0.05,
+		max: 3,
+		sensativity: 0.005
+	}
 
 	p.setup = function () {
 		var canvas = p.createCanvas(width, height);
@@ -54,6 +60,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		p.setCursor();
 		p.setOutput();
 		p.background(200);
+		p.scale(scale);
 		p.drawImage();
 		bgLayer.display();
 		p.drawAreas();
@@ -68,18 +75,18 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 				switch (tool) {
 					case "circle":
 					case "rectangle":
-						p.setTempArea(p.mouseX, p.mouseY);
+						p.setTempArea(p.mX(), p.mY());
 						break;
 					case "polygon":
 						if (tempArea.empty()) {
-							p.setTempArea(p.mouseX, p.mouseY);
-						} else if (tempArea.isClosable(p.mouseX, p.mouseY)) {
+							p.setTempArea(p.mX(), p.mY());
+						} else if (tempArea.isClosable(p.mX(), p.mY(), 5 * iScale)) {
 							tempArea.close();
 							if (tempArea.isValidShape())
 								p.createArea(tempArea);
 							tempArea = new Area();
 						} else {
-							tempArea.addCoord(p.mouseX, p.mouseY);
+							tempArea.addCoord(p.mX(), p.mY());
 						}
 						break;
 					case "move":
@@ -101,7 +108,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		switch (tool) {
 			case "move":
 				if (selected) {
-					let mvmt = new XY(p.mouseX - p.pmouseX, p.mouseY - p.pmouseY);
+					let mvmt = new XY(p.mX() - p.pmouseX * (iScale), p.mY() - p.pmouseY * (iScale));
 					selected.move(mvmt);
 				}
 				break;
@@ -135,8 +142,8 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		selected = false;
 		if (p.mouseButton == p.RIGHT) {
 			if (hovered) {
-				menu.MoveUp.enabled = !map.isLastArea(hovered.id);
-				menu.MoveDown.enabled = !map.isFirstArea(hovered.id);
+				menu.MoveUp.enabled = !(map.isLastArea(hovered.id) || hovered.shape == 'default');
+				menu.MoveDown.enabled = !(map.isFirstArea(hovered.id) || hovered.shape == 'default');
 				ContextMenu.display(e, menu, {
 					position: "click",
 					data: hovered
@@ -146,7 +153,21 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		}
 	}
 
+	p.mouseWheel = function (e) {
+		if (p.mouseIsHover()) {
+			p.updateScale(scale - zoom.sensativity * e.delta);
+		}
+	}
+
 	//---------------------------- Functions ----------------------------------
+
+	p.mX = function () {
+		return p.mouseX * iScale;
+	}
+
+	p.mY = function () {
+		return p.mouseY * iScale;
+	}
 
 	p.mouseIsHover = function () {
 		return p.mouseX <= p.width && p.mouseX >= 0 && p.mouseY <= p.height && p.mouseY >= 0;
@@ -158,7 +179,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	p.mouseIsHoverArea = function () {
 		let allAreas = map.getAreas();
 		let area = allAreas.reverse().find(area => {
-			return area.isHover(p.mouseX, p.mouseY);
+			return area.isHover(p.mX(), p.mY());
 		});
 		return area != undefined ? area : false;
 	}
@@ -180,7 +201,6 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	p.handeFile = function (file) {
 		if (file.type == "image") {
 			img = p.loadImage(file.data, img => p.setScale(img));
-			map.setSize(img.width, img.height);
 			if (!map.name) {
 				map.setName(file.name);
 				settings.setValue("Map Name", map.name);
@@ -190,19 +210,25 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	}
 
 	p.setScale = function (img) {
-		scale = 1;
+		p.updateScale(1);
 		let xScale = p.width / img.width;
 		let yScale = p.height / img.height;
 		if (xScale < scale)
-			scale = xScale;
+			p.updateScale(xScale);
 		if (yScale < scale)
-			scale = yScale;
-		map.setScale(scale);
+			p.updateScale(yScale);
+		map.setSize(img.width, img.height);
+	}
+
+	p.updateScale = function (newScale) {
+		scale = newScale;
+		scale = p.constrain(scale, zoom.min, zoom.max);
+		iScale = 1 / scale;
 	}
 
 	p.drawImage = function () {
 		if (img)
-			p.image(img, 0, 0, img.width * scale, img.height * scale);
+			p.image(img, 0, 0, img.width, img.height);
 	}
 
 	p.drawAreas = function () {
@@ -223,7 +249,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		if (drawingTools.includes(tool)) {
 			switch (tool) {
 				case "polygon":
-					if (!tempArea.empty() && tempArea.isClosable(p.mouseX, p.mouseY)) {
+					if (!tempArea.empty() && tempArea.isClosable(p.mX(), p.mY(), 5 * iScale)) {
 						p.cursor(p.HAND);
 						break;
 					}
@@ -269,7 +295,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 			color = p.color(255, 200, 200, 178); // highlight (set color red)
 		}
 		p.fill(color);
-		p.strokeWeight(1);
+		p.strokeWeight(1 * iScale);
 		if (tool == "inspect")
 			p.noStroke();
 		else
@@ -295,7 +321,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 
 	p.updateTempArea = function () {
 		if (!tempArea.empty()) {
-			tempArea.updateLastCoord(p.mouseX, p.mouseY);
+			tempArea.updateLastCoord(p.mX(), p.mY());
 		}
 	}
 
@@ -418,6 +444,6 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		}
 		p.noStroke();
 		p.fill(255, 255, 255, this.alpha);
-		p.rect(0, 0, p.width, p.height);
+		p.rect(0, 0, p.width * iScale, p.height * iScale);
 	}
 }

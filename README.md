@@ -16,15 +16,16 @@ Here is the list of all the features of this app :
 _The checked ones are implemented, the others are the ones I plan to add in the future_
 
 -   [x] drag&drop a picture on the canvas
+-   [ ] zoom in & out
 -   [x] show a menu by right-clicking on an area with these options :
 	-   [x] set url
 	-   [x] delete
 	-   [x] move forward
 	-   [x] move backwards
 -   [x] differents tools :
-	-   [x] draw rectangular areas
-	-   [x] draw circular areas (by dragging left)
-	-   [x] draw polygon areas
+	-   [x] rectangle mode
+	-   [x] circle mode
+	-   [x] polygon mode
 	-   [X] move mode
 	-   [x] inspect mode
 	-   [ ] select mode
@@ -57,3 +58,17 @@ var iMap = new p5(imageMapCreator, "div-1");
 For more details on the instance mode of p5 see [the p5 documentation](https://p5js.org/examples/instance-mode-instance-container.html)
 
 You can also see the detailled example in the `/demos` folder.
+
+## Built with
+
+-   [p5.js](https://github.com/processing/p5.js) - an easy canvas drawing library - [website](http://p5js.org/)
+-   [quicksettings](https://github.com/bit101/quicksettings) - a quick and easy settings creation library - [website](http://bit101.github.io/quicksettings/)
+-   [Undo Manager](https://github.com/ArthurClemens/Javascript-Undo-Manager) - a light undo manager library
+-   [contextmenu](https://github.com/theyak/contextmenu) - a light right-click menu creation library
+-   [Rawgit](https://rawgit.com/) - a content delivery network based on github's raw files
+
+## Authors
+
+-   **Nicolas Peugnet** - _Initial work_ - [Github](https://github.com/n-peugnet) - [Website](http://nicolas.club1.fr)
+
+See also the list of [contributors](https://github.com/n-peugnet/image-map-creator/contributors) who participated in this project.
