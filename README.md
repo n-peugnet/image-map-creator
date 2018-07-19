@@ -17,6 +17,7 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 
 -   [x] drag&drop a picture on the canvas
 -   [x] zoom in & out
+-   [X] pan (dragging with MouseWheel click)
 -   [x] show a menu by right-clicking on an area with these options :
 	-   [x] set url
 	-   [x] delete

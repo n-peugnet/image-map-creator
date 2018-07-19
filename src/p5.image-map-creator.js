@@ -27,8 +27,8 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	var bgLayer = new BgLayer();
 	var map = new ImageMap(width, height);
 	var undoManager = new UndoManager();
-	var img = null;
-	var w = {
+	var img;
+	var view = {
 		scale: 1,
 		transX: 0,
 		transY: 0
@@ -63,8 +63,8 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		p.setCursor();
 		p.setOutput();
 		p.background(200);
-		p.translate(w.transX, w.transY);
-		p.scale(w.scale);
+		p.translate(view.transX, view.transY);
+		p.scale(view.scale);
 		p.drawImage();
 		bgLayer.display();
 		p.drawAreas();
@@ -75,7 +75,6 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	p.mousePressed = function () {
 		if (p.mouseIsHover()) {
 			if (p.mouseButton == p.LEFT && !ContextMenu.isOpen()) {
-				hovered.shape != "default" ? selected = hovered : false;
 				switch (tool) {
 					case "circle":
 					case "rectangle":
@@ -84,7 +83,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 					case "polygon":
 						if (tempArea.empty()) {
 							p.setTempArea(p.mX(), p.mY());
-						} else if (tempArea.isClosable(p.mX(), p.mY(), 5 / w.scale)) {
+						} else if (tempArea.isClosable(p.mX(), p.mY(), 5 / view.scale)) {
 							tempArea.close();
 							if (tempArea.isValidShape())
 								p.createArea(tempArea);
@@ -94,7 +93,8 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 						}
 						break;
 					case "move":
-						if (selected) {
+						if (hovered) {
+							selected = hovered.shape != "default" ? hovered : false;
 							tempCoord = selected.firstCoord();
 						}
 						break;
@@ -109,13 +109,20 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	}
 
 	p.mouseDragged = function () {
-		switch (tool) {
-			case "move":
-				if (selected) {
-					let mvmt = new XY(p.mX() - p.trueX(p.pmouseX), p.mY() - p.trueY(p.pmouseY));
-					selected.move(mvmt);
+		if (p.mouseIsHover() && !ContextMenu.isOpen()) {
+			if (p.mouseButton == p.LEFT) {
+				switch (tool) {
+					case "move":
+						if (selected) {
+							let mvmt = new XY(p.mX() - p.trueX(p.pmouseX), p.mY() - p.trueY(p.pmouseY));
+							selected.move(mvmt);
+						}
+						break;
 				}
-				break;
+			} else if (p.mouseButton == p.CENTER) {
+				view.transX += p.mouseX - p.pmouseX;
+				view.transY += p.mouseY - p.pmouseY;
+			}
 		}
 	}
 
@@ -142,24 +149,25 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 				}
 				break;
 		}
-		bgLayer.disappear();
-		selected = false;
-		if (p.mouseButton == p.RIGHT) {
+		if (p.mouseButton == p.RIGHT && p.mouseIsHover()) {
 			if (hovered) {
+				selected = hovered;
 				menu.MoveUp.enabled = !(map.isLastArea(hovered.id) || hovered.shape == 'default');
 				menu.MoveDown.enabled = !(map.isFirstArea(hovered.id) || hovered.shape == 'default');
 				ContextMenu.display(e, menu, {
 					position: "click",
 					data: hovered
 				});
+				return false; // doesen't work as expected
 			}
-			return false; // doesen't work as expected
 		}
+		bgLayer.disappear();
+		selected = false;
 	}
 
 	p.mouseWheel = function (e) {
 		if (p.mouseIsHover()) {
-			let coefZoom = w.scale * zoom.sensativity * - e.delta;
+			let coefZoom = view.scale * zoom.sensativity * - e.delta;
 			p.zoom(coefZoom);
 		}
 	}
@@ -175,11 +183,11 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	}
 
 	p.trueX = function (coord) {
-		return (coord - w.transX) / w.scale;
+		return (coord - view.transX) / view.scale;
 	}
 
 	p.trueY = function (coord) {
-		return (coord - w.transY) / w.scale;
+		return (coord - view.transY) / view.scale;
 	}
 
 	p.mouseIsHover = function () {
@@ -213,7 +221,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 
 	p.handeFile = function (file) {
 		if (file.type == "image") {
-			img = p.loadImage(file.data, img => p.setScale(img));
+			img = p.loadImage(file.data, img => p.resetView(img));
 			if (!map.name) {
 				map.setName(file.name);
 				settings.setValue("Map Name", map.name);
@@ -222,31 +230,31 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		bgLayer.disappear();
 	}
 
-	p.setScale = function (img) {
-		w.scale = 1;
-		w.transX = 0;
-		w.transY = 0;
+	p.resetView = function (img) {
+		view.scale = 1;
+		view.transX = 0;
+		view.transY = 0;
 		let xScale = p.width / img.width;
 		let yScale = p.height / img.height;
-		if (xScale < w.scale)
-			w.scale = xScale;
-		if (yScale < w.scale)
-			w.scale = yScale;
+		if (xScale < view.scale)
+			view.scale = xScale;
+		if (yScale < view.scale)
+			view.scale = yScale;
 		map.setSize(img.width, img.height);
 	}
 
 	p.zoom = function (coef) {
 
-		let newScale = w.scale + coef;
+		let newScale = view.scale + coef;
 		if (newScale > zoom.min && newScale < zoom.max) {
 			let mouseXToOrigin = p.mX();
 			let mouseYToOrigin = p.mY();
 			let transX = mouseXToOrigin * coef;
 			let transY = mouseYToOrigin * coef;
 
-			w.scale = newScale;
-			w.transX -= transX;
-			w.transY -= transY;
+			view.scale = newScale;
+			view.transX -= transX;
+			view.transY -= transY;
 		}
 	}
 
@@ -273,7 +281,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		if (drawingTools.includes(tool)) {
 			switch (tool) {
 				case "polygon":
-					if (!tempArea.empty() && tempArea.isClosable(p.mX(), p.mY(), 5 / w.scale)) {
+					if (!tempArea.empty() && tempArea.isClosable(p.mX(), p.mY(), 5 / view.scale)) {
 						p.cursor(p.HAND);
 						break;
 					}
@@ -311,15 +319,15 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		var color = p.color(255, 255, 255, 178);
 		if (tool == "inspect")
 			color = p.color(255, 0);
-		if (
-			(p.mouseIsHover() && (tool == "inspect" || tool == "delete") && area == hovered) ||
-			(tool == "move" && selected == false && area == hovered && p.mouseIsHover()) ||
-			(tool == "move" && selected == area)
-		) {
+		if ((p.mouseIsHover() && area == hovered && selected == false && (
+			tool == "inspect" ||
+			tool == "delete" ||
+			tool == "move")) ||
+			selected == area) {
 			color = p.color(255, 200, 200, 178); // highlight (set color red)
 		}
 		p.fill(color);
-		p.strokeWeight(1 / w.scale);
+		p.strokeWeight(1 / view.scale);
 		if (tool == "inspect")
 			p.noStroke();
 		else
@@ -468,6 +476,6 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		}
 		p.noStroke();
 		p.fill(255, 255, 255, this.alpha);
-		p.rect(p.trueX(0), p.trueY(0), p.width / w.scale, p.height / w.scale);
+		p.rect(p.trueX(0), p.trueY(0), p.width / view.scale, p.height / view.scale);
 	}
 }
