@@ -5,10 +5,29 @@ class Area {
 	 * @param {string} href the link this area is going to point to
 	 */
 	constructor(shape, coords = [], href) {
-		this.shape = shape;
-		this.coords = coords;
-		this.href = href;
+		this.setShape(shape);
+		this.setCoords(coords);
+		this.setHref(href);
 		this.id = 0;
+	}
+
+	static fromObject(obj) {
+		switch (obj.shape) {
+			case 'rect':
+				return new AreaRect(obj.coords.map(XY.fromObject), obj.href);
+			case 'circle':
+				return new AreaCircle(obj.coords.map(XY.fromObject), obj.radius, obj.href);
+			case 'poly':
+				return new AreaPoly(obj.coords.map(XY.fromObject), obj.href);
+			case 'default':
+				return new AreaDefault(obj.href);
+			default:
+				throw 'Not an area'
+		}
+	}
+
+	setShape(shape) {
+		this.shape = shape;
 	}
 
 	/**
@@ -18,6 +37,10 @@ class Area {
 	 */
 	addCoord(x, y) {
 		return this.coords.push(new XY(x, y));
+	}
+
+	setCoords(coords) {
+		this.coords = coords;
 	}
 
 	getCoords(mode = "default") {
@@ -59,7 +82,7 @@ class Area {
 		return this.isDrawable();
 	}
 
-	sethref(url) {
+	setHref(url) {
 		this.href = url;
 	}
 
@@ -98,8 +121,11 @@ class AreaRect extends Area {
 	 * @param {string} href the link this area is going to point to
 	 */
 	constructor(coords = [], href) {
-		super("rect");
-		this.coords = coords.slice(0, 2);
+		super("rect", coords, href);
+	}
+
+	setCoords(coords) {
+		super.setCoords(coords.slice(0, 2));
 	}
 
 	updateLastCoord(x, y) {
@@ -150,7 +176,10 @@ class AreaCircle extends Area {
 	constructor(coords = [], radius = 0, href) {
 		super("circle", coords, href);
 		this.radius = radius;
-		this.getCenter = this.firstCoord;
+	}
+
+	getCenter() {
+		return this.firstCoord;
 	}
 
 	isValidShape() {

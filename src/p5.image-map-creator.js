@@ -9,12 +9,12 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 			label: "Set url",
 		},
 		Delete: (target, key, item, area) => { p.deleteArea(area); },
-		MoveUp: {
+		MoveFront: {
 			onSelect: (target, key, item, area) => { p.moveArea(area, 1); },
 			enabled: true,
 			label: "Move Forward",
 		},
-		MoveDown: {
+		MoveBack: {
 			onSelect: (target, key, item, area) => { p.moveArea(area, -1); },
 			enabled: true,
 			label: "Move Backward",
@@ -52,7 +52,8 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 			.addButton("Clear", p.clearAreas)
 			.addButton("Generate Html", function () { settings.setValue("Output", map.toHtml()) })
 			.addButton("Generate Svg", function () { settings.setValue("Output", map.toSvg()) })
-			.addTextArea("Output");
+			.addTextArea("Output")
+			.addButton("Save", p.export);
 		// Fix for oncontextmenu
 		p.canvas.addEventListener("contextmenu", function (e) { e.preventDefault(); });
 	}
@@ -152,8 +153,8 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		if (p.mouseButton == p.RIGHT && p.mouseIsHover()) {
 			if (hovered) {
 				selected = hovered;
-				menu.MoveUp.enabled = !(map.isLastArea(hovered.id) || hovered.shape == 'default');
-				menu.MoveDown.enabled = !(map.isFirstArea(hovered.id) || hovered.shape == 'default');
+				menu.MoveFront.enabled = !(map.isLastArea(hovered.id) || hovered.shape == 'default');
+				menu.MoveBack.enabled = !(map.isFirstArea(hovered.id) || hovered.shape == 'default');
 				ContextMenu.display(e, menu, {
 					position: "click",
 					data: hovered
@@ -226,6 +227,19 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 				map.setName(file.name);
 				settings.setValue("Map Name", map.name);
 			}
+		} else if (file.subtype == 'json') {
+			fetch(file.data)
+				.then(res => res.blob())
+				.then(blob => {
+					console.log(blob);
+					var reader = new FileReader();
+					reader.onload = function () {
+						var json = reader.result;
+						console.log(json);
+						map.setFromJson(json);
+					}
+					reader.readAsText(blob);
+				});
 		}
 		bgLayer.disappear();
 	}
@@ -407,13 +421,13 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		var href = area.href;
 		var input = prompt("Entrez l'url vers laquelle devrait pointer cette zone", href ? href : "http://");
 		if (input != null) {
-			area.sethref(input);
+			area.setHref(input);
 			undoManager.add({
 				undo: function () {
-					area.sethref(href);
+					area.setHref(href);
 				},
 				redo: function () {
-					area.sethref(input);
+					area.setHref(input);
 				}
 			});
 		}
@@ -423,11 +437,11 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		map.setDefaultArea(bool);
 		undoManager.add({
 			undo: function () {
-				map.setDefaultArea(!bool);
+				map.setDefaultArea(!bool); // semble redondant
 				settings.setValue("Default Area", !bool)
 			},
 			redo: function () {
-				map.setDefaultArea(bool);
+				map.setDefaultArea(bool); // semble redondant
 				settings.setValue("Default Area", bool)
 			}
 		});
@@ -444,6 +458,10 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 				map.clearAreas();
 			}
 		});
+	}
+
+	p.export = function () {
+		download(map.toJson(), `${map.name}.map.json`, 'application/json')
 	}
 
 	//---------------------------- P5 Classes ---------------------------------

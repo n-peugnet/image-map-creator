@@ -11,6 +11,10 @@ class XY {
 		this.y = y;
 	}
 
+	static fromObject(obj) {
+		return new XY(obj.x, obj.y);
+	}
+
 	/**
 	 * returns the distance between two xy coordinates
 	 * @param {XY} xy1 

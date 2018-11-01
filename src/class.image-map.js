@@ -16,6 +16,22 @@ class ImageMap {
 		this.lastId = 0;
 	}
 
+	setFromJson(data) {
+		data = JSON.parse(data);
+		for (const key in data) {
+			if (data.hasOwnProperty(key)) {
+				var value = data[key];
+				if (key == 'areas') {
+					this.areas = value.map(Area.fromObject);
+				} else if (key == 'dArea') {
+					this.dArea = Area.fromObject(value);
+				} else if (Object.keys(this).includes(key)) {
+					this[key] = value;
+				}
+			}
+		}
+	}
+
 	setName(name) {
 		this.name = name.replace(/\s+/g, "");
 	}
@@ -116,7 +132,11 @@ class ImageMap {
 		return str;
 	}
 
-	/** Removes avery areas from the areas array */
+	toJson() {
+		return JSON.stringify(this);
+	}
+
+	/** Removes every areas from the areas array */
 	clearAreas() {
 		this.areas = [];
 	}
