@@ -32,6 +32,7 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 	-   [ ] select mode
 	-   [ ] resize mode ?
 	-   [x] delete mode
+	-   [ ] test mode
 -   [ ] differents drawing modes for rectangles :
 	-   [x] dram from edges
 	-   [ ] draw from center (with `alt`)

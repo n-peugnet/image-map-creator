@@ -10,3 +10,8 @@ function between(val, refA, refB, included = true) {
 function round(x, digits) {
 	return parseFloat(x.toFixed(digits))
 }
+
+function openWindow(url, width = 400, height = 300) {
+
+	window.open(url, "_blank", `width=${width},height=${height}`);
+}

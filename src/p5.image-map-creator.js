@@ -1,3 +1,6 @@
+/**
+ * @param {p5} p a P5 object
+ */
 var imageMapCreator = function (p, width = 600, height = 450) {
 
 	var tool = "rectangle";
@@ -45,7 +48,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		settings = QuickSettings.create(p.width + 5, 0, "Image-map Creator", p.canvas.parentElement)
 			.setDraggable(false)
 			.addText("Map Name", "", v => { map.setName(v) })
-			.addDropDown("Tool", ["rectangle", "circle", "polygon", "inspect", "move", "delete"], v => { p.setTool(v.value) })
+			.addDropDown("Tool", ["rectangle", "circle", "polygon", "inspect", "move", "delete", "test"], v => { p.setTool(v.value) })
 			.addBoolean("Default Area", map.hasDefaultArea, v => { p.setDefaultArea(v) })
 			.addButton("Undo", undoManager.undo)
 			.addButton("Redo", undoManager.redo)
@@ -99,11 +102,6 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 							tempCoord = selected.firstCoord();
 						}
 						break;
-					case "delete":
-						if (hovered) {
-							p.deleteArea(hovered);
-						}
-						break;
 				}
 			}
 		}
@@ -150,20 +148,8 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 				}
 				break;
 		}
-		if (p.mouseButton == p.RIGHT && p.mouseIsHover()) {
-			if (hovered) {
-				selected = hovered;
-				menu.MoveFront.enabled = !(map.isLastArea(hovered.id) || hovered.shape == 'default');
-				menu.MoveBack.enabled = !(map.isFirstArea(hovered.id) || hovered.shape == 'default');
-				ContextMenu.display(e, menu, {
-					position: "click",
-					data: hovered
-				});
-				return false; // doesen't work as expected
-			}
-		}
+		p.onClick(e);
 		bgLayer.disappear();
-		selected = false;
 	}
 
 	p.mouseWheel = function (e) {
@@ -210,6 +196,33 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 	// 	var fCoord = tempArea.firstCoord();
 	// 	return fCoord.x > p.mouseX;
 	// }
+
+	p.onClick = function (event) {
+		if (p.mouseIsHover()) {
+			if (hovered) {
+				if (p.mouseButton == p.RIGHT) {
+					selected = hovered;
+					menu.MoveFront.enabled = !(map.isLastArea(hovered.id) || hovered.shape == 'default');
+					menu.MoveBack.enabled = !(map.isFirstArea(hovered.id) || hovered.shape == 'default');
+					ContextMenu.display(event, menu, {
+						position: "click",
+						data: hovered
+					});
+					return false; // doesen't work as expected
+				} else if (p.mouseButton == p.LEFT) {
+					switch (tool) {
+						case "test":
+							openWindow(hovered.href);
+							break;
+						case "delete":
+							p.deleteArea(hovered);
+							break;
+					}
+				}
+			}
+		}
+		selected = false;
+	}
 
 	p.onOver = function (evt) {
 		bgLayer.appear();
@@ -307,6 +320,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 			if (hovered) {
 				switch (tool) {
 					case "inspect":
+					case "test":
 					case "delete":
 						p.cursor(p.HAND);
 						break;
@@ -342,8 +356,10 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 
 	p.setAreaStyle = function (area) {
 		var color = p.color(255, 255, 255, 178);
-		if (tool == "inspect")
+		if (tool == "inspect" ||
+			tool == "test") {
 			color = p.color(255, 0);
+		}
 		if ((p.mouseIsHover() && area == hovered && selected == false && (
 			tool == "inspect" ||
 			tool == "delete" ||
@@ -353,10 +369,12 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		}
 		p.fill(color);
 		p.strokeWeight(1 / view.scale);
-		if (tool == "inspect")
+		if (tool == "inspect" ||
+			tool == "test") {
 			p.noStroke();
-		else
+		} else {
 			p.stroke(0);
+		}
 	}
 
 	p.setTempArea = function (x, y) {
