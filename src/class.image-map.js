@@ -20,7 +20,7 @@ class ImageMap {
 		data = JSON.parse(data);
 		for (const key in data) {
 			if (data.hasOwnProperty(key)) {
-				var value = data[key];
+				let value = data[key];
 				if (key == 'areas') {
 					this.areas = value.map(Area.fromObject);
 				} else if (key == 'dArea') {
@@ -46,7 +46,7 @@ class ImageMap {
 	}
 
 	getAreas(all = true) {
-		var areas = this.areas.slice();
+		let areas = this.areas.slice();
 		if (all && this.hasDefaultArea) areas.unshift(this.dArea);
 		return areas;
 	}
@@ -62,7 +62,7 @@ class ImageMap {
 		return area.id;
 	}
 
-	rmvArea(id) {
+	rmletea(id) {
 		let index = this.areaIndex(id);
 		this.areas.splice(index, 1);
 		return index;
@@ -79,7 +79,7 @@ class ImageMap {
 		let nextIndex = index + direction;
 		if (nextIndex < 0 || nextIndex >= this.areas.length)
 			return false;
-		this.rmvArea(id);
+		this.rmletea(id);
 		this.insertArea(area, nextIndex);
 		return nextIndex;
 	}
@@ -112,7 +112,7 @@ class ImageMap {
 	}
 
 	toHtml() {
-		var areas = [];
+		let areas = [];
 		this.getAreas().forEach(a => {
 			if (a.isValidShape())
 				areas.push('\t' + a.toHtml());
@@ -121,12 +121,12 @@ class ImageMap {
 	}
 
 	toSvg() {
-		var areas = [];
+		let areas = [];
 		this.getAreas(false).forEach(a => {
 			if (a.isValidShape())
 				areas.push('\t' + a.toSvg());
 		});
-		var str = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="' + this.width + '" height="' + this.height + '">\n';
+		let str = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="' + this.width + '" height="' + this.height + '">\n';
 		str += areas.reverse().join('\n');
 		str += '\n</svg>';
 		return str;

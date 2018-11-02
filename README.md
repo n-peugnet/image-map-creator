@@ -55,7 +55,7 @@ You just need to import `p5.js`, `p5.dom.js` and the files of `/src` in
 your html page. Then instantiate the p5 object like this :
 
 ```JavaScript
-var iMap = new p5(imageMapCreator, "div-1");
+let iMap = new p5(imageMapCreator, "div-1");
 ```
 For more details on the instance mode of p5 see [the p5 documentation](https://p5js.org/examples/instance-mode-instance-container.html)
 

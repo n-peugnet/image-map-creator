@@ -1,6 +1,6 @@
 function between(val, refA, refB, included = true) {
 	if (refA > refB) {
-		var refT = refA;
+		let refT = refA;
 		refA = refB;
 		refB = refT;
 	}

@@ -136,7 +136,7 @@ class AreaRect extends Area {
 
 	updateLastCoord(x, y) {
 		if (this.coords.length == 2) {
-			var fCoord = this.firstCoord();
+			let fCoord = this.firstCoord();
 			this.coords[1] = new XY(x - fCoord.x, y - fCoord.y);
 		}
 	}
@@ -146,8 +146,8 @@ class AreaRect extends Area {
 	}
 
 	isHover(x, y) {
-		var fCoord = this.firstCoord();
-		var lCoord = this.coords[1].sum(fCoord);
+		let fCoord = this.firstCoord();
+		let lCoord = this.coords[1].sum(fCoord);
 		return between(x, fCoord.x, lCoord.x) && between(y, fCoord.y, lCoord.y);
 	}
 
@@ -194,12 +194,12 @@ class AreaCircle extends Area {
 	}
 
 	isHover(x, y) {
-		var center = this.getCenter();
+		let center = this.getCenter();
 		return XY.dist(new XY(x, y), center) < this.radius;
 	}
 
 	updateLastCoord(x, y) {
-		var center = this.getCenter();
+		let center = this.getCenter();
 		this.radius = XY.dist(center, new XY(x, y));
 	}
 
@@ -230,14 +230,14 @@ class AreaPoly extends Area {
 	}
 
 	isHover(x, y) {
-		var cornersX = this.coords.map(c => { return c.x });
-		var cornersY = this.coords.map(c => { return c.y });
+		let cornersX = this.coords.map(c => { return c.x });
+		let cornersY = this.coords.map(c => { return c.y });
 
-		var i, j = cornersX.length - 1;
-		var oddNodes = false;
+		let i, j = cornersX.length - 1;
+		let oddNodes = false;
 
-		var polyX = cornersX;
-		var polyY = cornersY;
+		let polyX = cornersX;
+		let polyY = cornersY;
 
 		for (i = 0; i < cornersX.length; i++) {
 			if ((polyY[i] < y && polyY[j] >= y || polyY[j] < y && polyY[i] >= y) && (polyX[i] <= x || polyX[j] <= x)) {
