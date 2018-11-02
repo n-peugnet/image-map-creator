@@ -57,7 +57,7 @@ class ImageMap {
 	 */
 	addArea(area, setId = true) {
 		if (setId)
-			area.id = this.getNewId();
+			area.setId(this.getNewId());
 		this.areas.push(area);
 		return area.id;
 	}

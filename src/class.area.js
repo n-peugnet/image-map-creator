@@ -3,22 +3,23 @@ class Area {
 	 * @param {string} shape the type of area
 	 * @param {XY[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
+	 * @param {int} id the unique id
 	 */
-	constructor(shape, coords = [], href) {
+	constructor(shape, coords = [], href, id = 0) {
 		this.setShape(shape);
 		this.setCoords(coords);
 		this.setHref(href);
-		this.id = 0;
+		this.setId(id);
 	}
 
 	static fromObject(obj) {
 		switch (obj.shape) {
 			case 'rect':
-				return new AreaRect(obj.coords.map(XY.fromObject), obj.href);
+				return new AreaRect(obj.coords.map(XY.fromObject), obj.href, obj.id);
 			case 'circle':
-				return new AreaCircle(obj.coords.map(XY.fromObject), obj.radius, obj.href);
+				return new AreaCircle(obj.coords.map(XY.fromObject), obj.radius, obj.href, obj.id);
 			case 'poly':
-				return new AreaPoly(obj.coords.map(XY.fromObject), obj.href);
+				return new AreaPoly(obj.coords.map(XY.fromObject), obj.href, obj.id);
 			case 'default':
 				return new AreaDefault(obj.href);
 			default:
@@ -86,6 +87,10 @@ class Area {
 		this.href = url;
 	}
 
+	setId(id) {
+		this.id = id;
+	}
+
 	firstCoord() {
 		return this.coords[0];
 	}
@@ -119,9 +124,10 @@ class AreaRect extends Area {
 	/**
 	 * @param {XY[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
+	 * @param {int} id the unique id
 	 */
-	constructor(coords = [], href) {
-		super("rect", coords, href);
+	constructor(coords = [], href, id) {
+		super("rect", coords, href, id);
 	}
 
 	setCoords(coords) {
@@ -172,9 +178,10 @@ class AreaCircle extends Area {
 	 * @param {XY[]} coords the list of coordinates
 	 * @param {number} radius radius of the circle
 	 * @param {string} href the link this area is going to point to
+	 * @param {int} id the unique id
 	 */
-	constructor(coords = [], radius = 0, href) {
-		super("circle", coords, href);
+	constructor(coords = [], radius = 0, href, id) {
+		super("circle", coords, href, id);
 		this.radius = radius;
 	}
 
@@ -212,9 +219,10 @@ class AreaPoly extends Area {
 	/**
 	 * @param {XY[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
+	 * @param {int} id the unique id
 	 */
-	constructor(coords = [], href) {
-		super("poly", coords, href);
+	constructor(coords = [], href, id) {
+		super("poly", coords, href, id);
 	}
 
 	isValidShape() {

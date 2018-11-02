@@ -63,7 +63,7 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 		hovered = p.mouseIsHoverArea();
 		p.setCursor();
 		p.setOutput();
-		p.background(200);
+		p.setBackground();
 		p.translate(view.transX, view.transY);
 		p.scale(view.scale);
 		p.drawImage();
@@ -326,6 +326,17 @@ var imageMapCreator = function (p, width = 600, height = 450) {
 					settings.setValue("Output", href);
 				}
 				break;
+		}
+	}
+
+	p.setBackground = function () {
+		p.background(200);
+		if (!img) {
+			p.noStroke();
+			p.fill(0);
+			p.textSize(15);
+			let text = 'Drag and drop an image and/or a .map.json save file here';
+			p.text(text, p.width / 6, p.height / 2);
 		}
 	}
 

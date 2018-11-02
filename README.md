@@ -45,8 +45,8 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 	-   [x] redo
 	-   [x] export the result as a valid html map
 	-   [ ] export the result as a usable svg map
-	-   [ ] export the result as JSON
-	-   [ ] import from JSON
+	-   [x] export the result as JSON
+	-   [x] import from JSON
 
 ## How to Integrate it
 
@@ -66,6 +66,7 @@ You can also see the detailled example in the `/demos` folder.
 -   [quicksettings](https://github.com/bit101/quicksettings) - a quick and easy settings creation library - [website](http://bit101.github.io/quicksettings/)
 -   [Undo Manager](https://github.com/ArthurClemens/Javascript-Undo-Manager) - a light undo manager library
 -   [contextmenu](https://github.com/theyak/contextmenu) - a light right-click menu creation library
+-   [download.js](http://danml.com/download.html) - a one liner function to download files client side
 -   [Rawgit](https://rawgit.com/) - a content delivery network based on github's raw files
 
 ## Authors
