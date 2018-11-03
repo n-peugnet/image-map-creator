@@ -36,7 +36,7 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		transX: 0,
 		transY: 0
 	}
-	let zoom = {
+	let zoomParams = {
 		min: 0.03,
 		max: 3,
 		sensativity: 0.001
@@ -72,6 +72,10 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		drawImage();
 		bgLayer.display();
 		drawAreas();
+	}
+
+	p.getMap = function () {
+		return map;
 	}
 
 	//------------------------------ Events -----------------------------------
@@ -154,8 +158,8 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 
 	p.mouseWheel = function (e) {
 		if (mouseIsHover()) {
-			let coefZoom = view.scale * zoom.sensativity * - e.delta;
-			p.zoom(coefZoom);
+			let coefZoom = view.scale * zoomParams.sensativity * - e.delta;
+			zoom(coefZoom);
 		}
 	}
 
@@ -273,7 +277,7 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 	zoom = function (coef) {
 
 		let newScale = view.scale + coef;
-		if (newScale > zoom.min && newScale < zoom.max) {
+		if (newScale > zoomParams.min && newScale < zoomParams.max) {
 			let mouseXToOrigin = mX();
 			let mouseYToOrigin = mY();
 			let transX = mouseXToOrigin * coef;
@@ -398,10 +402,6 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		if (!tempArea.empty()) {
 			tempArea.updateLastCoord(mX(), mY());
 		}
-	}
-
-	getMap = function () {
-		return map;
 	}
 
 	exportMap = function () {
