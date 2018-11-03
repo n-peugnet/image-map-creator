@@ -1,4 +1,5 @@
 import { ImageMap } from "./class.image-map";
+import { BgLayer } from "./p5.bg-layer";
 import { Area, AreaCircle, AreaRect, AreaPoly } from "./class.area";
 import { XY } from "./class.xy";
 import { openWindow } from './utils';
@@ -7,252 +8,249 @@ import UndoManager from "undo-manager";
 import QuickSettings from "quicksettings";
 
 /**
- * @param {p5} p5 a P5 object
  */
-export let imageMapCreator = function (p5, width = 600, height = 450) {
-
-	let tool = "rectangle";
-	let drawingTools = ["rectangle", "circle", "polygon"];
-	let settings;
-	let menu = {
-		SetUrl: {
-			onSelect: (target, key, item, area) => { setAreaUrl(area); },
-			label: "Set url",
-		},
-		Delete: (target, key, item, area) => { deleteArea(area); },
-		MoveFront: {
-			onSelect: (target, key, item, area) => { moveArea(area, 1); },
-			enabled: true,
-			label: "Move Forward",
-		},
-		MoveBack: {
-			onSelect: (target, key, item, area) => { moveArea(area, -1); },
-			enabled: true,
-			label: "Move Backward",
-		}
-	};
-	let tempArea = new Area();
-	let tempCoord = new XY();
-	let selected = false;
-	let hovered = false;
-	let bgLayer = new BgLayer();
-	let map = new ImageMap(width, height);
-	let undoManager = new UndoManager();
-	let img;
-	let view = {
-		scale: 1,
-		transX: 0,
-		transY: 0
-	}
-	let zoomParams = {
-		min: 0.03,
-		max: 3,
-		sensativity: 0.001
-	}
-
-	p5.setup = function () {
-		let canvas = p5.createCanvas(width, height);
-		canvas.drop(handeFile).dragLeave(onLeave).dragOver(onOver);
-		settings = QuickSettings.create(p5.width + 5, 0, "Image-map Creator", p5.canvas.parentElement)
-			.setDraggable(false)
-			.addText("Map Name", "", v => { map.setName(v) })
-			.addDropDown("Tool", ["rectangle", "circle", "polygon", "inspect", "move", "delete", "test"], v => { setTool(v.value) })
-			.addBoolean("Default Area", map.hasDefaultArea, v => { setDefaultArea(v) })
-			.addButton("Undo", undoManager.undo)
-			.addButton("Redo", undoManager.redo)
-			.addButton("Clear", clearAreas)
-			.addButton("Generate Html", function () { settings.setValue("Output", map.toHtml()) })
-			.addButton("Generate Svg", function () { settings.setValue("Output", map.toSvg()) })
-			.addTextArea("Output")
-			.addButton("Save", exportMap);
-		// Fix for oncontextmenu
-		p5.canvas.addEventListener("contextmenu", function (e) { e.preventDefault(); });
-		// Select all onclick on the Output field
-		document.getElementById("Output").setAttribute("onClick", "this.select();");
-	}
-
-	p5.draw = function () {
-		updateTempArea();
-		hovered = mouseIsHoverArea();
-		setCursor();
-		setOutput();
-		setBackground();
-		p5.translate(view.transX, view.transY);
-		p5.scale(view.scale);
-		drawImage();
-		bgLayer.display();
-		drawAreas();
-	}
-
-	p5.getMap = function () {
-		return map;
-	}
-
-	//------------------------------ Events -----------------------------------
-
-	p5.mousePressed = function () {
-		if (mouseIsHover()) {
-			if (p5.mouseButton == p5.LEFT && !ContextMenu.isOpen()) {
-				switch (tool) {
-					case "circle":
-					case "rectangle":
-						setTempArea(mX(), mY());
-						break;
-					case "polygon":
-						if (tempArea.empty()) {
-							setTempArea(mX(), mY());
-						} else if (tempArea.isClosable(mX(), mY(), 5 / view.scale)) {
-							tempArea.close();
-							if (tempArea.isValidShape())
-								createArea(tempArea);
-							tempArea = new Area();
-						} else {
-							tempArea.addCoord(mX(), mY());
-						}
-						break;
-					case "move":
-						if (hovered) {
-							selected = hovered.shape != "default" ? hovered : false;
-							tempCoord = selected.firstCoord();
-						}
-						break;
-				}
+export class imageMapCreator {
+	constructor(width = 600, height = 450) {
+		this.width = width;
+		this.height = 450;
+		this.tool = "rectangle";
+		this.drawingTools = ["rectangle", "circle", "polygon"];
+		this.settings;
+		this.menu = {
+			SetUrl: {
+				onSelect: (target, key, item, area) => { this.setAreaUrl(area); },
+				label: "Set url",
+			},
+			Delete: (target, key, item, area) => { this.deleteArea(area); },
+			MoveFront: {
+				onSelect: (target, key, item, area) => { this.moveArea(area, 1); },
+				enabled: true,
+				label: "Move Forward",
+			},
+			MoveBack: {
+				onSelect: (target, key, item, area) => { this.moveArea(area, -1); },
+				enabled: true,
+				label: "Move Backward",
 			}
+		};
+		this.tempArea = new Area();
+		this.tempCoord = new XY();
+		this.selected = false;
+		this.hovered = false;
+		this.map = new ImageMap(width, height);
+		this.undoManager = new UndoManager();
+		this.img;
+		this.view = {
+			scale: 1,
+			transX: 0,
+			transY: 0
+		}
+		this.zoomParams = {
+			min: 0.03,
+			max: 3,
+			sensativity: 0.001
 		}
 	}
 
-	p5.mouseDragged = function () {
-		if (mouseIsHover() && !ContextMenu.isOpen()) {
-			if (p5.mouseButton == p5.LEFT) {
-				switch (tool) {
-					case "move":
-						if (selected) {
-							let mvmt = new XY(mX() - trueX(p5.pmouseX), mY() - trueY(p5.pmouseY));
-							selected.move(mvmt);
-						}
-						break;
-				}
-			} else if (p5.mouseButton == p5.CENTER) {
-				view.transX += p5.mouseX - p5.pmouseX;
-				view.transY += p5.mouseY - p5.pmouseY;
-			}
+	sketch(p5) {
+		this.p5 = p5;
+		this.bgLayer = new BgLayer(this);
+
+		p5.setup = () => {
+			let canvas = p5.createCanvas(this.width, this.height);
+			canvas.drop(this.handeFile.bind(this)).dragLeave(this.onLeave.bind(this)).dragOver(this.onOver.bind(this));
+			this.settings = QuickSettings.create(p5.width + 5, 0, "Image-map Creator", p5.canvas.parentElement)
+				.setDraggable(false)
+				.addText("Map Name", "", (v) => { this.map.setName(v) })
+				.addDropDown("Tool", ["rectangle", "circle", "polygon", "inspect", "move", "delete", "test"], (v) => { this.setTool(v.value) })
+				.addBoolean("Default Area", this.map.hasDefaultArea, (v) => { this.setDefaultArea(v) })
+				.addButton("Undo", this.undoManager.undo)
+				.addButton("Redo", this.undoManager.redo)
+				.addButton("Clear", this.clearAreas.bind(this))
+				.addButton("Generate Html", () => { this.settings.setValue("Output", this.map.toHtml()) })
+				.addButton("Generate Svg", () => { this.settings.setValue("Output", this.map.toSvg()) })
+				.addTextArea("Output")
+				.addButton("Save", this.exportMap.bind(this));
+			// Fix for oncontextmenu
+			p5.canvas.addEventListener("contextmenu", (e) => { e.preventDefault(); });// Select all onclick on the Output field
+			// Select all onclick on the Output field
+			document.getElementById("Output").setAttribute("onFocus", "this.select();");
 		}
-	}
 
-	p5.mouseReleased = function (e) {
-		switch (tool) {
-			case "rectangle":
-			case "circle":
-				if (tempArea.isValidShape())
-					createArea(tempArea);
-				tempArea = new Area();
-				break;
-			case "move":
-				if (selected) {
-					let area = selected;
-					let move = area.firstCoord().diff(tempCoord);
-					undoManager.add({
-						undo: function () {
-							area.move(move.invert());
-						},
-						redo: function () {
-							area.move(move);
-						}
-					});
-				}
-				break;
+		p5.draw = () => {
+			this.updateTempArea();
+			this.hovered = this.mouseIsHoverArea();
+			this.setCursor();
+			this.setOutput();
+			this.setBackground();
+			p5.translate(this.view.transX, this.view.transY);
+			p5.scale(this.view.scale);
+			this.drawImage();
+			this.bgLayer.display();
+			this.drawAreas();
 		}
-		onClick(e);
-		bgLayer.disappear();
-	}
 
-	p5.mouseWheel = function (e) {
-		if (mouseIsHover()) {
-			let coefZoom = view.scale * zoomParams.sensativity * - e.delta;
-			zoom(coefZoom);
-		}
-	}
+		//------------------------------ Events -----------------------------------
 
-	//---------------------------- Functions ----------------------------------
-
-	function mX() {
-		return trueX(p5.mouseX);
-	}
-
-	function mY() {
-		return trueY(p5.mouseY);
-	}
-
-	function trueX(coord) {
-		return (coord - view.transX) / view.scale;
-	}
-
-	function trueY(coord) {
-		return (coord - view.transY) / view.scale;
-	}
-
-	function mouseIsHover() {
-		return p5.mouseX <= p5.width && p5.mouseX >= 0 && p5.mouseY <= p5.height && p5.mouseY >= 0;
-	}
-
-	/**
-	 * @returns {Area|false}
-	 */
-	function mouseIsHoverArea() {
-		let allAreas = map.getAreas();
-		let area = allAreas.reverse().find(area => {
-			return area.isHover(mX(), mY());
-		});
-		return area != undefined ? area : false;
-	}
-
-	// mouseIsDraggedLeft = function () {
-	// 	let fCoord = tempArea.firstCoord();
-	// 	return fCoord.x > p5.mouseX;
-	// }
-
-	function onClick(event) {
-		if (mouseIsHover()) {
-			if (hovered) {
-				if (p5.mouseButton == p5.RIGHT) {
-					selected = hovered;
-					menu.MoveFront.enabled = !(map.isLastArea(hovered.id) || hovered.shape == 'default');
-					menu.MoveBack.enabled = !(map.isFirstArea(hovered.id) || hovered.shape == 'default');
-					ContextMenu.display(event, menu, {
-						position: "click",
-						data: hovered
-					});
-					return false; // doesen't work as expected
-				} else if (p5.mouseButton == p5.LEFT) {
-					switch (tool) {
-						case "test":
-							openWindow(hovered.href);
+		p5.mousePressed = () => {
+			if (this.mouseIsHover()) {
+				if (p5.mouseButton == p5.LEFT && !ContextMenu.isOpen()) {
+					switch (this.tool) {
+						case "circle":
+						case "rectangle":
+							this.setTempArea(this.mX(), this.mY());
 							break;
-						case "delete":
-							deleteArea(hovered);
+						case "polygon":
+							if (this.tempArea.empty()) {
+								this.setTempArea(this.mX(), this.mY());
+							} else if (this.tempArea.isClosable(this.mX(), this.mY(), 5 / this.view.scale)) {
+								this.tempArea.close();
+								if (this.tempArea.isValidShape())
+									this.createArea(this.tempArea);
+								this.tempArea = new Area();
+							} else {
+								this.tempArea.addCoord(this.mX(), this.mY());
+							}
+							break;
+						case "move":
+							if (this.hovered) {
+								this.selected = this.hovered.shape != "default" ? this.hovered : false;
+								this.tempCoord = this.selected.firstCoord();
+							}
 							break;
 					}
 				}
 			}
 		}
-		selected = false;
+
+		p5.mouseDragged = () => {
+			if (this.mouseIsHover() && !ContextMenu.isOpen()) {
+				if (p5.mouseButton == p5.LEFT) {
+					switch (this.tool) {
+						case "move":
+							if (this.selected) {
+								let mvmt = new XY(this.mX() - this.trueX(p5.pmouseX), this.mY() - this.trueY(p5.pmouseY));
+								this.selected.move(mvmt);
+							}
+							break;
+					}
+				} else if (p5.mouseButton == p5.CENTER) {
+					this.view.transX += p5.mouseX - p5.pmouseX;
+					this.view.transY += p5.mouseY - p5.pmouseY;
+				}
+			}
+		}
+
+		p5.mouseReleased = (e) => {
+			switch (this.tool) {
+				case "rectangle":
+				case "circle":
+					if (this.tempArea.isValidShape())
+						this.createArea(this.tempArea);
+					this.tempArea = new Area();
+					break;
+				case "move":
+					if (this.selected) {
+						let area = this.selected;
+						let move = area.firstCoord().diff(this.tempCoord);
+						this.undoManager.add({
+							undo: () => {
+								area.move(move.invert());
+							},
+							redo: () => {
+								area.move(move);
+							}
+						});
+					}
+					break;
+			}
+			this.onClick(e);
+			this.bgLayer.disappear();
+		}
+
+		p5.mouseWheel = (e) => {
+			if (this.mouseIsHover()) {
+				let coefZoom = this.view.scale * this.zoomParams.sensativity * - e.delta;
+				this.zoom(coefZoom);
+			}
+		}
 	}
 
-	function onOver(evt) {
-		bgLayer.appear();
+	//---------------------------- Functions ----------------------------------
+
+	mX() {
+		return this.trueX(this.p5.mouseX);
+	}
+
+	mY() {
+		return this.trueY(this.p5.mouseY);
+	}
+
+	trueX(coord) {
+		return (coord - this.view.transX) / this.view.scale;
+	}
+
+	trueY(coord) {
+		return (coord - this.view.transY) / this.view.scale;
+	}
+
+	mouseIsHover() {
+		return this.p5.mouseX <= this.p5.width && this.p5.mouseX >= 0 && this.p5.mouseY <= this.p5.height && this.p5.mouseY >= 0;
+	}
+
+	/**
+	 * @returns {Area|false}
+	 */
+	mouseIsHoverArea() {
+		let allAreas = this.map.getAreas();
+		let area = allAreas.reverse().find(area => {
+			return area.isHover(this.mX(), this.mY());
+		});
+		return area != undefined ? area : false;
+	}
+
+	onClick(event) {
+		if (this.mouseIsHover()) {
+			if (this.hovered) {
+				if (this.p5.mouseButton == this.p5.RIGHT) {
+					this.selected = this.hovered;
+					this.menu.MoveFront.enabled = !(this.map.isLastArea(this.hovered.id) || this.hovered.shape == 'default');
+					this.menu.MoveBack.enabled = !(this.map.isFirstArea(this.hovered.id) || this.hovered.shape == 'default');
+					ContextMenu.display(event, this.menu, {
+						position: "click",
+						data: this.hovered
+					});
+					return false; // doesen't work as expected
+				} else if (this.p5.mouseButton == this.p5.LEFT) {
+					switch (this.tool) {
+						case "test":
+							openWindow(this.hovered.href);
+							break;
+						case "delete":
+							this.deleteArea(this.hovered);
+							break;
+					}
+				}
+			}
+		}
+		this.selected = false;
+	}
+
+	onOver(evt) {
+		this.bgLayer.appear();
 		evt.preventDefault();
 	}
 
-	function onLeave() {
-		bgLayer.disappear();
+	onLeave() {
+		this.bgLayer.disappear();
 	}
 
-	function handeFile(file) {
+	handeFile(file) {
 		if (file.type == "image") {
-			img = p5.loadImage(file.data, img => resetView(img));
-			if (!map.name) {
-				map.setName(file.name);
-				settings.setValue("Map Name", map.name);
+			this.img = this.p5.loadImage(file.data, img => this.resetView(img));
+			if (!this.map.name) {
+				this.map.setName(file.name);
+				this.settings.setValue("Map Name", this.map.name);
 			}
 		} else if (file.subtype == 'json') {
 			fetch(file.data)
@@ -260,279 +258,246 @@ export let imageMapCreator = function (p5, width = 600, height = 450) {
 				.then(blob => {
 					console.log(blob);
 					let reader = new FileReader();
-					reader.onload = function () {
+					reader.onload = () => {
 						let json = reader.result;
 						console.log(json);
-						map.setFromJson(json);
-					}
+						this.map.setFromJson(json);
+					};
 					reader.readAsText(blob);
 				});
 		}
-		bgLayer.disappear();
+		this.bgLayer.disappear();
 	}
 
-	function resetView(img) {
-		view.scale = 1;
-		view.transX = 0;
-		view.transY = 0;
-		let xScale = p5.width / img.width;
-		let yScale = p5.height / img.height;
-		if (xScale < view.scale)
-			view.scale = xScale;
-		if (yScale < view.scale)
-			view.scale = yScale;
-		map.setSize(img.width, img.height);
+	resetView(img) {
+		this.view.scale = 1;
+		this.view.transX = 0;
+		this.view.transY = 0;
+		let xScale = this.p5.width / img.width;
+		let yScale = this.p5.height / img.height;
+		if (xScale < this.view.scale)
+			this.view.scale = xScale;
+		if (yScale < this.view.scale)
+			this.view.scale = yScale;
+		this.map.setSize(img.width, img.height);
 	}
 
-	function zoom(coef) {
+	zoom(coef) {
 
-		let newScale = view.scale + coef;
-		if (newScale > zoomParams.min && newScale < zoomParams.max) {
-			let mouseXToOrigin = mX();
-			let mouseYToOrigin = mY();
+		let newScale = this.view.scale + coef;
+		if (newScale > this.zoomParams.min && newScale < this.zoomParams.max) {
+			let mouseXToOrigin = this.mX();
+			let mouseYToOrigin = this.mY();
 			let transX = mouseXToOrigin * coef;
 			let transY = mouseYToOrigin * coef;
 
-			view.scale = newScale;
-			view.transX -= transX;
-			view.transY -= transY;
+			this.view.scale = newScale;
+			this.view.transX -= transX;
+			this.view.transY -= transY;
 		}
 	}
 
-	function drawImage() {
-		if (img)
-			p5.image(img, 0, 0, img.width, img.height);
+	drawImage() {
+		if (this.img)
+			this.p5.image(this.img, 0, 0, this.img.width, this.img.height);
 	}
 
-	function drawAreas() {
-		let allAreas = map.getAreas().concat([tempArea]);
+	drawAreas() {
+		let allAreas = this.map.getAreas().concat([this.tempArea]);
 		allAreas.forEach(area => {
-			setAreaStyle(area);
+			this.setAreaStyle(area);
 			if (area.isDrawable())
-				area.display(p5);
+				area.display(this.p5);
 		});
 	}
 
-	function setTool(value) {
-		tool = value;
-		tempArea = new Area();
+	setTool(value) {
+		this.tool = value;
+		this.tempArea = new Area();
 	}
 
-	function setCursor() {
-		if (drawingTools.includes(tool)) {
-			switch (tool) {
+	setCursor() {
+		if (this.drawingTools.includes(this.tool)) {
+			switch (this.tool) {
 				case "polygon":
-					if (!tempArea.empty() && tempArea.isClosable(mX(), mY(), 5 / view.scale)) {
-						p5.cursor(p5.HAND);
+					if (!this.tempArea.empty() && this.tempArea.isClosable(this.mX(), this.mY(), 5 / this.view.scale)) {
+						this.p5.cursor(this.p5.HAND);
 						break;
 					}
 				default:
-					p5.cursor(p5.CROSS);
+					this.p5.cursor(this.p5.CROSS);
 			}
 		} else {
-			p5.cursor(p5.ARROW);
-			if (hovered) {
-				switch (tool) {
+			this.p5.cursor(this.p5.ARROW);
+			if (this.hovered) {
+				switch (this.tool) {
 					case "inspect":
 					case "test":
 					case "delete":
-						p5.cursor(p5.HAND);
+						this.p5.cursor(this.p5.HAND);
 						break;
 					case "move":
-						p5.cursor(p5.MOVE);
+						this.p5.cursor(this.p5.MOVE);
 						break;
 				}
 			}
 		}
 	}
 
-	function setOutput() {
-		switch (tool) {
+	setOutput() {
+		switch (this.tool) {
 			case "inspect":
-				if (mouseIsHover()) {
-					let href = hovered ? hovered.href : "none";
-					settings.setValue("Output", href);
+				if (this.mouseIsHover()) {
+					let href = this.hovered ? this.hovered.href : "none";
+					this.settings.setValue("Output", href);
 				}
 				break;
 		}
 	}
 
-	function setBackground() {
-		p5.background(200);
-		if (!img) {
-			p5.noStroke();
-			p5.fill(0);
-			p5.textSize(15);
+	setBackground() {
+		this.p5.background(200);
+		if (!this.img) {
+			this.p5.noStroke();
+			this.p5.fill(0);
+			this.p5.textSize(15);
 			let text = 'Drag and drop an image and/or a .map.json save file here';
-			p5.text(text, p5.width / 6, p5.height / 2);
+			this.p5.text(text, this.p5.width / 6, this.p5.height / 2);
 		}
 	}
 
-	function setAreaStyle(area) {
-		let color = p5.color(255, 255, 255, 178);
-		if (tool == "inspect" ||
-			tool == "test") {
-			color = p5.color(255, 0);
+	setAreaStyle(area) {
+		let color = this.p5.color(255, 255, 255, 178);
+		if (this.tool == "inspect" ||
+			this.tool == "test") {
+			color = this.p5.color(255, 0);
 		}
-		if ((mouseIsHover() && area == hovered && selected == false && (
-			tool == "inspect" ||
-			tool == "delete" ||
-			tool == "move")) ||
-			selected == area) {
-			color = p5.color(255, 200, 200, 178); // highlight (set color red)
+		if ((this.mouseIsHover() && area == this.hovered && this.selected == false && (
+			this.tool == "inspect" ||
+			this.tool == "delete" ||
+			this.tool == "move")) ||
+			this.selected == area) {
+			color = this.p5.color(255, 200, 200, 178); // highlight (set color red)
 		}
-		p5.fill(color);
-		p5.strokeWeight(1 / view.scale);
-		if (tool == "inspect" ||
-			tool == "test") {
-			p5.noStroke();
+		this.p5.fill(color);
+		this.p5.strokeWeight(1 / this.view.scale);
+		if (this.tool == "inspect" ||
+			this.tool == "test") {
+			this.p5.noStroke();
 		} else {
-			p5.stroke(0);
+			this.p5.stroke(0);
 		}
 	}
 
-	function setTempArea(x, y) {
+	setTempArea(x, y) {
 		let coords = [new XY(x, y)];
-		switch (tool) {
+		switch (this.tool) {
 			case "rectangle":
-				tempArea = new AreaRect(coords);
-				tempArea.addCoord(0, 0);
+				this.tempArea = new AreaRect(coords);
+				this.tempArea.addCoord(0, 0);
 				break;
 			case "circle":
-				tempArea = new AreaCircle(coords);
+				this.tempArea = new AreaCircle(coords);
 				break;
 			case "polygon":
-				tempArea = new AreaPoly(coords);
-				tempArea.addCoord(x, y);
+				this.tempArea = new AreaPoly(coords);
+				this.tempArea.addCoord(x, y);
 				break;
 		}
 	}
 
-	function updateTempArea() {
-		if (!tempArea.empty()) {
-			tempArea.updateLastCoord(mX(), mY());
+	updateTempArea() {
+		if (!this.tempArea.empty()) {
+			this.tempArea.updateLastCoord(this.mX(), this.mY());
 		}
 	}
 
-	function exportMap() {
-		download(map.toJson(), `${map.name}.map.json`, 'application/json')
+	exportMap() {
+		download(this.map.toJson(), `${this.map.name}.map.json`, 'application/json')
 	}
 
-	function createArea(area) {
-		map.addArea(area);
-		undoManager.add({
-			undo: function () {
-				area = map.popArea();
+	createArea(area) {
+		this.map.addArea(area);
+		this.undoManager.add({
+			undo: () => {
+				area = this.map.popArea();
 			},
-			redo: function () {
-				map.addArea(area, false);
+			redo: () => {
+				this.map.addArea(area, false);
 			}
 		});
 	}
 
-	function deleteArea(area) {
+	deleteArea(area) {
 		let id = area.id;
 		if (id === 0) {
-			settings.setValue("Default Area", false);
+			this.settings.setValue("Default Area", false);
 		} else {
-			let index = map.rmletea(id);
-			undoManager.add({
-				undo: function () {
-					map.insertArea(area, index);
+			let index = this.map.rmletea(id);
+			this.undoManager.add({
+				undo: () => {
+					this.map.insertArea(area, index);
 				},
-				redo: function () {
-					map.rmletea(id);
+				redo: () => {
+					this.map.rmletea(id);
 				}
 			});
 		}
 	}
 
-	function moveArea(area, direction) {
-		if (map.moveArea(area.id, direction) !== false) {
-			undoManager.add({
-				undo: function () {
-					map.moveArea(area.id, -direction);
+	moveArea(area, direction) {
+		if (this.map.moveArea(area.id, direction) !== false) {
+			this.undoManager.add({
+				undo: () => {
+					this.map.moveArea(area.id, -direction);
 				},
-				redo: function () {
-					map.moveArea(area.id, direction);
+				redo: () => {
+					this.map.moveArea(area.id, direction);
 				}
 			});
 		}
 	}
 
-	function setAreaUrl(area) {
+	setAreaUrl(area) {
 		let href = area.href;
 		let input = prompt("Entrez l'url vers laquelle devrait pointer cette zone", href ? href : "http://");
 		if (input != null) {
 			area.setHref(input);
-			undoManager.add({
-				undo: function () {
+			this.undoManager.add({
+				undo: () => {
 					area.setHref(href);
 				},
-				redo: function () {
+				redo: () => {
 					area.setHref(input);
 				}
 			});
 		}
 	}
 
-	function setDefaultArea(bool) {
-		map.setDefaultArea(bool);
-		undoManager.add({
-			undo: function () {
-				map.setDefaultArea(!bool); // semble redondant
-				settings.setValue("Default Area", !bool)
+	setDefaultArea(bool) {
+		this.map.setDefaultArea(bool);
+		this.undoManager.add({
+			undo: () => {
+				this.map.setDefaultArea(!bool); // semble redondant
+				this.settings.setValue("Default Area", !bool)
 			},
-			redo: function () {
-				map.setDefaultArea(bool); // semble redondant
-				settings.setValue("Default Area", bool)
+			redo: () => {
+				this.map.setDefaultArea(bool); // semble redondant
+				this.settings.setValue("Default Area", bool)
 			}
 		});
 	}
 
-	function clearAreas() {
-		let areas = map.getAreas(false);
-		map.clearAreas();
-		undoManager.add({
-			undo: function () {
-				map.setAreas(areas);
+	clearAreas() {
+		let areas = this.map.getAreas(false);
+		this.map.clearAreas();
+		this.undoManager.add({
+			undo: () => {
+				this.map.setAreas(areas);
 			},
-			redo: function () {
-				map.clearAreas();
+			redo: () => {
+				this.map.clearAreas();
 			}
 		});
-	}
-
-	//---------------------------- P5 Classes ---------------------------------
-
-	/**
-	 * Class representing the semi transparent layer which can appear on top of the background
-	 * @param {number} speed the speed of the opacity animation (1-255, default 15)
-	 */
-	function BgLayer(speed = 15) {
-		this.speed = speed;
-		this.alpha = 0;
-		this.over = false;
-	}
-
-	BgLayer.prototype.appear = function () {
-		this.over = true;
-	}
-
-	BgLayer.prototype.disappear = function () {
-		this.over = false;
-	}
-
-	BgLayer.prototype.display = function () {
-		if (this.over) {
-			if (this.alpha < 100)
-				this.alpha += this.speed;
-		} else {
-			if (this.alpha > 0)
-				this.alpha -= this.speed;
-		}
-		p5.noStroke();
-		p5.fill(255, 255, 255, this.alpha);
-		p5.rect(trueX(0), trueY(0), p5.width / view.scale, p5.height / view.scale);
 	}
 }

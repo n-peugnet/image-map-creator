@@ -22,7 +22,6 @@
 </head>
 
 <body>
-	<h1>Image-map Creator Demo</h1>
 
 	<!-- A <div> with an id -->
 	<div id="div-1" style="position: relative;"></div>
@@ -33,17 +32,18 @@
 
 	<!-- A <script> to enable the tool on the disired div -->
 	<script type="text/javascript">
-		let iMap = new p5(imageMapCreator, "div-1");  // for more details on the instantiation of a p5 sketch see https://p5js.org/examples/instance-mode-instance-container.html
+		let iMap = new imageMapCreator();
+		let sketch = new p5(iMap.sketch.bind(iMap), "div-1");  // for more details on the instantiation of a p5 sketch see https://p5js.org/examples/instance-mode-instance-container.html
 	</script>
 
 	<!-- Another <script> (optionnal) for the optionnal buttons -->
 	<script type="text/javascript">
 		function logMap() {
-			console.log(iMap.getMap());
+			console.log(iMap.map);
 		}
 
 		function logP5() {
-			console.log(iMap);
+			console.log(sketch);
 		}
 	</script>
 </body>
