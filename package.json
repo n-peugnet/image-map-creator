@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "downloadjs": "^1.4.7",
+    "quicksettings": "^3.0.1",
     "undo-manager": "^1.0.5"
   }
 }

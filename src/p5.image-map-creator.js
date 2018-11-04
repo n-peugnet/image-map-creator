@@ -4,6 +4,7 @@ import { XY } from "./class.xy";
 import { openWindow } from './utils';
 import download from "downloadjs";
 import UndoManager from "undo-manager";
+import QuickSettings from "quicksettings";
 
 /**
  * @param {p5} p a P5 object
