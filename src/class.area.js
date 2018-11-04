@@ -1,4 +1,7 @@
-class Area {
+import { between } from "./utils";
+import { XY } from "./class.xy";
+
+export class Area {
 	/**
 	 * @param {string} shape the type of area
 	 * @param {XY[]} coords the list of coordinates
@@ -120,7 +123,7 @@ class Area {
 	}
 }
 
-class AreaRect extends Area {
+export class AreaRect extends Area {
 	/**
 	 * @param {XY[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
@@ -173,7 +176,7 @@ class AreaRect extends Area {
 	}
 }
 
-class AreaCircle extends Area {
+export class AreaCircle extends Area {
 	/**
 	 * @param {XY[]} coords the list of coordinates
 	 * @param {number} radius radius of the circle
@@ -215,7 +218,7 @@ class AreaCircle extends Area {
 		return '<circle cx="' + this.coords[0].toString(0, 'x') + '" cy="' + this.coords[0].toString(0, 'y') + '" r="' + round(this.radius, 0) + '" />'
 	}
 }
-class AreaPoly extends Area {
+export class AreaPoly extends Area {
 	/**
 	 * @param {XY[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
@@ -275,7 +278,7 @@ class AreaPoly extends Area {
 	}
 }
 
-class AreaDefault extends Area {
+export class AreaDefault extends Area {
 	/**
 	 * Constructor
 	 * @param {string} href the link this area is going to point to

@@ -1,7 +1,12 @@
+import { ImageMap } from "./class.image-map";
+import { Area, AreaCircle, AreaRect, AreaPoly } from "./class.area";
+import { XY } from "./class.xy";
+import { openWindow } from './utils';
+
 /**
  * @param {p5} p a P5 object
  */
-let imageMapCreator = function (p, width = 600, height = 450) {
+export let imageMapCreator = function (p, width = 600, height = 450) {
 
 	let tool = "rectangle";
 	let drawingTools = ["rectangle", "circle", "polygon"];

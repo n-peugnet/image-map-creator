@@ -1,7 +1,9 @@
+import { round } from "./utils";
+
 /**
  * Class representing a 2d xy coordinate
 */
-class XY {
+export class XY {
 	constructor(x, y) {
 		this.set(x, y);
 	}
