@@ -2,6 +2,7 @@ import { ImageMap } from "./class.image-map";
 import { Area, AreaCircle, AreaRect, AreaPoly } from "./class.area";
 import { XY } from "./class.xy";
 import { openWindow } from './utils';
+import download from "downloadjs";
 
 /**
  * @param {p5} p a P5 object
