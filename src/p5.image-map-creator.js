@@ -67,6 +67,8 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 			.addButton("Save", exportMap);
 		// Fix for oncontextmenu
 		p.canvas.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+		// Select all onclick on the Output field
+		document.getElementById("Output").setAttribute("onClick", "this.select();");
 	}
 
 	p.draw = function () {
