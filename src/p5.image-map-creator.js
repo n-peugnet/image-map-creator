@@ -165,30 +165,30 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 
 	//---------------------------- Functions ----------------------------------
 
-	mX = function () {
+	function mX() {
 		return trueX(p.mouseX);
 	}
 
-	mY = function () {
+	function mY() {
 		return trueY(p.mouseY);
 	}
 
-	trueX = function (coord) {
+	function trueX(coord) {
 		return (coord - view.transX) / view.scale;
 	}
 
-	trueY = function (coord) {
+	function trueY(coord) {
 		return (coord - view.transY) / view.scale;
 	}
 
-	mouseIsHover = function () {
+	function mouseIsHover() {
 		return p.mouseX <= p.width && p.mouseX >= 0 && p.mouseY <= p.height && p.mouseY >= 0;
 	}
 
 	/**
 	 * @returns {Area|false}
 	 */
-	mouseIsHoverArea = function () {
+	function mouseIsHoverArea() {
 		let allAreas = map.getAreas();
 		let area = allAreas.reverse().find(area => {
 			return area.isHover(mX(), mY());
@@ -201,7 +201,7 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 	// 	return fCoord.x > p.mouseX;
 	// }
 
-	onClick = function (event) {
+	function onClick(event) {
 		if (mouseIsHover()) {
 			if (hovered) {
 				if (p.mouseButton == p.RIGHT) {
@@ -228,16 +228,16 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		selected = false;
 	}
 
-	onOver = function (evt) {
+	function onOver(evt) {
 		bgLayer.appear();
 		evt.preventDefault();
 	}
 
-	onLeave = function () {
+	function onLeave() {
 		bgLayer.disappear();
 	}
 
-	handeFile = function (file) {
+	function handeFile(file) {
 		if (file.type == "image") {
 			img = p.loadImage(file.data, img => resetView(img));
 			if (!map.name) {
@@ -261,7 +261,7 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		bgLayer.disappear();
 	}
 
-	resetView = function (img) {
+	function resetView(img) {
 		view.scale = 1;
 		view.transX = 0;
 		view.transY = 0;
@@ -274,7 +274,7 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		map.setSize(img.width, img.height);
 	}
 
-	zoom = function (coef) {
+	function zoom(coef) {
 
 		let newScale = view.scale + coef;
 		if (newScale > zoomParams.min && newScale < zoomParams.max) {
@@ -289,12 +289,12 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		}
 	}
 
-	drawImage = function () {
+	function drawImage() {
 		if (img)
 			p.image(img, 0, 0, img.width, img.height);
 	}
 
-	drawAreas = function () {
+	function drawAreas() {
 		let allAreas = map.getAreas().concat([tempArea]);
 		allAreas.forEach(area => {
 			setAreaStyle(area);
@@ -303,12 +303,12 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		});
 	}
 
-	setTool = function (value) {
+	function setTool(value) {
 		tool = value;
 		tempArea = new Area();
 	}
 
-	setCursor = function () {
+	function setCursor() {
 		if (drawingTools.includes(tool)) {
 			switch (tool) {
 				case "polygon":
@@ -336,7 +336,7 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		}
 	}
 
-	setOutput = function () {
+	function setOutput() {
 		switch (tool) {
 			case "inspect":
 				if (mouseIsHover()) {
@@ -347,7 +347,7 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		}
 	}
 
-	setBackground = function () {
+	function setBackground() {
 		p.background(200);
 		if (!img) {
 			p.noStroke();
@@ -358,7 +358,7 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		}
 	}
 
-	setAreaStyle = function (area) {
+	function setAreaStyle(area) {
 		let color = p.color(255, 255, 255, 178);
 		if (tool == "inspect" ||
 			tool == "test") {
@@ -381,7 +381,7 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		}
 	}
 
-	setTempArea = function (x, y) {
+	function setTempArea(x, y) {
 		let coords = [new XY(x, y)];
 		switch (tool) {
 			case "rectangle":
@@ -398,17 +398,17 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		}
 	}
 
-	updateTempArea = function () {
+	function updateTempArea() {
 		if (!tempArea.empty()) {
 			tempArea.updateLastCoord(mX(), mY());
 		}
 	}
 
-	exportMap = function () {
+	function exportMap() {
 		download(map.toJson(), `${map.name}.map.json`, 'application/json')
 	}
 
-	createArea = function (area) {
+	function createArea(area) {
 		map.addArea(area);
 		undoManager.add({
 			undo: function () {
@@ -420,7 +420,7 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		});
 	}
 
-	deleteArea = function (area) {
+	function deleteArea(area) {
 		let id = area.id;
 		if (id === 0) {
 			settings.setValue("Default Area", false);
@@ -437,7 +437,7 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		}
 	}
 
-	moveArea = function (area, direction) {
+	function moveArea(area, direction) {
 		if (map.moveArea(area.id, direction) !== false) {
 			undoManager.add({
 				undo: function () {
@@ -450,7 +450,7 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		}
 	}
 
-	setAreaUrl = function (area) {
+	function setAreaUrl(area) {
 		let href = area.href;
 		let input = prompt("Entrez l'url vers laquelle devrait pointer cette zone", href ? href : "http://");
 		if (input != null) {
@@ -466,7 +466,7 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		}
 	}
 
-	setDefaultArea = function (bool) {
+	function setDefaultArea(bool) {
 		map.setDefaultArea(bool);
 		undoManager.add({
 			undo: function () {
@@ -480,7 +480,7 @@ let imageMapCreator = function (p, width = 600, height = 450) {
 		});
 	}
 
-	clearAreas = function () {
+	function clearAreas() {
 		let areas = map.getAreas(false);
 		map.clearAreas();
 		undoManager.add({
