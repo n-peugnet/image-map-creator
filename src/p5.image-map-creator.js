@@ -3,6 +3,7 @@ import { Area, AreaCircle, AreaRect, AreaPoly } from "./class.area";
 import { XY } from "./class.xy";
 import { openWindow } from './utils';
 import download from "downloadjs";
+import UndoManager from "undo-manager";
 
 /**
  * @param {p5} p a P5 object
