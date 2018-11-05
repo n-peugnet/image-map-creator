@@ -1,4 +1,4 @@
-import { between } from "./utils";
+import { between, round } from "./utils";
 import { XY } from "./class.xy";
 
 export class Area {
@@ -189,7 +189,7 @@ export class AreaCircle extends Area {
 	}
 
 	getCenter() {
-		return this.firstCoord;
+		return this.firstCoord();
 	}
 
 	isValidShape() {
