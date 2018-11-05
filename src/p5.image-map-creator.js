@@ -7,9 +7,9 @@ import UndoManager from "undo-manager";
 import QuickSettings from "quicksettings";
 
 /**
- * @param {p5} p a P5 object
+ * @param {p5} p5 a P5 object
  */
-export let imageMapCreator = function (p, width = 600, height = 450) {
+export let imageMapCreator = function (p5, width = 600, height = 450) {
 
 	let tool = "rectangle";
 	let drawingTools = ["rectangle", "circle", "polygon"];
@@ -50,10 +50,10 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 		sensativity: 0.001
 	}
 
-	p.setup = function () {
-		let canvas = p.createCanvas(width, height);
+	p5.setup = function () {
+		let canvas = p5.createCanvas(width, height);
 		canvas.drop(handeFile).dragLeave(onLeave).dragOver(onOver);
-		settings = QuickSettings.create(p.width + 5, 0, "Image-map Creator", p.canvas.parentElement)
+		settings = QuickSettings.create(p5.width + 5, 0, "Image-map Creator", p5.canvas.parentElement)
 			.setDraggable(false)
 			.addText("Map Name", "", v => { map.setName(v) })
 			.addDropDown("Tool", ["rectangle", "circle", "polygon", "inspect", "move", "delete", "test"], v => { setTool(v.value) })
@@ -66,33 +66,33 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 			.addTextArea("Output")
 			.addButton("Save", exportMap);
 		// Fix for oncontextmenu
-		p.canvas.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+		p5.canvas.addEventListener("contextmenu", function (e) { e.preventDefault(); });
 		// Select all onclick on the Output field
 		document.getElementById("Output").setAttribute("onClick", "this.select();");
 	}
 
-	p.draw = function () {
+	p5.draw = function () {
 		updateTempArea();
 		hovered = mouseIsHoverArea();
 		setCursor();
 		setOutput();
 		setBackground();
-		p.translate(view.transX, view.transY);
-		p.scale(view.scale);
+		p5.translate(view.transX, view.transY);
+		p5.scale(view.scale);
 		drawImage();
 		bgLayer.display();
 		drawAreas();
 	}
 
-	p.getMap = function () {
+	p5.getMap = function () {
 		return map;
 	}
 
 	//------------------------------ Events -----------------------------------
 
-	p.mousePressed = function () {
+	p5.mousePressed = function () {
 		if (mouseIsHover()) {
-			if (p.mouseButton == p.LEFT && !ContextMenu.isOpen()) {
+			if (p5.mouseButton == p5.LEFT && !ContextMenu.isOpen()) {
 				switch (tool) {
 					case "circle":
 					case "rectangle":
@@ -121,25 +121,25 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 		}
 	}
 
-	p.mouseDragged = function () {
+	p5.mouseDragged = function () {
 		if (mouseIsHover() && !ContextMenu.isOpen()) {
-			if (p.mouseButton == p.LEFT) {
+			if (p5.mouseButton == p5.LEFT) {
 				switch (tool) {
 					case "move":
 						if (selected) {
-							let mvmt = new XY(mX() - trueX(p.pmouseX), mY() - trueY(p.pmouseY));
+							let mvmt = new XY(mX() - trueX(p5.pmouseX), mY() - trueY(p5.pmouseY));
 							selected.move(mvmt);
 						}
 						break;
 				}
-			} else if (p.mouseButton == p.CENTER) {
-				view.transX += p.mouseX - p.pmouseX;
-				view.transY += p.mouseY - p.pmouseY;
+			} else if (p5.mouseButton == p5.CENTER) {
+				view.transX += p5.mouseX - p5.pmouseX;
+				view.transY += p5.mouseY - p5.pmouseY;
 			}
 		}
 	}
 
-	p.mouseReleased = function (e) {
+	p5.mouseReleased = function (e) {
 		switch (tool) {
 			case "rectangle":
 			case "circle":
@@ -166,7 +166,7 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 		bgLayer.disappear();
 	}
 
-	p.mouseWheel = function (e) {
+	p5.mouseWheel = function (e) {
 		if (mouseIsHover()) {
 			let coefZoom = view.scale * zoomParams.sensativity * - e.delta;
 			zoom(coefZoom);
@@ -176,11 +176,11 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 	//---------------------------- Functions ----------------------------------
 
 	function mX() {
-		return trueX(p.mouseX);
+		return trueX(p5.mouseX);
 	}
 
 	function mY() {
-		return trueY(p.mouseY);
+		return trueY(p5.mouseY);
 	}
 
 	function trueX(coord) {
@@ -192,7 +192,7 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 	}
 
 	function mouseIsHover() {
-		return p.mouseX <= p.width && p.mouseX >= 0 && p.mouseY <= p.height && p.mouseY >= 0;
+		return p5.mouseX <= p5.width && p5.mouseX >= 0 && p5.mouseY <= p5.height && p5.mouseY >= 0;
 	}
 
 	/**
@@ -208,13 +208,13 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 
 	// mouseIsDraggedLeft = function () {
 	// 	let fCoord = tempArea.firstCoord();
-	// 	return fCoord.x > p.mouseX;
+	// 	return fCoord.x > p5.mouseX;
 	// }
 
 	function onClick(event) {
 		if (mouseIsHover()) {
 			if (hovered) {
-				if (p.mouseButton == p.RIGHT) {
+				if (p5.mouseButton == p5.RIGHT) {
 					selected = hovered;
 					menu.MoveFront.enabled = !(map.isLastArea(hovered.id) || hovered.shape == 'default');
 					menu.MoveBack.enabled = !(map.isFirstArea(hovered.id) || hovered.shape == 'default');
@@ -223,7 +223,7 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 						data: hovered
 					});
 					return false; // doesen't work as expected
-				} else if (p.mouseButton == p.LEFT) {
+				} else if (p5.mouseButton == p5.LEFT) {
 					switch (tool) {
 						case "test":
 							openWindow(hovered.href);
@@ -249,7 +249,7 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 
 	function handeFile(file) {
 		if (file.type == "image") {
-			img = p.loadImage(file.data, img => resetView(img));
+			img = p5.loadImage(file.data, img => resetView(img));
 			if (!map.name) {
 				map.setName(file.name);
 				settings.setValue("Map Name", map.name);
@@ -275,8 +275,8 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 		view.scale = 1;
 		view.transX = 0;
 		view.transY = 0;
-		let xScale = p.width / img.width;
-		let yScale = p.height / img.height;
+		let xScale = p5.width / img.width;
+		let yScale = p5.height / img.height;
 		if (xScale < view.scale)
 			view.scale = xScale;
 		if (yScale < view.scale)
@@ -301,7 +301,7 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 
 	function drawImage() {
 		if (img)
-			p.image(img, 0, 0, img.width, img.height);
+			p5.image(img, 0, 0, img.width, img.height);
 	}
 
 	function drawAreas() {
@@ -309,7 +309,7 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 		allAreas.forEach(area => {
 			setAreaStyle(area);
 			if (area.isDrawable())
-				area.display(p);
+				area.display(p5);
 		});
 	}
 
@@ -323,23 +323,23 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 			switch (tool) {
 				case "polygon":
 					if (!tempArea.empty() && tempArea.isClosable(mX(), mY(), 5 / view.scale)) {
-						p.cursor(p.HAND);
+						p5.cursor(p5.HAND);
 						break;
 					}
 				default:
-					p.cursor(p.CROSS);
+					p5.cursor(p5.CROSS);
 			}
 		} else {
-			p.cursor(p.ARROW);
+			p5.cursor(p5.ARROW);
 			if (hovered) {
 				switch (tool) {
 					case "inspect":
 					case "test":
 					case "delete":
-						p.cursor(p.HAND);
+						p5.cursor(p5.HAND);
 						break;
 					case "move":
-						p.cursor(p.MOVE);
+						p5.cursor(p5.MOVE);
 						break;
 				}
 			}
@@ -358,36 +358,36 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 	}
 
 	function setBackground() {
-		p.background(200);
+		p5.background(200);
 		if (!img) {
-			p.noStroke();
-			p.fill(0);
-			p.textSize(15);
+			p5.noStroke();
+			p5.fill(0);
+			p5.textSize(15);
 			let text = 'Drag and drop an image and/or a .map.json save file here';
-			p.text(text, p.width / 6, p.height / 2);
+			p5.text(text, p5.width / 6, p5.height / 2);
 		}
 	}
 
 	function setAreaStyle(area) {
-		let color = p.color(255, 255, 255, 178);
+		let color = p5.color(255, 255, 255, 178);
 		if (tool == "inspect" ||
 			tool == "test") {
-			color = p.color(255, 0);
+			color = p5.color(255, 0);
 		}
 		if ((mouseIsHover() && area == hovered && selected == false && (
 			tool == "inspect" ||
 			tool == "delete" ||
 			tool == "move")) ||
 			selected == area) {
-			color = p.color(255, 200, 200, 178); // highlight (set color red)
+			color = p5.color(255, 200, 200, 178); // highlight (set color red)
 		}
-		p.fill(color);
-		p.strokeWeight(1 / view.scale);
+		p5.fill(color);
+		p5.strokeWeight(1 / view.scale);
 		if (tool == "inspect" ||
 			tool == "test") {
-			p.noStroke();
+			p5.noStroke();
 		} else {
-			p.stroke(0);
+			p5.stroke(0);
 		}
 	}
 
@@ -531,8 +531,8 @@ export let imageMapCreator = function (p, width = 600, height = 450) {
 			if (this.alpha > 0)
 				this.alpha -= this.speed;
 		}
-		p.noStroke();
-		p.fill(255, 255, 255, this.alpha);
-		p.rect(trueX(0), trueY(0), p.width / view.scale, p.height / view.scale);
+		p5.noStroke();
+		p5.fill(255, 255, 255, this.alpha);
+		p5.rect(trueX(0), trueY(0), p5.width / view.scale, p5.height / view.scale);
 	}
 }
