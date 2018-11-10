@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Images-map creator Demo</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
+	<script src="dist/image-map-creator.bundle.js"></script>
+	<script src="https://rawgit.com/n-peugnet/contextmenu/n-peugnet/contextmenu.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.js"></script>
+
+	<link rel="stylesheet" href="https://rawgit.com/n-peugnet/contextmenu/n-peugnet/contextmenu.css">
+</head>
+
+<body>
+	<div id="div-1" style="position: relative;"></div>
+
+	<script type="text/javascript">
+		let iMap = new imageMapCreator(700, 555);
+		let sketch = new p5(iMap.sketch.bind(iMap), "div-1");
+	</script>
+</body>
+
+</html>

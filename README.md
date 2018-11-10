@@ -1,4 +1,4 @@
-# [Image Map Creator](https://rawgit.com/n-peugnet/image-map-creator/master/demos/)
+# [Image Map Creator](https://n-peugnet.github.io/image-map-creator/)
 
 This is a simple map creator tool made with the p5.js library. I want it
 to be easy to use for both the end user and the developper.
@@ -7,7 +7,8 @@ to be easy to use for both the end user and the developper.
 
 ## Live demo
 
-the live demo can be tried thanks to [rawgit](https://rawgit.com/): https://rawgit.com/n-peugnet/image-map-creator/master/demos/
+the live demo can be tried here:
+<https://n-peugnet.github.io/image-map-creator/>
 
 ## Features
 
