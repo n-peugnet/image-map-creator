@@ -52,6 +52,8 @@ export class imageMapCreator {
 		}
 	}
 
+	//---------------------------- p5 Sketch ----------------------------------
+
 	sketch(p5) {
 		this.p5 = p5;
 		this.bgLayer = new BgLayer(this);
@@ -90,7 +92,7 @@ export class imageMapCreator {
 			this.drawAreas();
 		}
 
-		//------------------------------ Events -----------------------------------
+		//------------------------------ p5 Events -----------------------------------
 
 		p5.mousePressed = () => {
 			if (this.mouseIsHover()) {
@@ -172,6 +174,28 @@ export class imageMapCreator {
 			if (this.mouseIsHover()) {
 				let coefZoom = this.view.scale * this.zoomParams.sensativity * - e.delta;
 				this.zoom(coefZoom);
+			}
+		}
+
+		/**
+		 * @param {KeyboardEvent} e
+		 */
+		p5.keyPressed = (e) => {
+			if (e.composed && e.ctrlKey) {
+				switch (e.key) {
+					case 's':
+						this.exportMap();
+						break;
+					case 'z':
+						this.undoManager.undo();
+						break;
+					case 'y':
+						this.undoManager.redo();
+						break;
+					default:
+						return true;
+				}
+				return false;
 			}
 		}
 	}
