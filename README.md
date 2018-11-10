@@ -7,7 +7,7 @@ to be easy to use for both the end user and the developper.
 
 ## Live demo
 
-the live demos can be tried thanks to [rawgit](https://rawgit.com/): https://rawgit.com/n-peugnet/image-map-creator/master/demos/
+the live demo can be tried thanks to [rawgit](https://rawgit.com/): https://rawgit.com/n-peugnet/image-map-creator/master/demos/
 
 ## Features
 
@@ -51,12 +51,21 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
 
 ## How to Integrate it
 
-You just need to import `p5.js`, `p5.dom.js` and the files of `/src` in
-your html page. Then instantiate the p5 object like this :
+You need to import `p5.js`, `p5.dom.js`, the js bundle from `/dist` and
+the contextmenu library in your html page. Then instantiate the p5 object
+like this :
 
 ```JavaScript
-let iMap = new p5(imageMapCreator, "div-1");
+let iMap = new imageMapCreator();
+let sketch = new p5(iMap.sketch.bind(iMap), "div-1");
 ```
+
+The contructor of imageMapCreator accepts parameters:
+
+```Javascript
+new imageMapCreator([ width = 600 [, height = 450 ]]);
+```
+
 For more details on the instance mode of p5 see [the p5 documentation](https://p5js.org/examples/instance-mode-instance-container.html)
 
 You can also see the detailled example in the `/demos` folder.

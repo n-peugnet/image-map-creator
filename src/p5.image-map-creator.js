@@ -12,7 +12,7 @@ import QuickSettings from "quicksettings";
 export class imageMapCreator {
 	constructor(width = 600, height = 450) {
 		this.width = width;
-		this.height = 450;
+		this.height = height;
 		this.tool = "rectangle";
 		this.drawingTools = ["rectangle", "circle", "polygon"];
 		this.settings;
