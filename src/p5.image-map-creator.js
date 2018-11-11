@@ -24,6 +24,10 @@ export class imageMapCreator {
 				onSelect: (target, key, item, area) => { this.setAreaUrl(area); },
 				label: "Set url",
 			},
+			SetTitle: {
+				onSelect: (target, key, item, area) => { this.setAreaTitle(area); },
+				label: "Set title",
+			},
 			Delete: (target, key, item, area) => { this.deleteArea(area); },
 			MoveFront: {
 				onSelect: (target, key, item, area) => { this.moveArea(area, 1); },
@@ -81,7 +85,7 @@ export class imageMapCreator {
 				.addTextArea("Output")
 				.addButton("Save", this.exportMap.bind(this));
 			// Fix for oncontextmenu
-			p5.canvas.addEventListener("contextmenu", (e) => { e.preventDefault(); });// Select all onclick on the Output field
+			p5.canvas.addEventListener("contextmenu", (e) => { e.preventDefault(); }); // Select all onclick on the Output field
 			// Select all onclick on the Output field
 			document.getElementById("Output").setAttribute("onFocus", "this.select();");
 		}
@@ -92,6 +96,7 @@ export class imageMapCreator {
 			this.setCursor();
 			this.setOutput();
 			this.setBackground();
+			this.setTitle(this.hovered);
 			p5.translate(this.view.transX, this.view.transY);
 			p5.scale(this.view.scale);
 			this.drawImage();
@@ -256,7 +261,7 @@ export class imageMapCreator {
 						data: this.hovered
 					});
 					return false; // doesen't work as expected
-				} else if (this.p5.mouseButton == this.p5.LEFT) {
+				} else if (this.p5.mouseButton == this.p5.LEFT && !ContextMenu.isOpen()) {
 					switch (this.tool) {
 						case "test":
 							openWindow(this.hovered.href);
@@ -402,6 +407,18 @@ export class imageMapCreator {
 		}
 	}
 
+	/**
+	 * Set the title of the canvas from an area
+	 * @param {Area} area
+	 */
+	setTitle(area) {
+		if (this.tool == "test" && area && area.title) {
+			this.p5.canvas.setAttribute("title", area.title);
+		} else {
+			this.p5.canvas.removeAttribute("title");
+		}
+	}
+
 	setAreaStyle(area) {
 		let color = this.p5.color(255, 255, 255, 178);
 		if (this.tool == "inspect" ||
@@ -452,6 +469,10 @@ export class imageMapCreator {
 		download(this.map.toJson(), `${this.map.name}.map.json`, 'application/json')
 	}
 
+	/**
+	 * Add an area to the imageMap object
+	 * @param {Area} area
+	 */
 	createArea(area) {
 		this.map.addArea(area);
 		this.undoManager.add({
@@ -464,6 +485,10 @@ export class imageMapCreator {
 		});
 	}
 
+	/**
+	 * remove an area from the imageMap object
+	 * @param {Area} area
+	 */
 	deleteArea(area) {
 		let id = area.id;
 		if (id === 0) {
@@ -481,6 +506,10 @@ export class imageMapCreator {
 		}
 	}
 
+	/**
+	 * Move an area forward or backward
+	 * @param {Area} area
+	 */
 	moveArea(area, direction) {
 		if (this.map.moveArea(area.id, direction) !== false) {
 			this.undoManager.add({
@@ -494,9 +523,13 @@ export class imageMapCreator {
 		}
 	}
 
+	/**
+	 * Set the url of an area
+	 * @param {Area} area
+	 */
 	setAreaUrl(area) {
 		let href = area.href;
-		let input = prompt("Entrez l'url vers laquelle devrait pointer cette zone", href ? href : "http://");
+		let input = prompt("Enter the pointing url of this area", href ? href : "http://");
 		if (input != null) {
 			area.setHref(input);
 			this.undoManager.add({
@@ -505,6 +538,26 @@ export class imageMapCreator {
 				},
 				redo: () => {
 					area.setHref(input);
+				}
+			});
+		}
+	}
+
+	/**
+	 * Set the title of an area
+	 * @param {Area} area
+	 */
+	setAreaTitle(area) {
+		let title = area.title;
+		let input = prompt("Enter the title of this area", title ? title : "");
+		if (input != null) {
+			area.setTitle(input);
+			this.undoManager.add({
+				undo: () => {
+					area.setTitle(title);
+				},
+				redo: () => {
+					area.setTitle(input);
 				}
 			});
 		}

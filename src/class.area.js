@@ -9,23 +9,24 @@ export class Area {
 	 * @param {string} href the link this area is going to point to
 	 * @param {int} id the unique id
 	 */
-	constructor(shape, coords = [], href, id = 0) {
+	constructor(shape, coords = [], href, title, id = 0) {
 		this.setShape(shape);
 		this.setCoords(coords);
-		this.setHref(href);
+		this.setTitle(href);
+		this.setTitle(title);
 		this.setId(id);
 	}
 
-	static fromObject(obj) {
-		switch (obj.shape) {
+	static fromObject(o) {
+		switch (o.shape) {
 			case 'rect':
-				return new AreaRect(obj.coords.map(XY.fromObject), obj.href, obj.id);
+				return new AreaRect(o.coords.map(XY.fromObject), o.href, o.title, o.id);
 			case 'circle':
-				return new AreaCircle(obj.coords.map(XY.fromObject), obj.radius, obj.href, obj.id);
+				return new AreaCircle(o.coords.map(XY.fromObject), o.radius, o.href, o.title, o.id);
 			case 'poly':
-				return new AreaPoly(obj.coords.map(XY.fromObject), obj.href, obj.id);
+				return new AreaPoly(o.coords.map(XY.fromObject), o.href, o.title, o.id);
 			case 'default':
-				return new AreaDefault(obj.href);
+				return new AreaDefault(o.href, o.title);
 			default:
 				throw 'Not an area'
 		}
@@ -91,6 +92,10 @@ export class Area {
 		this.href = url;
 	}
 
+	setTitle(title) {
+		this.title = title;
+	}
+
 	setId(id) {
 		this.id = id;
 	}
@@ -112,15 +117,20 @@ export class Area {
 
 	toHtml() {
 		let htmlCoords = this.htmlCoords(0);
-		if (htmlCoords != "")
-			htmlCoords = 'coords="' + htmlCoords + '" ';
-		return '<area shape="' + this.shape + '" ' + htmlCoords + 'href="' + this.href + '" alt="' + this.href + '"/>';
+		let title = "";
+		if (htmlCoords != ""){
+			htmlCoords = `coords="${htmlCoords}"`;
+		}
+		if (this.title) {
+			title = `title="${this.title}"`;
+		}
+		return `<area shape="${this.shape}" ${htmlCoords} href="${this.href}" alt="${this.href}" ${title} />`;
 	}
 
 	svgArea() { }
 
 	toSvg() {
-		return '<a xlink:href="' + this.href + '">' + this.svgArea() + '</a>';
+		return `<a xlink:href="${this.href}">${this.svgArea()}</a>`;
 	}
 }
 
@@ -130,8 +140,8 @@ export class AreaRect extends Area {
 	 * @param {string} href the link this area is going to point to
 	 * @param {int} id the unique id
 	 */
-	constructor(coords = [], href, id) {
-		super("rect", coords, href, id);
+	constructor(coords = [], href, title, id) {
+		super("rect", coords, href, title, id);
 	}
 
 	setCoords(coords) {
@@ -177,7 +187,11 @@ export class AreaRect extends Area {
 	}
 
 	svgArea() {
-		return '<rect x="' + this.coords[0].toString(0, 'x') + '" y="' + this.coords[0].toString(0, 'y') + '" width="' + this.coords[1].toString(0, 'x') + '" height="' + this.coords[1].toString(0, 'y') + '" />'
+		let x = this.coords[0].toString(0, 'x');
+		let y = this.coords[0].toString(0, 'y');
+		let w = this.coords[1].toString(0, 'x');
+		let h = this.coords[1].toString(0, 'y');
+		return `<rect x="${x}" y="${y}" width="${w}" height="${h}" />`;
 	}
 }
 
@@ -188,8 +202,8 @@ export class AreaCircle extends Area {
 	 * @param {string} href the link this area is going to point to
 	 * @param {int} id the unique id
 	 */
-	constructor(coords = [], radius = 0, href, id) {
-		super("circle", coords, href, id);
+	constructor(coords = [], radius = 0, href, title, id) {
+		super("circle", coords, href, title, id);
 		this.radius = radius;
 	}
 
@@ -224,7 +238,10 @@ export class AreaCircle extends Area {
 	}
 
 	svgArea() {
-		return '<circle cx="' + this.coords[0].toString(0, 'x') + '" cy="' + this.coords[0].toString(0, 'y') + '" r="' + round(this.radius, 0) + '" />'
+		let x = this.coords[0].toString(0, 'x');
+		let y = this.coords[0].toString(0, 'y');
+		let r = round(this.radius, 0);
+		return `<circle cx="${x}" cy="${y}" r="${r}" />`;
 	}
 }
 export class AreaPoly extends Area {
@@ -233,8 +250,8 @@ export class AreaPoly extends Area {
 	 * @param {string} href the link this area is going to point to
 	 * @param {int} id the unique id
 	 */
-	constructor(coords = [], href, id) {
-		super("poly", coords, href, id);
+	constructor(coords = [], href, title, id) {
+		super("poly", coords, href, title, id);
 	}
 
 	isValidShape() {
@@ -287,7 +304,7 @@ export class AreaPoly extends Area {
 		let points = this.coords.map(c => {
 			return c.toString(0, 'x') + ',' + c.toString(0, 'y');
 		}).join(' ');
-		return '<polygon points="' + points + '" />'
+		return `<polygon points="${points}" />`;
 	}
 }
 
@@ -296,8 +313,8 @@ export class AreaDefault extends Area {
 	 * Constructor
 	 * @param {string} href the link this area is going to point to
 	 */
-	constructor(href) {
-		super("default", [], href);
+	constructor(href, title) {
+		super("default", [], href, title);
 		this.isDefault = true;
 	}
 
@@ -318,6 +335,6 @@ export class AreaDefault extends Area {
 	}
 
 	svgArea() {
-		return '<rect x="0" y="0" width="100%" height="100%" />'
+		return '<rect x="0" y="0" width="100%" height="100%" />';
 	}
 }
