@@ -16,7 +16,7 @@ export class imageMapCreator {
 	constructor(width = 600, height = 450) {
 		this.width = width;
 		this.height = height;
-		this.tool = "rectangle";
+		this.tool = "polygon";
 		this.drawingTools = ["rectangle", "circle", "polygon"];
 		this.settings;
 		this.menu = {
@@ -75,7 +75,7 @@ export class imageMapCreator {
 			this.settings = QuickSettings.create(p5.width + 5, 0, "Image-map Creator", p5.canvas.parentElement)
 				.setDraggable(false)
 				.addText("Map Name", "", (v) => { this.map.setName(v) })
-				.addDropDown("Tool", ["rectangle", "circle", "polygon", "move", "delete", "test"], (v) => { this.setTool(v.value) })
+				.addDropDown("Tool", ["polygon", "rectangle", "circle", "move", "delete", "test"], (v) => { this.setTool(v.value) })
 				.addBoolean("Default Area", this.map.hasDefaultArea, (v) => { this.setDefaultArea(v) })
 				.addButton("Undo", this.undoManager.undo)
 				.addButton("Redo", this.undoManager.redo)
@@ -296,12 +296,11 @@ export class imageMapCreator {
 			fetch(file.data)
 				.then(res => res.blob())
 				.then(blob => {
-					console.log(blob);
 					let reader = new FileReader();
 					reader.onload = () => {
 						let json = reader.result;
 						console.log(json);
-						this.map.setFromJson(json);
+						this.importMap(json);
 					};
 					reader.readAsText(blob);
 				});
@@ -466,6 +465,14 @@ export class imageMapCreator {
 		download(blob, `${this.map.name}.map.json`, 'application/json')
 	}
 
+	importMap(jsonMap) {
+		let objectMap = JSON.parse(jsonMap);
+		this.map.setFromObject(objectMap);
+		this.settings.setValue("Map Name", objectMap.name);
+		this.settings.setValue("Default Area", objectMap.hasDefaultArea);
+		this.reset();
+	}
+
 	/**
 	 * Add an area to the imageMap object
 	 * @param {Area} area
@@ -585,5 +592,9 @@ export class imageMapCreator {
 				this.map.clearAreas();
 			}
 		});
+	}
+
+	reset() {
+		this.undoManager.clear();
 	}
 }

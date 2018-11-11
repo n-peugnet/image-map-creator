@@ -18,11 +18,10 @@ export class ImageMap {
 		this.lastId = 0;
 	}
 
-	setFromJson(data) {
-		data = JSON.parse(data);
-		for (const key in data) {
-			if (data.hasOwnProperty(key)) {
-				let value = data[key];
+	setFromObject(obj) {
+		for (const key in obj) {
+			if (obj.hasOwnProperty(key)) {
+				let value = obj[key];
 				if (key == 'areas') {
 					this.areas = value.map(Area.fromObject);
 				} else if (key == 'dArea') {
@@ -35,7 +34,9 @@ export class ImageMap {
 	}
 
 	setName(name) {
-		this.name = name.replace(/\s+/g, "");
+		if (name) {
+			this.name = name.replace(/\s+/g, "");
+		}
 	}
 
 	setSize(width, height) {
