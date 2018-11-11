@@ -1,3 +1,4 @@
+import { version } from "../package.json";
 import { ImageMap } from "./class.image-map";
 import { BgLayer } from "./p5.bg-layer";
 import { Area, AreaCircle, AreaRect, AreaPoly } from "./class.area";
@@ -463,12 +464,17 @@ export class imageMapCreator {
 	}
 
 	exportMap() {
-		let blob = new Blob([this.map.toJson()],{encoding:"UTF-8",type:"text/plain;charset=UTF-8"})
+		let json = JSON.stringify({
+			version: version,
+			map: this.map
+		});
+		let blob = new Blob([json],{encoding:"UTF-8",type:"text/plain;charset=UTF-8"})
 		download(blob, `${this.map.name}.map.json`, 'application/json')
 	}
 
-	importMap(jsonMap) {
-		let objectMap = JSON.parse(jsonMap);
+	importMap(json) {
+		let object = JSON.parse(json);
+		let objectMap = object.map;
 		this.map.setFromObject(objectMap);
 		this.settings.setValue("Map Name", objectMap.name);
 		this.settings.setValue("Default Area", objectMap.hasDefaultArea);

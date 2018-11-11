@@ -135,10 +135,6 @@ export class ImageMap {
 		return str;
 	}
 
-	toJson() {
-		return JSON.stringify(this);
-	}
-
 	/** Removes every areas from the areas array */
 	clearAreas() {
 		this.areas = [];
