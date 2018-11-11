@@ -11,4 +11,12 @@ module.exports = {
 	externals: [
 		'p5',
 	],
+	module: {
+		rules: [
+			{
+				test: /\.css$/,
+				use: ['style-loader', 'css-loader'],
+			},
+		],
+	},
 };
