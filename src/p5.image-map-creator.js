@@ -462,7 +462,8 @@ export class imageMapCreator {
 	}
 
 	exportMap() {
-		download(this.map.toJson(), `${this.map.name}.map.json`, 'application/json')
+		let blob = new Blob([this.map.toJson()],{encoding:"UTF-8",type:"text/plain;charset=UTF-8"})
+		download(blob, `${this.map.name}.map.json`, 'application/json')
 	}
 
 	/**
