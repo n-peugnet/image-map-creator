@@ -1,5 +1,6 @@
 import { between, round } from "./utils";
 import { XY } from "./class.xy";
+import p5 from "p5";
 
 export class Area {
 	/**
@@ -154,6 +155,10 @@ export class AreaRect extends Area {
 		return between(x, fCoord.x, lCoord.x) && between(y, fCoord.y, lCoord.y);
 	}
 
+	/**
+	 * draw the area to the given p5 instance
+	 * @param {p5} p5 
+	 */
 	display(p5) {
 		p5.rect(this.coords[0].x, this.coords[0].y, this.coords[1].x, this.coords[1].y);
 	}
@@ -206,6 +211,10 @@ export class AreaCircle extends Area {
 		this.radius = XY.dist(center, new XY(x, y));
 	}
 
+	/**
+	 * draw the area to the given p5 instance
+	 * @param {p5} p5 
+	 */
 	display(p5) {
 		p5.ellipse(this.getCenter().x, this.getCenter().y, this.radius * 2);
 	}
@@ -264,6 +273,10 @@ export class AreaPoly extends Area {
 		this.coords = this.coords.map(c => c.sum(xy));
 	}
 
+	/**
+	 * draw the area to the given p5 instance
+	 * @param {p5} p5 
+	 */
 	display(p5) {
 		p5.beginShape();
 		this.coords.forEach(c => p5.vertex(c.x, c.y));
@@ -296,6 +309,10 @@ export class AreaDefault extends Area {
 		return true;
 	}
 
+	/**
+	 * draw the area to the given p5 instance
+	 * @param {p5} p5 
+	 */
 	display(p5) {
 		p5.rect(0, 0, p5.getMap().width - 1, p5.getMap().height - 1);
 	}

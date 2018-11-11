@@ -8,5 +8,8 @@ module.exports = {
 		filename: 'image-map-creator.bundle.js',
 		libraryTarget: 'window'
 	},
-	devtool: 'inline-source-map'
+	devtool: 'inline-source-map',
+	externals: [
+		'p5',
+	],
 };

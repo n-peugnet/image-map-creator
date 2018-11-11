@@ -1,10 +1,15 @@
+import { imageMapCreator } from "./p5.image-map-creator";
 
-//---------------------------- P5 Classes ---------------------------------
 /**
  * Class representing the semi transparent layer which can appear on top of the background
  * @param {number} speed the speed of the opacity animation (1-255, default 15)
  */
 export class BgLayer {
+
+	/**
+	 * @param {imageMapCreator} iMap
+	 * @param {number} speed
+	 */
 	constructor(iMap, speed = 15) {
 		this.speed = speed;
 		this.alpha = 0;

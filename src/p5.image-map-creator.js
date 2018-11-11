@@ -6,6 +6,7 @@ import { openWindow } from './utils';
 import download from "downloadjs";
 import UndoManager from "undo-manager";
 import QuickSettings from "quicksettings";
+import p5 from "p5";
 
 /**
  */
@@ -54,6 +55,10 @@ export class imageMapCreator {
 
 	//---------------------------- p5 Sketch ----------------------------------
 
+	/**
+	 * Override p5 methods
+	 * @param {p5} p5
+	 */
 	sketch(p5) {
 		this.p5 = p5;
 		this.bgLayer = new BgLayer(this);
@@ -92,10 +97,14 @@ export class imageMapCreator {
 			this.drawAreas();
 		}
 
+		p5.getMap = () => {
+			return this.map;
+		}
+
 		//------------------------------ p5 Events -----------------------------------
 
 		p5.mousePressed = () => {
-			if (this.mouseIsHover()) {
+			if (this.mouseIsHoverSketch()) {
 				if (p5.mouseButton == p5.LEFT && !ContextMenu.isOpen()) {
 					switch (this.tool) {
 						case "circle":
@@ -126,7 +135,7 @@ export class imageMapCreator {
 		}
 
 		p5.mouseDragged = () => {
-			if (this.mouseIsHover() && !ContextMenu.isOpen()) {
+			if (this.mouseIsHoverSketch() && !ContextMenu.isOpen()) {
 				if (p5.mouseButton == p5.LEFT) {
 					switch (this.tool) {
 						case "move":
@@ -171,7 +180,7 @@ export class imageMapCreator {
 		}
 
 		p5.mouseWheel = (e) => {
-			if (this.mouseIsHover()) {
+			if (this.mouseIsHoverSketch()) {
 				let coefZoom = this.view.scale * this.zoomParams.sensativity * - e.delta;
 				this.zoom(coefZoom);
 			}
@@ -218,7 +227,7 @@ export class imageMapCreator {
 		return (coord - this.view.transY) / this.view.scale;
 	}
 
-	mouseIsHover() {
+	mouseIsHoverSketch() {
 		return this.p5.mouseX <= this.p5.width && this.p5.mouseX >= 0 && this.p5.mouseY <= this.p5.height && this.p5.mouseY >= 0;
 	}
 
@@ -234,7 +243,7 @@ export class imageMapCreator {
 	}
 
 	onClick(event) {
-		if (this.mouseIsHover()) {
+		if (this.mouseIsHoverSketch()) {
 			if (this.hovered) {
 				if (this.p5.mouseButton == this.p5.RIGHT) {
 					this.selected = this.hovered;
@@ -371,7 +380,7 @@ export class imageMapCreator {
 	setOutput() {
 		switch (this.tool) {
 			case "inspect":
-				if (this.mouseIsHover()) {
+				if (this.mouseIsHoverSketch()) {
 					let href = this.hovered ? this.hovered.href : "none";
 					this.settings.setValue("Output", href);
 				}
@@ -396,7 +405,7 @@ export class imageMapCreator {
 			this.tool == "test") {
 			color = this.p5.color(255, 0);
 		}
-		if ((this.mouseIsHover() && area == this.hovered && this.selected == false && (
+		if ((this.mouseIsHoverSketch() && area == this.hovered && this.selected == false && (
 			this.tool == "inspect" ||
 			this.tool == "delete" ||
 			this.tool == "move")) ||

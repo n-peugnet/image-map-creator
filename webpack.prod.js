@@ -7,5 +7,8 @@ module.exports = {
 		path: path.resolve(__dirname, 'dist'),
 		filename: 'image-map-creator.bundle.js',
 		libraryTarget: 'window'
-	}
+	},
+	externals: [
+		'p5',
+	],
 };
