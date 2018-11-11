@@ -57,7 +57,7 @@ export class Area {
 		}
 	}
 
-	empty() {
+	isEmpty() {
 		return this.coords.length == 0;
 	}
 

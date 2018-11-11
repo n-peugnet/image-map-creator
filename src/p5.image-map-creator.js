@@ -119,7 +119,7 @@ export class imageMapCreator {
 							this.setTempArea(this.mX(), this.mY());
 							break;
 						case "polygon":
-							if (this.tempArea.empty()) {
+							if (this.tempArea.isEmpty()) {
 								this.setTempArea(this.mX(), this.mY());
 							} else if (this.tempArea.isClosable(this.mX(), this.mY(), 5 / this.view.scale)) {
 								this.tempArea.close();
@@ -212,6 +212,8 @@ export class imageMapCreator {
 						return true;
 				}
 				return false;
+			} else if (this.tool == "polygon" && e.keyCode == this.p5.ESCAPE) {
+				this.tempArea = new Area();
 			}
 		}
 	}
@@ -359,7 +361,7 @@ export class imageMapCreator {
 		if (this.drawingTools.includes(this.tool)) {
 			switch (this.tool) {
 				case "polygon":
-					if (!this.tempArea.empty() && this.tempArea.isClosable(this.mX(), this.mY(), 5 / this.view.scale)) {
+					if (!this.tempArea.isEmpty() && this.tempArea.isClosable(this.mX(), this.mY(), 5 / this.view.scale)) {
 						this.p5.cursor(this.p5.HAND);
 						break;
 					}
@@ -455,7 +457,7 @@ export class imageMapCreator {
 	}
 
 	updateTempArea() {
-		if (!this.tempArea.empty()) {
+		if (!this.tempArea.isEmpty()) {
 			this.tempArea.updateLastCoord(this.mX(), this.mY());
 		}
 	}
