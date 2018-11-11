@@ -75,7 +75,7 @@ export class imageMapCreator {
 			this.settings = QuickSettings.create(p5.width + 5, 0, "Image-map Creator", p5.canvas.parentElement)
 				.setDraggable(false)
 				.addText("Map Name", "", (v) => { this.map.setName(v) })
-				.addDropDown("Tool", ["rectangle", "circle", "polygon", "inspect", "move", "delete", "test"], (v) => { this.setTool(v.value) })
+				.addDropDown("Tool", ["rectangle", "circle", "polygon", "move", "delete", "test"], (v) => { this.setTool(v.value) })
 				.addBoolean("Default Area", this.map.hasDefaultArea, (v) => { this.setDefaultArea(v) })
 				.addButton("Undo", this.undoManager.undo)
 				.addButton("Redo", this.undoManager.redo)
@@ -371,7 +371,6 @@ export class imageMapCreator {
 			this.p5.cursor(this.p5.ARROW);
 			if (this.hovered) {
 				switch (this.tool) {
-					case "inspect":
 					case "test":
 					case "delete":
 						this.p5.cursor(this.p5.HAND);
@@ -386,7 +385,7 @@ export class imageMapCreator {
 
 	setOutput() {
 		switch (this.tool) {
-			case "inspect":
+			case "test":
 				if (this.mouseIsHoverSketch()) {
 					let href = this.hovered ? this.hovered.href : "none";
 					this.settings.setValue("Output", href);
@@ -421,12 +420,10 @@ export class imageMapCreator {
 
 	setAreaStyle(area) {
 		let color = this.p5.color(255, 255, 255, 178);
-		if (this.tool == "inspect" ||
-			this.tool == "test") {
+		if (this.tool == "test") {
 			color = this.p5.color(255, 0);
 		}
 		if ((this.mouseIsHoverSketch() && area == this.hovered && this.selected == false && (
-			this.tool == "inspect" ||
 			this.tool == "delete" ||
 			this.tool == "move")) ||
 			this.selected == area) {
@@ -434,8 +431,7 @@ export class imageMapCreator {
 		}
 		this.p5.fill(color);
 		this.p5.strokeWeight(1 / this.view.scale);
-		if (this.tool == "inspect" ||
-			this.tool == "test") {
+		if (this.tool == "test") {
 			this.p5.noStroke();
 		} else {
 			this.p5.stroke(0);

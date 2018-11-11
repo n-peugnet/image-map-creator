@@ -29,11 +29,10 @@ _The checked ones are implemented, the others are the ones I plan to add in the 
     -   [x] circle mode
     -   [x] polygon mode
     -   [X] move mode
-    -   [x] inspect mode
     -   [ ] select mode
     -   [ ] resize mode ?
     -   [x] delete mode
-    -   [ ] test mode
+    -   [x] test mode
 -   [ ] differents drawing modes for rectangles :
     -   [x] dram from edges
     -   [ ] draw from center (with `alt`)
