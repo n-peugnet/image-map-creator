@@ -1,0 +1,3 @@
+[submodule "lib/contextmenu"]
+	path = lib/contextmenu
+	url = https://github.com/n-peugnet/contextmenu

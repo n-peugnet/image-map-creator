@@ -7,6 +7,8 @@ import download from "downloadjs";
 import UndoManager from "undo-manager";
 import QuickSettings from "quicksettings";
 import p5 from "p5";
+import ContextMenu from "../lib/contextmenu/contextmenu";
+import '../lib/contextmenu/contextmenu.css';
 
 /**
  */
