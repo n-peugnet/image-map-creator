@@ -80,6 +80,20 @@ export class Coord {
 		this.y -= coord.y;
 	}
 
+	//------------------------ Start Interface Movable -------------------------------
+	/**
+	 * Alias of add
+	 * @param {Coord} coord
+	 */
+	move(coord) {
+		this.add(coord);
+	}
+
+	position() {
+		return this;
+	}
+	//------------------------- End Interface Movable --------------------------------
+
 	clone() {
 		return new Coord(this.x, this.y);
 	}
@@ -88,12 +102,12 @@ export class Coord {
 		return new Coord(- this.x, -this.y);
 	}
 
-	toString(dec, val) {
+	toStr(dec, val) {
 		return round(this[val], dec)
 	}
 
 	toHtml(dec) {
-		return this.toString(dec, "x") + "," + this.toString(dec, "y");
+		return this.toStr(dec, "x") + "," + this.toStr(dec, "y");
 	}
 
 }

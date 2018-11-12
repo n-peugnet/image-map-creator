@@ -60,6 +60,10 @@ export class Area {
 		}
 	}
 
+	getPoints() {
+		return this.coords;
+	}
+
 	isEmpty() {
 		return this.coords.length == 0;
 	}
@@ -76,12 +80,18 @@ export class Area {
 		this.coords[this.coords.length - 1] = new Coord(x, y);
 	}
 
+	//------------------------ Start Interface Movable -------------------------------
 	move(coord) {
 		let fcoord = this.firstCoord();
 		if (coord != undefined) {
 			fcoord.add(coord);
 		}
 	}
+
+	position() {
+		return this.firstCoord();
+	}
+	//------------------------- End Interface Movable --------------------------------
 
 	isDrawable() {
 		return this.coords.length >= 1;
@@ -104,7 +114,7 @@ export class Area {
 	 * @returns {Coord|false}
 	 */
 	isHoverPoint(coord, tolerance) {
-		let point = this.coords.find(c => {
+		let point = this.getPoints().find(c => {
 			return Coord.dist(coord, c) < tolerance;
 		});
 		return point ? point : false;
@@ -207,10 +217,10 @@ export class AreaRect extends Area {
 	}
 
 	svgArea() {
-		let x = this.coords[0].toString(0, 'x');
-		let y = this.coords[0].toString(0, 'y');
-		let w = this.coords[1].toString(0, 'x');
-		let h = this.coords[1].toString(0, 'y');
+		let x = this.coords[0].toStr(0, 'x');
+		let y = this.coords[0].toStr(0, 'y');
+		let w = this.coords[1].toStr(0, 'x');
+		let h = this.coords[1].toStr(0, 'y');
 		return `<rect x="${x}" y="${y}" width="${w}" height="${h}" />`;
 	}
 }
@@ -261,8 +271,8 @@ export class AreaCircle extends Area {
 	}
 
 	svgArea() {
-		let x = this.coords[0].toString(0, 'x');
-		let y = this.coords[0].toString(0, 'y');
+		let x = this.coords[0].toStr(0, 'x');
+		let y = this.coords[0].toStr(0, 'y');
 		let r = round(this.radius, 0);
 		return `<circle cx="${x}" cy="${y}" r="${r}" />`;
 	}
@@ -349,7 +359,7 @@ export class AreaPoly extends Area {
 
 	svgArea() {
 		let points = this.getCoords().map(c => {
-			return c.toString(0, 'x') + ',' + c.toString(0, 'y');
+			return c.toStr(0, 'x') + ',' + c.toStr(0, 'y');
 		}).join(' ');
 		return `<polygon points="${points}" />`;
 	}

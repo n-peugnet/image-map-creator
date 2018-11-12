@@ -12,6 +12,5 @@ export function round(x, digits) {
 }
 
 export function openWindow(url, width = 400, height = 300) {
-
 	window.open(url, "_blank", `width=${width},height=${height}`);
 }

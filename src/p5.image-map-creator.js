@@ -140,6 +140,10 @@ export class imageMapCreator {
 								this.selected = this.hoveredArea.shape != "default" ? this.hoveredArea : false;
 								this.tempCoord = this.selected.firstCoord().clone();
 							}
+							if (this.hoveredPoint) {
+								this.selected = this.hoveredPoint;
+								this.tempCoord = this.hoveredPoint.clone();
+							}
 							break;
 					}
 				}
@@ -174,14 +178,14 @@ export class imageMapCreator {
 					break;
 				case "move":
 					if (this.selected) {
-						let area = this.selected;
-						let move = area.firstCoord().diff(this.tempCoord);
+						let select = this.selected;
+						let move = select.position().diff(this.tempCoord);
 						this.undoManager.add({
 							undo: () => {
-								area.move(move.invert());
+								select.move(move.invert());
 							},
 							redo: () => {
-								area.move(move);
+								select.move(move);
 							}
 						});
 					}
