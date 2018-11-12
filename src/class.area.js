@@ -24,7 +24,7 @@ export class Area {
 			case 'circle':
 				return new AreaCircle(o.coords.map(Coord.fromObject), o.radius, o.href, o.title, o.id);
 			case 'poly':
-				return new AreaPoly(o.coords.map(Coord.fromObject), o.href, o.title, o.id);
+				return new AreaPoly(o.coords.map(Coord.fromObject), o.href, o.title, o.id, o.closed);
 			case 'default':
 				return new AreaDefault(o.href, o.title);
 			default:
