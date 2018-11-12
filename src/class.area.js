@@ -91,6 +91,25 @@ export class Area {
 		return this.isDrawable();
 	}
 
+	/**
+	 * @param {Coord} coord 
+	 */
+	isHover(coord) {
+		return false;
+	}
+
+	/**
+	 * @param {Coord} coord 
+	 * @param {number} tolerance
+	 * @returns {Coord|false}
+	 */
+	isHoverPoint(coord, tolerance) {
+		let point = this.coords.find(c => {
+			return Coord.dist(coord, c) < tolerance;
+		});
+		return point ? point : false;
+	}
+
 	setHref(url) {
 		this.href = url;
 	}
@@ -105,11 +124,6 @@ export class Area {
 
 	firstCoord() {
 		return this.coords[0];
-	}
-
-	distToFirstCoord(x, y) {
-		let coord = new Coord(x, y);
-		return Coord.dist(coord, this.firstCoord());
 	}
 
 	htmlCoords(dec) {
@@ -162,10 +176,13 @@ export class AreaRect extends Area {
 		return this.coords.length == 2 && !this.coords[1].oneIsEmpty();
 	}
 
-	isHover(x, y) {
+	/**
+	 * @param {Coord} coord 
+	 */
+	isHover(coord) {
 		let fCoord = this.firstCoord();
 		let lCoord = this.coords[1].sum(fCoord);
-		return between(x, fCoord.x, lCoord.x) && between(y, fCoord.y, lCoord.y);
+		return between(coord.x, fCoord.x, lCoord.x) && between(coord.y, fCoord.y, lCoord.y);
 	}
 
 	/**
@@ -218,9 +235,12 @@ export class AreaCircle extends Area {
 		return super.isValidShape() && this.radius > 0;
 	}
 
-	isHover(x, y) {
+	/**
+	 * @param {Coord} coord 
+	 */
+	isHover(coord) {
 		let center = this.getCenter();
-		return Coord.dist(new Coord(x, y), center) < this.radius;
+		return Coord.dist(coord, center) < this.radius;
 	}
 
 	updateLastCoord(x, y) {
@@ -258,11 +278,20 @@ export class AreaPoly extends Area {
 		this.closed = closed;
 	}
 
-	isValidShape() {
-		return this.coords.length >= 3;
+	isDrawable() {
+		return this.coords.length >= 2;
 	}
 
-	isHover(x, y) {
+	isValidShape() {
+		return super.isValidShape() && this.closed;
+	}
+
+	/**
+	 * @param {Coord} coord 
+	 */
+	isHover(coord) {
+		let x = coord.x;
+		let y = coord.y;
 		let cornersX = this.coords.map(c => { return c.x });
 		let cornersY = this.coords.map(c => { return c.y });
 
@@ -282,8 +311,9 @@ export class AreaPoly extends Area {
 		return oddNodes;
 	}
 
-	isClosable(x, y, dist = 5) {
-		return this.isValidShape() && this.distToFirstCoord(x, y) < dist;
+	isClosable(coord, tolerance) {
+		let dist = Coord.dist(coord, this.firstCoord());
+		return this.coords.length >= 4 && dist < tolerance;
 	}
 
 	getCoords(mode = "default") {

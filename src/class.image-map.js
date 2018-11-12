@@ -48,6 +48,11 @@ export class ImageMap {
 		this.hasDefaultArea = bool;
 	}
 
+	/**
+	 * Returns a copy of the area of the imageMap
+	 * @param {boolean} all with the default area (if exist) or not (default: true)
+	 * @returns {Area[]} a copy of the areas
+	 */
 	getAreas(all = true) {
 		let areas = this.areas.slice();
 		if (all && this.hasDefaultArea) areas.push(this.dArea);

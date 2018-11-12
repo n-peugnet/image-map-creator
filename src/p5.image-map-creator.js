@@ -44,7 +44,8 @@ export class imageMapCreator {
 		this.tempArea = new Area();
 		this.tempCoord = new Coord();
 		this.selected = false;
-		this.hovered = false;
+		this.hoveredArea = false;
+		this.hoveredPoint = false;
 		this.map = new ImageMap(width, height);
 		this.undoManager = new UndoManager();
 		this.img;
@@ -58,6 +59,7 @@ export class imageMapCreator {
 			max: 3,
 			sensativity: 0.001
 		}
+		this.tolerance = 5;
 	}
 
 	//---------------------------- p5 Sketch ----------------------------------
@@ -95,11 +97,11 @@ export class imageMapCreator {
 
 		p5.draw = () => {
 			this.updateTempArea();
-			this.hovered = this.mouseIsHoverArea();
+			this.updateHovered();
 			this.setCursor();
 			this.setOutput();
 			this.setBackground();
-			this.setTitle(this.hovered);
+			this.setTitle(this.hoveredArea);
 			p5.translate(this.view.transX, this.view.transY);
 			p5.scale(this.view.scale);
 			this.drawImage();
@@ -124,7 +126,7 @@ export class imageMapCreator {
 						case "polygon":
 							if (this.tempArea.isEmpty()) {
 								this.setTempArea(this.mX(), this.mY());
-							} else if (this.tempArea.isClosable(this.mX(), this.mY(), 5 / this.view.scale)) {
+							} else if (this.tempArea.isClosable(this.mCoord(), this.tolerance / this.view.scale)) {
 								this.tempArea.close();
 								if (this.tempArea.isValidShape())
 									this.createArea(this.tempArea);
@@ -134,8 +136,8 @@ export class imageMapCreator {
 							}
 							break;
 						case "move":
-							if (this.hovered) {
-								this.selected = this.hovered.shape != "default" ? this.hovered : false;
+							if (this.hoveredArea) {
+								this.selected = this.hoveredArea.shape != "default" ? this.hoveredArea : false;
 								this.tempCoord = this.selected.firstCoord().clone();
 							}
 							break;
@@ -224,14 +226,6 @@ export class imageMapCreator {
 
 	//---------------------------- Functions ----------------------------------
 
-	mX() {
-		return this.trueX(this.p5.mouseX);
-	}
-
-	mY() {
-		return this.trueY(this.p5.mouseY);
-	}
-
 	trueX(coord) {
 		return (coord - this.view.transX) / this.view.scale;
 	}
@@ -240,40 +234,65 @@ export class imageMapCreator {
 		return (coord - this.view.transY) / this.view.scale;
 	}
 
+	mX() {
+		return this.trueX(this.p5.mouseX);
+	}
+
+	mY() {
+		return this.trueY(this.p5.mouseY);
+	}
+
+	/**
+	 * Get the true coordinate of the mouse relative to the imageMap
+	 * @returns {Coord}
+	 */
+	mCoord() {
+		return new Coord(this.mX(), this.mY());
+	}
+
 	mouseIsHoverSketch() {
 		return this.p5.mouseX <= this.p5.width && this.p5.mouseX >= 0 && this.p5.mouseY <= this.p5.height && this.p5.mouseY >= 0;
 	}
 
-	/**
-	 * @returns {Area|false}
-	 */
-	mouseIsHoverArea() {
+	updateHovered() {
 		let allAreas = this.map.getAreas();
 		let area = allAreas.find(area => {
-			return area.isHover(this.mX(), this.mY());
+			if (this.tool != "test") {
+				let point = area.isHoverPoint(this.mCoord(), this.tolerance / this.view.scale)
+				if (point) {
+					this.hoveredPoint = point;
+					return true;
+				} else {
+					this.hoveredPoint = false;
+				}
+			}
+			if (area.isHover(this.mCoord())) {
+				return true;
+			}
+			return false;
 		});
-		return area != undefined ? area : false;
+		this.hoveredArea = area != undefined ? area : false;
 	}
 
 	onClick(event) {
 		if (this.mouseIsHoverSketch()) {
-			if (this.hovered) {
+			if (this.hoveredArea) {
 				if (this.p5.mouseButton == this.p5.RIGHT) {
-					this.selected = this.hovered;
-					this.menu.MoveFront.enabled = !(this.map.isFirstArea(this.hovered.id) || this.hovered.shape == 'default');
-					this.menu.MoveBack.enabled = !(this.map.isLastArea(this.hovered.id) || this.hovered.shape == 'default');
+					this.selected = this.hoveredArea;
+					this.menu.MoveFront.enabled = !(this.map.isFirstArea(this.hoveredArea.id) || this.hoveredArea.shape == 'default');
+					this.menu.MoveBack.enabled = !(this.map.isLastArea(this.hoveredArea.id) || this.hoveredArea.shape == 'default');
 					ContextMenu.display(event, this.menu, {
 						position: "click",
-						data: this.hovered
+						data: this.hoveredArea
 					});
 					return false; // doesen't work as expected
 				} else if (this.p5.mouseButton == this.p5.LEFT && !ContextMenu.isOpen()) {
 					switch (this.tool) {
 						case "test":
-							openWindow(this.hovered.href);
+							openWindow(this.hoveredArea.href);
 							break;
 						case "delete":
-							this.deleteArea(this.hovered);
+							this.deleteArea(this.hoveredArea);
 							break;
 					}
 				}
@@ -349,11 +368,17 @@ export class imageMapCreator {
 
 	drawAreas() {
 		let allAreas = [this.tempArea].concat(this.map.getAreas());
-		for(let i = allAreas.length; i--;) {
+		for (let i = allAreas.length; i--;) {
 			let area = allAreas[i];
 			this.setAreaStyle(area);
 			if (area.isDrawable())
 				area.display(this.p5);
+		}
+		if (this.hoveredPoint) {
+			let point = this.hoveredPoint;
+			this.p5.fill(0);
+			this.p5.noStroke();
+			this.p5.ellipse(point.x, point.y, 6 / this.view.scale)
 		}
 	}
 
@@ -366,7 +391,7 @@ export class imageMapCreator {
 		if (this.drawingTools.includes(this.tool)) {
 			switch (this.tool) {
 				case "polygon":
-					if (!this.tempArea.isEmpty() && this.tempArea.isClosable(this.mX(), this.mY(), 5 / this.view.scale)) {
+					if (!this.tempArea.isEmpty() && this.tempArea.isClosable(this.mCoord(), 5 / this.view.scale)) {
 						this.p5.cursor(this.p5.HAND);
 						break;
 					}
@@ -375,7 +400,7 @@ export class imageMapCreator {
 			}
 		} else {
 			this.p5.cursor(this.p5.ARROW);
-			if (this.hovered) {
+			if (this.hoveredArea) {
 				switch (this.tool) {
 					case "test":
 					case "delete":
@@ -393,7 +418,7 @@ export class imageMapCreator {
 		switch (this.tool) {
 			case "test":
 				if (this.mouseIsHoverSketch()) {
-					let href = this.hovered ? this.hovered.href : "none";
+					let href = this.hoveredArea ? this.hoveredArea.href : "none";
 					this.settings.setValue("Output", href);
 				}
 				break;
@@ -429,7 +454,7 @@ export class imageMapCreator {
 		if (this.tool == "test") {
 			color = this.p5.color(255, 0);
 		}
-		if ((this.mouseIsHoverSketch() && area == this.hovered && this.selected == false && (
+		if ((this.mouseIsHoverSketch() && area == this.hoveredArea && this.selected == false && (
 			this.tool == "delete" ||
 			this.tool == "move")) ||
 			this.selected == area) {
@@ -472,7 +497,7 @@ export class imageMapCreator {
 			version: version,
 			map: this.map
 		});
-		let blob = new Blob([json],{encoding:"UTF-8",type:"text/plain;charset=UTF-8"})
+		let blob = new Blob([json], { encoding: "UTF-8", type: "text/plain;charset=UTF-8" })
 		download(blob, `${this.map.name}.map.json`, 'application/json')
 	}
 
