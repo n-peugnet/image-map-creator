@@ -136,7 +136,7 @@ export class imageMapCreator {
 						case "move":
 							if (this.hovered) {
 								this.selected = this.hovered.shape != "default" ? this.hovered : false;
-								this.tempCoord = this.selected.firstCoord();
+								this.tempCoord = this.selected.firstCoord().clone();
 							}
 							break;
 					}

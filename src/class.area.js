@@ -45,6 +45,9 @@ export class Area {
 		return this.coords.push(new Coord(x, y));
 	}
 
+	/**
+	 * @param {Coord[]} coords 
+	 */
 	setCoords(coords) {
 		this.coords = coords;
 	}
@@ -53,7 +56,7 @@ export class Area {
 		switch (mode) {
 			case "default":
 			default:
-				return this.coords;
+				return this.coords.slice();
 		}
 	}
 
@@ -76,7 +79,7 @@ export class Area {
 	move(coord) {
 		let fcoord = this.firstCoord();
 		if (coord != undefined) {
-			this.coords[0] = fcoord.sum(coord);
+			fcoord.add(coord);
 		}
 	}
 
@@ -118,7 +121,7 @@ export class Area {
 	toHtml() {
 		let htmlCoords = this.htmlCoords(0);
 		let title = "";
-		if (htmlCoords != ""){
+		if (htmlCoords != "") {
 			htmlCoords = `coords="${htmlCoords}"`;
 		}
 		if (this.title) {
@@ -250,12 +253,13 @@ export class AreaPoly extends Area {
 	 * @param {string} href the link this area is going to point to
 	 * @param {int} id the unique id
 	 */
-	constructor(coords = [], href, title, id) {
+	constructor(coords = [], href, title, id, closed = false) {
 		super("poly", coords, href, title, id);
+		this.closed = closed;
 	}
 
 	isValidShape() {
-		return this.coords.length >= 4;
+		return this.coords.length >= 3;
 	}
 
 	isHover(x, y) {
@@ -282,12 +286,25 @@ export class AreaPoly extends Area {
 		return this.isValidShape() && this.distToFirstCoord(x, y) < dist;
 	}
 
+	getCoords(mode = "default") {
+		let coords = super.getCoords();
+		switch (mode) {
+			case "default":
+			default:
+				if (this.closed) {
+					coords.push(this.firstCoord());
+				}
+				return coords;
+		}
+	}
+
 	close() {
-		this.coords[this.coords.length - 1] = this.firstCoord();
+		this.closed = true;
+		this.coords.pop();
 	}
 
 	move(coord) {
-		this.coords = this.coords.map(c => c.sum(coord));
+		this.coords.map(c => c.add(coord));
 	}
 
 	/**
@@ -296,12 +313,12 @@ export class AreaPoly extends Area {
 	 */
 	display(p5) {
 		p5.beginShape();
-		this.coords.forEach(c => p5.vertex(c.x, c.y));
+		this.getCoords().forEach(c => p5.vertex(c.x, c.y));
 		p5.endShape();
 	}
 
 	svgArea() {
-		let points = this.coords.map(c => {
+		let points = this.getCoords().map(c => {
 			return c.toString(0, 'x') + ',' + c.toString(0, 'y');
 		}).join(' ');
 		return `<polygon points="${points}" />`;

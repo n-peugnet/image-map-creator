@@ -55,11 +55,33 @@ export class Coord {
 	}
 
 	/**
+	 * Add the value of the given coordinate to the current one
+	 * @param {Coord} coord 
+	 */
+	add(coord) {
+		this.x += coord.x;
+		this.y += coord.y;
+	}
+
+	/**
 	 * returns the difference of two xy coordinates
 	 * @param {Coord} coord 
 	 */
 	diff(coord) {
 		return new Coord(this.x - coord.x, this.y - coord.y);
+	}
+
+	/**
+	 * Substract the value of the given coordinate to the current one
+	 * @param {Coord} coord 
+	 */
+	sub(coord) {
+		this.x -= coord.x;
+		this.y -= coord.y;
+	}
+
+	clone() {
+		return new Coord(this.x, this.y);
 	}
 
 	invert() {
