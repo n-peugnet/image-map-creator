@@ -78,7 +78,7 @@ export class imageMapCreator {
 			this.settings = QuickSettings.create(p5.width + 5, 0, "Image-map Creator", p5.canvas.parentElement)
 				.setDraggable(false)
 				.addText("Map Name", "", (v) => { this.map.setName(v) })
-				.addDropDown("Tool", ["polygon", "rectangle", "circle", "move", "delete", "test"], (v) => { this.setTool(v.value) })
+				.addDropDown("Tool", ["polygon", "rectangle", "circle", "select", "delete", "test"], (v) => { this.setTool(v.value) })
 				.addBoolean("Default Area", this.map.hasDefaultArea, (v) => { this.setDefaultArea(v) })
 				.addButton("Undo", this.undoManager.undo)
 				.addButton("Redo", this.undoManager.redo)
@@ -135,7 +135,7 @@ export class imageMapCreator {
 								this.tempArea.addCoord(this.mX(), this.mY());
 							}
 							break;
-						case "move":
+						case "select":
 							if (this.hoveredArea) {
 								this.selected = this.hoveredArea.shape != "default" ? this.hoveredArea : false;
 								this.tempCoord = this.selected.firstCoord().clone();
@@ -154,7 +154,7 @@ export class imageMapCreator {
 			if (this.mouseIsHoverSketch() && !ContextMenu.isOpen()) {
 				if (p5.mouseButton == p5.LEFT) {
 					switch (this.tool) {
-						case "move":
+						case "select":
 							if (this.selected) {
 								let mvmt = new Coord(this.mX() - this.trueX(p5.pmouseX), this.mY() - this.trueY(p5.pmouseY));
 								this.selected.move(mvmt);
@@ -176,7 +176,7 @@ export class imageMapCreator {
 						this.createArea(this.tempArea);
 					this.tempArea = new Area();
 					break;
-				case "move":
+				case "select":
 					if (this.selected) {
 						let select = this.selected;
 						let move = select.position().diff(this.tempCoord);
@@ -410,8 +410,10 @@ export class imageMapCreator {
 					case "delete":
 						this.p5.cursor(this.p5.HAND);
 						break;
-					case "move":
-						this.p5.cursor(this.p5.MOVE);
+					case "select":
+						if (!this.hoveredPoint) {
+							this.p5.cursor(this.p5.MOVE);
+						}
 						break;
 				}
 			}
@@ -421,6 +423,7 @@ export class imageMapCreator {
 	setOutput() {
 		switch (this.tool) {
 			case "test":
+			case "select":
 				if (this.mouseIsHoverSketch()) {
 					let href = this.hoveredArea ? this.hoveredArea.href : "none";
 					this.settings.setValue("Output", href);
@@ -460,7 +463,7 @@ export class imageMapCreator {
 		}
 		if ((this.mouseIsHoverSketch() && area == this.hoveredArea && this.selected == false && (
 			this.tool == "delete" ||
-			this.tool == "move")) ||
+			this.tool == "select")) ||
 			this.selected == area) {
 			color = this.p5.color(255, 200, 200, 178); // highlight (set color red)
 		}
