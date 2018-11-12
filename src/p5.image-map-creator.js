@@ -31,12 +31,12 @@ export class imageMapCreator {
 			},
 			Delete: (target, key, item, area) => { this.deleteArea(area); },
 			MoveFront: {
-				onSelect: (target, key, item, area) => { this.moveArea(area, 1); },
+				onSelect: (target, key, item, area) => { this.moveArea(area, -1); },
 				enabled: true,
 				label: "Move Forward",
 			},
 			MoveBack: {
-				onSelect: (target, key, item, area) => { this.moveArea(area, -1); },
+				onSelect: (target, key, item, area) => { this.moveArea(area, 1); },
 				enabled: true,
 				label: "Move Backward",
 			}
@@ -249,7 +249,7 @@ export class imageMapCreator {
 	 */
 	mouseIsHoverArea() {
 		let allAreas = this.map.getAreas();
-		let area = allAreas.reverse().find(area => {
+		let area = allAreas.find(area => {
 			return area.isHover(this.mX(), this.mY());
 		});
 		return area != undefined ? area : false;
@@ -260,8 +260,8 @@ export class imageMapCreator {
 			if (this.hovered) {
 				if (this.p5.mouseButton == this.p5.RIGHT) {
 					this.selected = this.hovered;
-					this.menu.MoveFront.enabled = !(this.map.isLastArea(this.hovered.id) || this.hovered.shape == 'default');
-					this.menu.MoveBack.enabled = !(this.map.isFirstArea(this.hovered.id) || this.hovered.shape == 'default');
+					this.menu.MoveFront.enabled = !(this.map.isFirstArea(this.hovered.id) || this.hovered.shape == 'default');
+					this.menu.MoveBack.enabled = !(this.map.isLastArea(this.hovered.id) || this.hovered.shape == 'default');
 					ContextMenu.display(event, this.menu, {
 						position: "click",
 						data: this.hovered
@@ -348,12 +348,13 @@ export class imageMapCreator {
 	}
 
 	drawAreas() {
-		let allAreas = this.map.getAreas().concat([this.tempArea]);
-		allAreas.forEach(area => {
+		let allAreas = [this.tempArea].concat(this.map.getAreas());
+		for(let i = allAreas.length; i--;) {
+			let area = allAreas[i];
 			this.setAreaStyle(area);
 			if (area.isDrawable())
 				area.display(this.p5);
-		});
+		}
 	}
 
 	setTool(value) {
@@ -492,7 +493,7 @@ export class imageMapCreator {
 		this.map.addArea(area);
 		this.undoManager.add({
 			undo: () => {
-				area = this.map.popArea();
+				area = this.map.shiftArea();
 			},
 			redo: () => {
 				this.map.addArea(area, false);
@@ -509,13 +510,13 @@ export class imageMapCreator {
 		if (id === 0) {
 			this.settings.setValue("Default Area", false);
 		} else {
-			let index = this.map.rmletea(id);
+			let index = this.map.rmvArea(id);
 			this.undoManager.add({
 				undo: () => {
 					this.map.insertArea(area, index);
 				},
 				redo: () => {
-					this.map.rmletea(id);
+					this.map.rmvArea(id);
 				}
 			});
 		}

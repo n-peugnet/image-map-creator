@@ -50,7 +50,7 @@ export class ImageMap {
 
 	getAreas(all = true) {
 		let areas = this.areas.slice();
-		if (all && this.hasDefaultArea) areas.unshift(this.dArea);
+		if (all && this.hasDefaultArea) areas.push(this.dArea);
 		return areas;
 	}
 
@@ -61,18 +61,18 @@ export class ImageMap {
 	addArea(area, setId = true) {
 		if (setId)
 			area.setId(this.getNewId());
-		this.areas.push(area);
+		this.areas.unshift(area);
 		return area.id;
 	}
 
-	rmletea(id) {
+	rmvArea(id) {
 		let index = this.areaIndex(id);
 		this.areas.splice(index, 1);
 		return index;
 	}
 
 	/**
-	 * 
+	 * Move an area up or down in the areas array
 	 * @param {number} id 
 	 * @param {number} direction 
 	 */
@@ -82,9 +82,13 @@ export class ImageMap {
 		let nextIndex = index + direction;
 		if (nextIndex < 0 || nextIndex >= this.areas.length)
 			return false;
-		this.rmletea(id);
+		this.rmvArea(id);
 		this.insertArea(area, nextIndex);
 		return nextIndex;
+	}
+
+	shiftArea() {
+		return this.areas.shift();
 	}
 
 	popArea() {
@@ -117,20 +121,22 @@ export class ImageMap {
 	toHtml() {
 		let areas = [];
 		this.getAreas().forEach(a => {
-			if (a.isValidShape())
+			if (a.isValidShape()) {
 				areas.push('\t' + a.toHtml());
+			}
 		});
-		return '<map name="' + this.name + '" id="' + this.name + '">\n' + areas.reverse().join('\n') + '\n</map>';
+		return '<map name="' + this.name + '" id="' + this.name + '">\n' + areas.join('\n') + '\n</map>';
 	}
 
 	toSvg() {
 		let areas = [];
 		this.getAreas(false).forEach(a => {
-			if (a.isValidShape())
+			if (a.isValidShape()) {
 				areas.push('\t' + a.toSvg());
+			}
 		});
 		let str = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="' + this.width + '" height="' + this.height + '">\n';
-		str += areas.reverse().join('\n');
+		str += areas.join('\n');
 		str += '\n</svg>';
 		return str;
 	}
