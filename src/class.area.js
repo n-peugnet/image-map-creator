@@ -12,7 +12,7 @@ export class Area {
 	constructor(shape, coords = [], href, title, id = 0) {
 		this.setShape(shape);
 		this.setCoords(coords);
-		this.setTitle(href);
+		this.setHref(href);
 		this.setTitle(title);
 		this.setId(id);
 	}
