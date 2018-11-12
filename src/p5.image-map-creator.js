@@ -86,7 +86,9 @@ export class imageMapCreator {
 				.addTextArea("Output")
 				.addButton("Save", this.exportMap.bind(this));
 			// Fix for oncontextmenu
-			p5.canvas.addEventListener("contextmenu", (e) => { e.preventDefault(); }); // Select all onclick on the Output field
+			p5.canvas.addEventListener("contextmenu", (e) => { e.preventDefault(); });
+			// Fix for middle click mouse down triggers scroll on windows
+			p5.canvas.addEventListener("mousedown", (e) => { e.preventDefault(); });
 			// Select all onclick on the Output field
 			document.getElementById("Output").setAttribute("onFocus", "this.select();");
 		}
