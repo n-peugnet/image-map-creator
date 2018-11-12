@@ -1,11 +1,11 @@
 import { between, round } from "./utils";
-import { XY } from "./class.xy";
+import { Coord } from "./class.coord";
 import p5 from "p5";
 
 export class Area {
 	/**
 	 * @param {string} shape the type of area
-	 * @param {XY[]} coords the list of coordinates
+	 * @param {Coord[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
 	 * @param {int} id the unique id
 	 */
@@ -20,11 +20,11 @@ export class Area {
 	static fromObject(o) {
 		switch (o.shape) {
 			case 'rect':
-				return new AreaRect(o.coords.map(XY.fromObject), o.href, o.title, o.id);
+				return new AreaRect(o.coords.map(Coord.fromObject), o.href, o.title, o.id);
 			case 'circle':
-				return new AreaCircle(o.coords.map(XY.fromObject), o.radius, o.href, o.title, o.id);
+				return new AreaCircle(o.coords.map(Coord.fromObject), o.radius, o.href, o.title, o.id);
 			case 'poly':
-				return new AreaPoly(o.coords.map(XY.fromObject), o.href, o.title, o.id);
+				return new AreaPoly(o.coords.map(Coord.fromObject), o.href, o.title, o.id);
 			case 'default':
 				return new AreaDefault(o.href, o.title);
 			default:
@@ -42,7 +42,7 @@ export class Area {
 	 * @param {number} y the y val of the coordinate
 	 */
 	addCoord(x, y) {
-		return this.coords.push(new XY(x, y));
+		return this.coords.push(new Coord(x, y));
 	}
 
 	setCoords(coords) {
@@ -64,19 +64,19 @@ export class Area {
 	copyCoords() {
 		let copy = [];
 		this.coords.forEach((val, index) => {
-			copy[index] = new XY(val.x, val.y);
+			copy[index] = new Coord(val.x, val.y);
 		});
 		return copy;
 	}
 
 	updateLastCoord(x, y) {
-		this.coords[this.coords.length - 1] = new XY(x, y);
+		this.coords[this.coords.length - 1] = new Coord(x, y);
 	}
 
-	move(xy) {
-		let coord = this.firstCoord();
+	move(coord) {
+		let fcoord = this.firstCoord();
 		if (coord != undefined) {
-			this.coords[0] = coord.sum(xy);
+			this.coords[0] = fcoord.sum(coord);
 		}
 	}
 
@@ -105,8 +105,8 @@ export class Area {
 	}
 
 	distToFirstCoord(x, y) {
-		let coord = new XY(x, y);
-		return XY.dist(coord, this.firstCoord());
+		let coord = new Coord(x, y);
+		return Coord.dist(coord, this.firstCoord());
 	}
 
 	htmlCoords(dec) {
@@ -136,7 +136,7 @@ export class Area {
 
 export class AreaRect extends Area {
 	/**
-	 * @param {XY[]} coords the list of coordinates
+	 * @param {Coord[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
 	 * @param {int} id the unique id
 	 */
@@ -151,7 +151,7 @@ export class AreaRect extends Area {
 	updateLastCoord(x, y) {
 		if (this.coords.length == 2) {
 			let fCoord = this.firstCoord();
-			this.coords[1] = new XY(x - fCoord.x, y - fCoord.y);
+			this.coords[1] = new Coord(x - fCoord.x, y - fCoord.y);
 		}
 	}
 
@@ -178,8 +178,8 @@ export class AreaRect extends Area {
 			case "html":
 				let coords = this.copyCoords();
 				coords[1] = coords[1].sum(coords[0]);
-				if (coords[0].x > coords[1].x) XY.swap(coords[0], coords[1], "x")
-				if (coords[0].y > coords[1].y) XY.swap(coords[0], coords[1], "y")
+				if (coords[0].x > coords[1].x) Coord.swap(coords[0], coords[1], "x")
+				if (coords[0].y > coords[1].y) Coord.swap(coords[0], coords[1], "y")
 				return coords;
 			default:
 				return super.getCoords(mode);
@@ -197,7 +197,7 @@ export class AreaRect extends Area {
 
 export class AreaCircle extends Area {
 	/**
-	 * @param {XY[]} coords the list of coordinates
+	 * @param {Coord[]} coords the list of coordinates
 	 * @param {number} radius radius of the circle
 	 * @param {string} href the link this area is going to point to
 	 * @param {int} id the unique id
@@ -217,12 +217,12 @@ export class AreaCircle extends Area {
 
 	isHover(x, y) {
 		let center = this.getCenter();
-		return XY.dist(new XY(x, y), center) < this.radius;
+		return Coord.dist(new Coord(x, y), center) < this.radius;
 	}
 
 	updateLastCoord(x, y) {
 		let center = this.getCenter();
-		this.radius = XY.dist(center, new XY(x, y));
+		this.radius = Coord.dist(center, new Coord(x, y));
 	}
 
 	/**
@@ -246,7 +246,7 @@ export class AreaCircle extends Area {
 }
 export class AreaPoly extends Area {
 	/**
-	 * @param {XY[]} coords the list of coordinates
+	 * @param {Coord[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
 	 * @param {int} id the unique id
 	 */
@@ -286,8 +286,8 @@ export class AreaPoly extends Area {
 		this.coords[this.coords.length - 1] = this.firstCoord();
 	}
 
-	move(xy) {
-		this.coords = this.coords.map(c => c.sum(xy));
+	move(coord) {
+		this.coords = this.coords.map(c => c.sum(coord));
 	}
 
 	/**

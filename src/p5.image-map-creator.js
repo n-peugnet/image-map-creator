@@ -2,7 +2,7 @@ import { version } from "../package.json";
 import { ImageMap } from "./class.image-map";
 import { BgLayer } from "./p5.bg-layer";
 import { Area, AreaCircle, AreaRect, AreaPoly } from "./class.area";
-import { XY } from "./class.xy";
+import { Coord } from "./class.coord";
 import { openWindow } from './utils';
 import download from "downloadjs";
 import UndoManager from "undo-manager";
@@ -42,7 +42,7 @@ export class imageMapCreator {
 			}
 		};
 		this.tempArea = new Area();
-		this.tempCoord = new XY();
+		this.tempCoord = new Coord();
 		this.selected = false;
 		this.hovered = false;
 		this.map = new ImageMap(width, height);
@@ -150,7 +150,7 @@ export class imageMapCreator {
 					switch (this.tool) {
 						case "move":
 							if (this.selected) {
-								let mvmt = new XY(this.mX() - this.trueX(p5.pmouseX), this.mY() - this.trueY(p5.pmouseY));
+								let mvmt = new Coord(this.mX() - this.trueX(p5.pmouseX), this.mY() - this.trueY(p5.pmouseY));
 								this.selected.move(mvmt);
 							}
 							break;
@@ -444,7 +444,7 @@ export class imageMapCreator {
 	}
 
 	setTempArea(x, y) {
-		let coords = [new XY(x, y)];
+		let coords = [new Coord(x, y)];
 		switch (this.tool) {
 			case "rectangle":
 				this.tempArea = new AreaRect(coords);

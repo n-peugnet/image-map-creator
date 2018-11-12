@@ -3,7 +3,7 @@ import { round } from "./utils";
 /**
  * Class representing a 2d xy coordinate
 */
-export class XY {
+export class Coord {
 	constructor(x, y) {
 		this.set(x, y);
 	}
@@ -14,28 +14,28 @@ export class XY {
 	}
 
 	static fromObject(obj) {
-		return new XY(obj.x, obj.y);
+		return new Coord(obj.x, obj.y);
 	}
 
 	/**
 	 * returns the distance between two xy coordinates
-	 * @param {XY} xy1 
-	 * @param {XY} xy2 
+	 * @param {Coord} coord1 
+	 * @param {Coord} coord2 
 	 */
-	static dist(xy1, xy2) {
-		return Math.sqrt(Math.pow(xy1.x - xy2.x, 2) + Math.pow(xy1.y - xy2.y, 2));
+	static dist(coord1, coord2) {
+		return Math.sqrt(Math.pow(coord1.x - coord2.x, 2) + Math.pow(coord1.y - coord2.y, 2));
 	}
 
 	/**
 	 *exchange a value between two xy coordinates
-	 * @param {XY} xy1 
-	 * @param {XY} xy2 
+	 * @param {Coord} coord1 
+	 * @param {Coord} coord2 
 	 * @param {string} val
 	 */
-	static swap(xy1, xy2, val) {
-		let tmp = xy1[val];
-		xy1[val] = xy2[val];
-		xy2[val] = tmp;
+	static swap(coord1, coord2, val) {
+		let tmp = coord1[val];
+		coord1[val] = coord2[val];
+		coord2[val] = tmp;
 	}
 
 	isEmpty() {
@@ -48,22 +48,22 @@ export class XY {
 
 	/**
 	 * returns the sum of two xy coordinates
-	 * @param {XY} xy 
+	 * @param {Coord} coord 
 	 */
-	sum(xy) {
-		return new XY(this.x + xy.x, this.y + xy.y);
+	sum(coord) {
+		return new Coord(this.x + coord.x, this.y + coord.y);
 	}
 
 	/**
 	 * returns the difference of two xy coordinates
-	 * @param {XY} xy 
+	 * @param {Coord} coord 
 	 */
-	diff(xy) {
-		return new XY(this.x - xy.x, this.y - xy.y);
+	diff(coord) {
+		return new Coord(this.x - coord.x, this.y - coord.y);
 	}
 
 	invert() {
-		return new XY(- this.x, -this.y);
+		return new Coord(- this.x, -this.y);
 	}
 
 	toString(dec, val) {
