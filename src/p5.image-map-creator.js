@@ -191,6 +191,7 @@ export class imageMapCreator {
 			if (this.mouseIsHoverSketch()) {
 				let coefZoom = this.view.scale * this.zoomParams.sensativity * - e.delta;
 				this.zoom(coefZoom);
+				return false;
 			}
 		}
 
