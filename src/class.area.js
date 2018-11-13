@@ -38,11 +38,10 @@ export class Area {
 
 	/**
 	 * Adds a coordinate to the coords array, and returns it's new length
-	 * @param {number} x the x val of the coordinate
-	 * @param {number} y the y val of the coordinate
+	 * @param {Coord} coord coordinate
 	 */
-	addCoord(x, y) {
-		return this.coords.push(new Coord(x, y));
+	addCoord(coord) {
+		return this.coords.push(coord);
 	}
 
 	/**
@@ -76,8 +75,8 @@ export class Area {
 		return copy;
 	}
 
-	updateLastCoord(x, y) {
-		this.coords[this.coords.length - 1] = new Coord(x, y);
+	updateLastCoord(coord) {
+		this.coords[this.coords.length - 1] = coord;
 	}
 
 	//------------------------ Start Interface Movable -------------------------------
@@ -104,7 +103,7 @@ export class Area {
 	/**
 	 * @param {Coord} coord 
 	 */
-	isHover(coord) {
+	isOver(coord) {
 		return false;
 	}
 
@@ -113,7 +112,7 @@ export class Area {
 	 * @param {number} tolerance
 	 * @returns {Coord|false}
 	 */
-	isHoverPoint(coord, tolerance) {
+	isOverPoint(coord, tolerance) {
 		let point = this.getPoints().find(c => {
 			return Coord.dist(coord, c) < tolerance;
 		});
@@ -175,10 +174,10 @@ export class AreaRect extends Area {
 		super.setCoords(coords.slice(0, 2));
 	}
 
-	updateLastCoord(x, y) {
+	updateLastCoord(coord) {
 		if (this.coords.length == 2) {
 			let fCoord = this.firstCoord();
-			this.coords[1] = new Coord(x - fCoord.x, y - fCoord.y);
+			this.coords[1] = coord.diff(fCoord);
 		}
 	}
 
@@ -189,7 +188,7 @@ export class AreaRect extends Area {
 	/**
 	 * @param {Coord} coord 
 	 */
-	isHover(coord) {
+	isOver(coord) {
 		let fCoord = this.firstCoord();
 		let lCoord = this.coords[1].sum(fCoord);
 		return between(coord.x, fCoord.x, lCoord.x) && between(coord.y, fCoord.y, lCoord.y);
@@ -248,14 +247,14 @@ export class AreaCircle extends Area {
 	/**
 	 * @param {Coord} coord 
 	 */
-	isHover(coord) {
+	isOver(coord) {
 		let center = this.getCenter();
 		return Coord.dist(coord, center) < this.radius;
 	}
 
-	updateLastCoord(x, y) {
+	updateLastCoord(coord) {
 		let center = this.getCenter();
-		this.radius = Coord.dist(center, new Coord(x, y));
+		this.radius = Coord.dist(center, coord);
 	}
 
 	/**
@@ -299,7 +298,7 @@ export class AreaPoly extends Area {
 	/**
 	 * @param {Coord} coord 
 	 */
-	isHover(coord) {
+	isOver(coord) {
 		let x = coord.x;
 		let y = coord.y;
 		let cornersX = this.coords.map(c => { return c.x });
@@ -379,7 +378,7 @@ export class AreaDefault extends Area {
 		return true;
 	}
 
-	isHover() {
+	isOver() {
 		return true;
 	}
 

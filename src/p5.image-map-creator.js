@@ -59,6 +59,7 @@ export class imageMapCreator {
 			max: 3,
 			sensativity: 0.001
 		}
+		this.magnetism = true;
 		this.tolerance = 5;
 	}
 
@@ -117,22 +118,23 @@ export class imageMapCreator {
 
 		p5.mousePressed = () => {
 			if (this.mouseIsHoverSketch()) {
+				let coord = this.drawingCoord();
 				if (p5.mouseButton == p5.LEFT && !ContextMenu.isOpen()) {
 					switch (this.tool) {
 						case "circle":
 						case "rectangle":
-							this.setTempArea(this.mX(), this.mY());
+							this.setTempArea(coord);
 							break;
 						case "polygon":
 							if (this.tempArea.isEmpty()) {
-								this.setTempArea(this.mX(), this.mY());
+								this.setTempArea(coord);
 							} else if (this.tempArea.isClosable(this.mCoord(), this.tolerance / this.view.scale)) {
 								this.tempArea.close();
 								if (this.tempArea.isValidShape())
 									this.createArea(this.tempArea);
 								this.tempArea = new Area();
 							} else {
-								this.tempArea.addCoord(this.mX(), this.mY());
+								this.tempArea.addCoord(this.mCoord());
 							}
 							break;
 						case "select":
@@ -254,6 +256,15 @@ export class imageMapCreator {
 		return new Coord(this.mX(), this.mY());
 	}
 
+	/**
+	 * Get the coordinate of the mouse for drawing
+	 * @returns {Coord}
+	 */
+	drawingCoord() {
+		let coord = this.mCoord();
+		return this.magnetism ? this.hoveredPoint ? this.hoveredPoint : coord : coord;
+	}
+
 	mouseIsHoverSketch() {
 		return this.p5.mouseX <= this.p5.width && this.p5.mouseX >= 0 && this.p5.mouseY <= this.p5.height && this.p5.mouseY >= 0;
 	}
@@ -262,7 +273,7 @@ export class imageMapCreator {
 		let allAreas = this.map.getAreas();
 		let area = allAreas.find(area => {
 			if (this.tool != "test") {
-				let point = area.isHoverPoint(this.mCoord(), this.tolerance / this.view.scale)
+				let point = area.isOverPoint(this.mCoord(), this.tolerance / this.view.scale)
 				if (point) {
 					this.hoveredPoint = point;
 					return true;
@@ -270,7 +281,7 @@ export class imageMapCreator {
 					this.hoveredPoint = false;
 				}
 			}
-			if (area.isHover(this.mCoord())) {
+			if (area.isOver(this.mCoord())) {
 				return true;
 			}
 			return false;
@@ -476,26 +487,27 @@ export class imageMapCreator {
 		}
 	}
 
-	setTempArea(x, y) {
-		let coords = [new Coord(x, y)];
+	setTempArea(coord) {
+		let coords = [coord];
 		switch (this.tool) {
 			case "rectangle":
 				this.tempArea = new AreaRect(coords);
-				this.tempArea.addCoord(0, 0);
+				this.tempArea.addCoord(new Coord(0, 0));
 				break;
 			case "circle":
 				this.tempArea = new AreaCircle(coords);
 				break;
 			case "polygon":
 				this.tempArea = new AreaPoly(coords);
-				this.tempArea.addCoord(x, y);
+				this.tempArea.addCoord(coord);
 				break;
 		}
 	}
 
 	updateTempArea() {
+		let coord = this.drawingCoord();
 		if (!this.tempArea.isEmpty()) {
-			this.tempArea.updateLastCoord(this.mX(), this.mY());
+			this.tempArea.updateLastCoord(coord);
 		}
 	}
 
