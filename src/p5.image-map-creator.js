@@ -492,7 +492,6 @@ export class imageMapCreator {
 		switch (this.tool) {
 			case "rectangle":
 				this.tempArea = new AreaRect(coords);
-				this.tempArea.addCoord(new Coord(0, 0));
 				break;
 			case "circle":
 				this.tempArea = new AreaCircle(coords);

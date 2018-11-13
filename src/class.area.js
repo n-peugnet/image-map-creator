@@ -160,70 +160,6 @@ export class Area {
 	}
 }
 
-export class AreaRect extends Area {
-	/**
-	 * @param {Coord[]} coords the list of coordinates
-	 * @param {string} href the link this area is going to point to
-	 * @param {int} id the unique id
-	 */
-	constructor(coords = [], href, title, id) {
-		super("rect", coords, href, title, id);
-	}
-
-	setCoords(coords) {
-		super.setCoords(coords.slice(0, 2));
-	}
-
-	updateLastCoord(coord) {
-		if (this.coords.length == 2) {
-			let fCoord = this.firstCoord();
-			this.coords[1] = coord.diff(fCoord);
-		}
-	}
-
-	isDrawable() {
-		return this.coords.length == 2 && !this.coords[1].oneIsEmpty();
-	}
-
-	/**
-	 * @param {Coord} coord 
-	 */
-	isOver(coord) {
-		let fCoord = this.firstCoord();
-		let lCoord = this.coords[1].sum(fCoord);
-		return between(coord.x, fCoord.x, lCoord.x) && between(coord.y, fCoord.y, lCoord.y);
-	}
-
-	/**
-	 * draw the area to the given p5 instance
-	 * @param {p5} p5 
-	 */
-	display(p5) {
-		p5.rect(this.coords[0].x, this.coords[0].y, this.coords[1].x, this.coords[1].y);
-	}
-
-	getCoords(mode = "default") {
-		switch (mode) {
-			case "html":
-				let coords = this.copyCoords();
-				coords[1] = coords[1].sum(coords[0]);
-				if (coords[0].x > coords[1].x) Coord.swap(coords[0], coords[1], "x")
-				if (coords[0].y > coords[1].y) Coord.swap(coords[0], coords[1], "y")
-				return coords;
-			default:
-				return super.getCoords(mode);
-		}
-	}
-
-	svgArea(scale) {
-		let x = this.coords[0].toStr(0, 'x', scale);
-		let y = this.coords[0].toStr(0, 'y', scale);
-		let w = this.coords[1].toStr(0, 'x', scale);
-		let h = this.coords[1].toStr(0, 'y', scale);
-		return `<rect x="${x}" y="${y}" width="${w}" height="${h}" />`;
-	}
-}
-
 export class AreaCircle extends Area {
 	/**
 	 * @param {Coord[]} coords the list of coordinates
@@ -362,6 +298,33 @@ export class AreaPoly extends Area {
 		}).join(' ');
 		return `<polygon points="${points}" />`;
 	}
+}
+
+export class AreaRect extends AreaPoly {
+	/**
+	 * @param {Coord[]} coords the list of coordinates
+	 * @param {string} href the link this area is going to point to
+	 * @param {int} id the unique id
+	 */
+	constructor(coords = [], href, title, id) {
+		super(coords, href, title, id, true);
+		if (this.coords.length > 0 && this.coords.length < 4) {
+			let coord = this.firstCoord();
+			this.coords = [
+				coord,
+				coord.clone(),
+				coord.clone(),
+				coord.clone(),
+			];
+		}
+	}
+
+	updateLastCoord(coord) {
+		this.coords[1].x = coord.x
+		this.coords[2] = coord;
+		this.coords[3].y = coord.y;
+	}
+
 }
 
 export class AreaDefault extends Area {
