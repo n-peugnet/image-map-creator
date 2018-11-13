@@ -92,6 +92,10 @@ export class Coord {
 	position() {
 		return this;
 	}
+
+	setPosition(coord) {
+		this.set(coord.x, coord.y);
+	}
 	//------------------------- End Interface Movable --------------------------------
 
 	clone() {

@@ -90,6 +90,11 @@ export class Area {
 	position() {
 		return this.firstCoord();
 	}
+
+	setPosition(coord) {
+		let move = this.coords[0].diff(coord);
+		 this.move(move);
+	}
 	//------------------------- End Interface Movable --------------------------------
 
 	isDrawable() {

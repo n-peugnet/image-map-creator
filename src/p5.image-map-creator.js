@@ -60,6 +60,7 @@ export class imageMapCreator {
 			sensativity: 0.001
 		}
 		this.magnetism = true;
+		this.fusion = false;
 		this.tolerance = 5;
 	}
 
@@ -158,8 +159,12 @@ export class imageMapCreator {
 					switch (this.tool) {
 						case "select":
 							if (this.selected) {
-								let mvmt = new Coord(this.mX() - this.trueX(p5.pmouseX), this.mY() - this.trueY(p5.pmouseY));
-								this.selected.move(mvmt);
+								if (this.hoveredPoint && this.selected instanceof Coord) {
+									this.selected.setPosition(this.drawingCoord());
+								} else {
+									let mvmt = new Coord(this.mX() - this.trueX(p5.pmouseX), this.mY() - this.trueY(p5.pmouseY));
+									this.selected.move(mvmt);
+								}
 							}
 							break;
 					}
@@ -262,7 +267,11 @@ export class imageMapCreator {
 	 */
 	drawingCoord() {
 		let coord = this.mCoord();
-		return this.magnetism ? this.hoveredPoint ? this.hoveredPoint : coord : coord;
+		coord = this.magnetism ? this.hoveredPoint ? this.hoveredPoint : coord : coord;
+		if (!this.fusion) {
+			coord = coord.clone();
+		}
+		return coord;
 	}
 
 	mouseIsHoverSketch() {
