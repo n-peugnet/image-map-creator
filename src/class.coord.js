@@ -102,12 +102,12 @@ export class Coord {
 		return new Coord(- this.x, -this.y);
 	}
 
-	toStr(dec, val) {
-		return round(this[val], dec)
+	toStr(dec, val, scale) {
+		return round(this[val] * scale, dec)
 	}
 
-	toHtml(dec) {
-		return this.toStr(dec, "x") + "," + this.toStr(dec, "y");
+	toHtml(dec, scale = 1) {
+		return this.toStr(dec, "x", scale) + "," + this.toStr(dec, "y", scale);
 	}
 
 }

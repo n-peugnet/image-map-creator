@@ -123,21 +123,21 @@ export class ImageMap {
 		return this.lastId;
 	}
 
-	toHtml() {
+	toHtml(scale = 1) {
 		let areas = [];
 		this.getAreas().forEach(a => {
 			if (a.isValidShape()) {
-				areas.push('\t' + a.toHtml());
+				areas.push('\t' + a.toHtml(scale));
 			}
 		});
 		return '<map name="' + this.name + '" id="' + this.name + '">\n' + areas.join('\n') + '\n</map>';
 	}
 
-	toSvg() {
+	toSvg(scale = 1) {
 		let areas = [];
 		this.getAreas(false).forEach(a => {
 			if (a.isValidShape()) {
-				areas.push('\t' + a.toSvg());
+				areas.push('\t' + a.toSvg(scale));
 			}
 		});
 		let str = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="' + this.width + '" height="' + this.height + '">\n';
