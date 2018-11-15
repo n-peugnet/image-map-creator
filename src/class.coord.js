@@ -89,7 +89,7 @@ export class Coord {
 		this.add(coord);
 	}
 
-	position() {
+	getPosition() {
 		return this;
 	}
 

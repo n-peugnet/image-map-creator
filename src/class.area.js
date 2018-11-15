@@ -67,6 +67,13 @@ export class Area {
 		return this.coords.length == 0;
 	}
 
+	/**
+	 * @param {Area} area 
+	 */
+	equals(area) {
+		return this.id == area.id;
+	}
+
 	copyCoords() {
 		let copy = [];
 		this.coords.forEach((val, index) => {
@@ -87,7 +94,7 @@ export class Area {
 		}
 	}
 
-	position() {
+	getPosition() {
 		return this.firstCoord();
 	}
 

@@ -3,6 +3,7 @@ import { ImageMap } from "./class.image-map";
 import { BgLayer } from "./p5.bg-layer";
 import { Area, AreaCircle, AreaRect, AreaPoly } from "./class.area";
 import { Coord } from "./class.coord";
+import { Selection } from "./class.selection";
 import { openWindow } from './utils';
 import download from "downloadjs";
 import UndoManager from "undo-manager";
@@ -42,8 +43,7 @@ export class imageMapCreator {
 			}
 		};
 		this.tempArea = new Area();
-		this.tempCoord = new Coord();
-		this.selected = false;
+		this.selected = new Selection();
 		this.hoveredArea = false;
 		this.hoveredPoint = false;
 		this.map = new ImageMap(width, height);
@@ -61,7 +61,7 @@ export class imageMapCreator {
 		}
 		this.magnetism = true;
 		this.fusion = false;
-		this.tolerance = 5;
+		this.tolerance = 6;
 	}
 
 	//---------------------------- p5 Sketch ----------------------------------
@@ -139,14 +139,7 @@ export class imageMapCreator {
 							}
 							break;
 						case "select":
-							if (this.hoveredArea) {
-								this.selected = this.hoveredArea.shape != "default" ? this.hoveredArea : false;
-								this.tempCoord = this.selected.firstCoord().clone();
-							}
-							if (this.hoveredPoint) {
-								this.selected = this.hoveredPoint;
-								this.tempCoord = this.hoveredPoint.clone();
-							}
+							this.selected.update(this.hoveredArea, this.hoveredPoint);
 							break;
 					}
 				}
@@ -158,8 +151,8 @@ export class imageMapCreator {
 				if (p5.mouseButton == p5.LEFT) {
 					switch (this.tool) {
 						case "select":
-							if (this.selected) {
-								if (this.hoveredPoint && this.selected instanceof Coord) {
+							if (this.selected.value()) {
+								if (this.selected.getPoint()) {
 									this.selected.setPosition(this.drawingCoord());
 								} else {
 									let mvmt = new Coord(this.mX() - this.trueX(p5.pmouseX), this.mY() - this.trueY(p5.pmouseY));
@@ -184,9 +177,9 @@ export class imageMapCreator {
 					this.tempArea = new Area();
 					break;
 				case "select":
-					if (this.selected) {
-						let select = this.selected;
-						let move = select.position().diff(this.tempCoord);
+					let select = this.selected.value();
+					if (select) {
+						let move = this.selected.getMove();
 						this.undoManager.add({
 							undo: () => {
 								select.move(move.invert());
@@ -278,31 +271,36 @@ export class imageMapCreator {
 		return this.p5.mouseX <= this.p5.width && this.p5.mouseX >= 0 && this.p5.mouseY <= this.p5.height && this.p5.mouseY >= 0;
 	}
 
+	/**
+	 * Sets hoveredPoint and hoveredArea excluding currently selected Area
+	 */
 	updateHovered() {
+		this.hoveredPoint = false;
 		let allAreas = this.map.getAreas();
-		let area = allAreas.find(area => {
+		let area = allAreas.find(a => {
+			if (a.equals(this.selected.getArea())) {
+				return false;
+			}
 			if (this.tool != "test") {
-				let point = area.isOverPoint(this.mCoord(), this.tolerance / this.view.scale)
+				let point = a.isOverPoint(this.mCoord(), this.tolerance / this.view.scale)
 				if (point) {
 					this.hoveredPoint = point;
 					return true;
-				} else {
-					this.hoveredPoint = false;
 				}
 			}
-			if (area.isOver(this.mCoord())) {
+			if (a.isOver(this.mCoord())) {
 				return true;
 			}
 			return false;
 		});
-		this.hoveredArea = area != undefined ? area : false;
+		this.hoveredArea = area ? area : false;
 	}
 
 	onClick(event) {
 		if (this.mouseIsHoverSketch()) {
 			if (this.hoveredArea) {
 				if (this.p5.mouseButton == this.p5.RIGHT) {
-					this.selected = this.hoveredArea;
+					this.selected.update(this.hoveredArea);
 					this.menu.MoveFront.enabled = !(this.map.isFirstArea(this.hoveredArea.id) || this.hoveredArea.shape == 'default');
 					this.menu.MoveBack.enabled = !(this.map.isLastArea(this.hoveredArea.id) || this.hoveredArea.shape == 'default');
 					ContextMenu.display(event, this.menu, {
@@ -322,7 +320,7 @@ export class imageMapCreator {
 				}
 			}
 		}
-		this.selected = false;
+		this.selected.clear();
 	}
 
 	onOver(evt) {
@@ -481,10 +479,10 @@ export class imageMapCreator {
 		if (this.tool == "test") {
 			color = this.p5.color(255, 0);
 		}
-		if ((this.mouseIsHoverSketch() && area == this.hoveredArea && this.selected == false && (
+		if ((this.mouseIsHoverSketch() && area == this.hoveredArea && this.selected.getArea() == false && (
 			this.tool == "delete" ||
 			this.tool == "select")) ||
-			this.selected == area) {
+			this.selected.getArea() == area) {
 			color = this.p5.color(255, 200, 200, 178); // highlight (set color red)
 		}
 		this.p5.fill(color);
