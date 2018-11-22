@@ -48,7 +48,7 @@ export class imageMapCreator {
 		this.hoveredPoint = false;
 		this.map = new ImageMap(width, height);
 		this.undoManager = new UndoManager();
-		this.img;
+		this.img = {};
 		this.view = {
 			scale: 1,
 			transX: 0,
@@ -88,7 +88,7 @@ export class imageMapCreator {
 				.addButton("Generate Html", () => { this.settings.setValue("Output", this.map.toHtml()) })
 				.addButton("Generate Svg", () => { this.settings.setValue("Output", this.map.toSvg()) })
 				.addTextArea("Output")
-				.addButton("Save", this.exportMap.bind(this));
+				.addButton("Save", this.save.bind(this));
 			// Fix for oncontextmenu
 			p5.canvas.addEventListener("contextmenu", (e) => { e.preventDefault(); });
 			// Fix for middle click mouse down triggers scroll on windows
@@ -210,7 +210,7 @@ export class imageMapCreator {
 			if (e.composed && e.ctrlKey) {
 				switch (e.key) {
 					case 's':
-						this.exportMap();
+						this.save();
 						break;
 					case 'z':
 						this.undoManager.undo();
@@ -334,7 +334,8 @@ export class imageMapCreator {
 
 	handeFile(file) {
 		if (file.type == "image") {
-			this.img = this.p5.loadImage(file.data, img => this.resetView(img));
+			this.img.data = this.p5.loadImage(file.data, img => this.resetView(img));
+			this.img.file = file.file;
 			if (!this.map.name) {
 				this.map.setName(file.name);
 				this.settings.setValue("Map Name", this.map.name);
@@ -384,8 +385,8 @@ export class imageMapCreator {
 	}
 
 	drawImage() {
-		if (this.img)
-			this.p5.image(this.img, 0, 0, this.img.width, this.img.height);
+		if (this.img.data)
+			this.p5.image(this.img.data, 0, 0, this.img.data.width, this.img.data.height);
 	}
 
 	drawAreas() {
@@ -452,7 +453,7 @@ export class imageMapCreator {
 
 	setBackground() {
 		this.p5.background(200);
-		if (!this.img) {
+		if (!this.img.data) {
 			this.p5.noStroke();
 			this.p5.fill(0);
 			this.p5.textAlign(this.p5.CENTER, this.p5.CENTER);
@@ -518,11 +519,14 @@ export class imageMapCreator {
 	}
 
 	exportMap() {
-		let json = JSON.stringify({
+		return JSON.stringify({
 			version: version,
 			map: this.map
 		});
-		let blob = new Blob([json], { encoding: "UTF-8", type: "text/plain;charset=UTF-8" })
+	}
+
+	save() {
+		let blob = new Blob([this.exportMap()], { encoding: "UTF-8", type: "text/plain;charset=UTF-8" })
 		download(blob, `${this.map.name}.map.json`, 'application/json')
 	}
 
