@@ -59,6 +59,10 @@ export class ImageMap {
 		return areas;
 	}
 
+	isEmpty() {
+		return this.getAreas().length == 0;
+	}
+
 	/**
 	 * Adds an Area at the end of the areas array, and returns the last inserted Area's id
 	 * @param {Area} area an area
