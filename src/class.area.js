@@ -149,7 +149,7 @@ export class Area {
 
 	htmlCoords(dec, scale) {
 		return this.getCoords("html").map(c => {
-			return c.toHtml(dec);
+			return c.toHtml(dec, scale);
 		}).join(',');
 	}
 
