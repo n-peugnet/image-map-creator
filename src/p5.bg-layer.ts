@@ -10,7 +10,7 @@ export class BgLayer {
 	 * @param {imageMapCreator} iMap
 	 * @param {number} speed
 	 */
-	constructor(iMap, speed = 15) {
+	constructor(public iMap: imageMapCreator, public speed = 15) {
 		this.speed = speed;
 		this.alpha = 0;
 		this.over = false;

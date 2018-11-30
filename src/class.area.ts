@@ -1,15 +1,20 @@
-import { between, round } from "./utils";
+import { round } from "./utils";
 import { Coord } from "./class.coord";
 import p5 from "p5";
+import { IMovable } from "./interface.movable";
 
-export class Area {
+export type Shape = "rect" | "circle" | "poly" | "default";
+export type Mode = "default"
+
+export class Area implements IMovable {
 	/**
 	 * @param {string} shape the type of area
 	 * @param {Coord[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
 	 * @param {int} id the unique id
 	 */
-	constructor(shape, coords = [], href, title, id = 0) {
+	constructor(public shape: Shape, public coords: Coord[] = [], public href: string, public title: string,
+		public id: number = 0) {
 		this.setShape(shape);
 		this.setCoords(coords);
 		this.setHref(href);
@@ -17,9 +22,9 @@ export class Area {
 		this.setId(id);
 	}
 
-	static fromObject(o) {
+	static fromObject(o:Area) {
 		switch (o.shape) {
-			case 'rect':
+			case "rect":
 				return new AreaRect(o.coords.map(Coord.fromObject), o.href, o.title, o.id);
 			case 'circle':
 				return new AreaCircle(o.coords.map(Coord.fromObject), o.radius, o.href, o.title, o.id);
@@ -32,7 +37,7 @@ export class Area {
 		}
 	}
 
-	setShape(shape) {
+	setShape(shape: Shape) {
 		this.shape = shape;
 	}
 
@@ -40,18 +45,18 @@ export class Area {
 	 * Adds a coordinate to the coords array, and returns it's new length
 	 * @param {Coord} coord coordinate
 	 */
-	addCoord(coord) {
+	addCoord(coord: Coord): number {
 		return this.coords.push(coord);
 	}
 
 	/**
-	 * @param {Coord[]} coords 
+	 * @param {Coord[]} coords
 	 */
-	setCoords(coords) {
+	setCoords(coords: Coord[]): void {
 		this.coords = coords;
 	}
 
-	getCoords(mode = "default") {
+	getCoords(mode: Mode = "default"): Coord[] {
 		switch (mode) {
 			case "default":
 			default:
@@ -59,101 +64,101 @@ export class Area {
 		}
 	}
 
-	getPoints() {
+	getPoints(): Coord[] {
 		return this.coords;
 	}
 
-	isEmpty() {
+	isEmpty(): boolean {
 		return this.coords.length == 0;
 	}
 
 	/**
-	 * @param {Area} area 
+	 * @param {Area} area
 	 */
-	equals(area) {
+	equals(area: Area): boolean {
 		return this.id == area.id;
 	}
 
-	copyCoords() {
-		let copy = [];
+	copyCoords(): Coord[] {
+		let copy: Coord[] = [];
 		this.coords.forEach((val, index) => {
 			copy[index] = new Coord(val.x, val.y);
 		});
 		return copy;
 	}
 
-	updateLastCoord(coord) {
+	updateLastCoord(coord: Coord): void {
 		this.coords[this.coords.length - 1] = coord;
 	}
 
 	//------------------------ Start Interface Movable -------------------------------
-	move(coord) {
+	move(coord: Coord): void {
 		let fcoord = this.firstCoord();
 		if (coord != undefined) {
 			fcoord.add(coord);
 		}
 	}
 
-	getPosition() {
+	getPosition(): Coord {
 		return this.firstCoord();
 	}
 
-	setPosition(coord) {
+	setPosition(coord: Coord): void {
 		let move = this.coords[0].diff(coord);
 		 this.move(move);
 	}
 	//------------------------- End Interface Movable --------------------------------
 
-	isDrawable() {
+	isDrawable(): boolean {
 		return this.coords.length >= 1;
 	}
 
-	isValidShape() {
+	isValidShape(): boolean {
 		return this.isDrawable();
 	}
 
 	/**
-	 * @param {Coord} coord 
+	 * @param {Coord} coord
 	 */
-	isOver(coord) {
+	isOver(coord: Coord): boolean {
 		return false;
 	}
 
 	/**
-	 * @param {Coord} coord 
+	 * @param {Coord} coord
 	 * @param {number} tolerance
 	 * @returns {Coord|false}
 	 */
-	isOverPoint(coord, tolerance) {
+	isOverPoint(coord: Coord, tolerance: number): boolean {
 		let point = this.getPoints().find(c => {
 			return Coord.dist(coord, c) < tolerance;
 		});
 		return point ? point : false;
 	}
 
-	setHref(url) {
+	setHref(url: string): void {
 		this.href = url;
 	}
 
-	setTitle(title) {
+	setTitle(title: string): void {
 		this.title = title;
 	}
 
-	setId(id) {
+	setId(id: number): void {
 		this.id = id;
 	}
 
-	firstCoord() {
+	firstCoord(): Coord {
 		return this.coords[0];
 	}
 
-	htmlCoords(dec, scale) {
+	htmlCoords(dec: number, scale: number): string {
 		return this.getCoords("html").map(c => {
 			return c.toHtml(dec, scale);
 		}).join(',');
 	}
 
-	toHtml(scale = 1) {
+	toHtml(scale: number = 1): string {
 		let htmlCoords = this.htmlCoords(0, scale);
 		let title = "";
 		if (htmlCoords != "") {
@@ -165,9 +170,9 @@ export class Area {
 		return `<area shape="${this.shape}" ${htmlCoords} href="${this.href}" alt="${this.href}" ${title} />`;
 	}
 
-	svgArea(scale) { }
+	svgArea(scale: number): void { }
 
-	toSvg(scale = 1) {
+	toSvg(scale: number = 1): string {
 		return `<a xlink:href="${this.href}">${this.svgArea(scale)}</a>`;
 	}
 }
@@ -179,74 +184,76 @@ export class AreaCircle extends Area {
 	 * @param {string} href the link this area is going to point to
 	 * @param {int} id the unique id
 	 */
-	constructor(coords = [], radius = 0, href, title, id) {
+	constructor(coords = [], public radius = 0, public href: string, public title: string, public id: number) {
 		super("circle", coords, href, title, id);
 		this.radius = radius;
 	}
 
-	getCenter() {
+	getCenter(): Coord {
 		return this.firstCoord();
 	}
 
-	isValidShape() {
+	isValidShape(): boolean {
 		return super.isValidShape() && this.radius > 0;
 	}
 
 	/**
-	 * @param {Coord} coord 
+	 * @param {Coord} coord
 	 */
-	isOver(coord) {
+	isOver(coord: Coord): boolean {
 		let center = this.getCenter();
 		return Coord.dist(coord, center) < this.radius;
 	}
 
-	updateLastCoord(coord) {
+	updateLastCoord(coord: Coord): void {
 		let center = this.getCenter();
 		this.radius = Coord.dist(center, coord);
 	}
 
 	/**
 	 * draw the area to the given p5 instance
-	 * @param {p5} p5 
+	 * @param {p5} p5
 	 */
-	display(p5) {
+	display(p5: p5): void {
 		p5.ellipse(this.getCenter().x, this.getCenter().y, this.radius * 2);
 	}
 
-	htmlCoords(dec, scale) {
+	htmlCoords(dec: number, scale: number): string {
 		return this.getCenter().toHtml(dec, scale) + "," + round(this.radius, dec);
 	}
 
-	svgArea(scale) {
+	svgArea(scale: number): string {
 		let x = this.coords[0].toStr(0, 'x', scale);
 		let y = this.coords[0].toStr(0, 'y', scale);
 		let r = round(this.radius, 0);
 		return `<circle cx="${x}" cy="${y}" r="${r}" />`;
 	}
 }
+
 export class AreaPoly extends Area {
 	/**
 	 * @param {Coord[]} coords the list of coordinates
 	 * @param {string} href the link this area is going to point to
 	 * @param {int} id the unique id
 	 */
-	constructor(coords = [], href, title, id, closed = false) {
+	constructor(public coords: Coord[] = [], public href: string, public title: string,
+		public id: number, public closed = false) {
 		super("poly", coords, href, title, id);
 		this.closed = closed;
 	}
 
-	isDrawable() {
+	isDrawable(): boolean {
 		return this.coords.length >= 2;
 	}
 
-	isValidShape() {
+	isValidShape(): boolean {
 		return super.isValidShape() && this.closed;
 	}
 
 	/**
-	 * @param {Coord} coord 
+	 * @param {Coord} coord
 	 */
-	isOver(coord) {
+	isOver(coord: Coord): boolean {
 		let x = coord.x;
 		let y = coord.y;
 		let cornersX = this.coords.map(c => { return c.x });
@@ -268,12 +275,12 @@ export class AreaPoly extends Area {
 		return oddNodes;
 	}
 
-	isClosable(coord, tolerance) {
+	isClosable(coord: Coord, tolerance: number): boolean {
 		let dist = Coord.dist(coord, this.firstCoord());
 		return this.coords.length >= 4 && dist < tolerance;
 	}
 
-	getCoords(mode = "default") {
+	getCoords(mode: Mode = "default"): Coord[] {
 		let coords = super.getCoords();
 		switch (mode) {
 			case "default":
@@ -285,26 +292,26 @@ export class AreaPoly extends Area {
 		}
 	}
 
-	close() {
+	close(): void {
 		this.closed = true;
 		this.coords.pop();
 	}
 
-	move(coord) {
+	move(coord: Coord): void {
 		this.coords.map(c => c.add(coord));
 	}
 
 	/**
 	 * draw the area to the given p5 instance
-	 * @param {p5} p5 
+	 * @param {p5} p5
 	 */
-	display(p5) {
+	display(p5: p5): void {
 		p5.beginShape();
 		this.getCoords().forEach(c => p5.vertex(c.x, c.y));
 		p5.endShape();
 	}
 
-	svgArea(scale) {
+	svgArea(scale: number): string {
 		let points = this.getCoords().map(c => {
 			return c.toStr(0, 'x', scale) + ',' + c.toStr(0, 'y', scale);
 		}).join(' ');
@@ -318,7 +325,8 @@ export class AreaRect extends AreaPoly {
 	 * @param {string} href the link this area is going to point to
 	 * @param {int} id the unique id
 	 */
-	constructor(coords = [], href, title, id) {
+	constructor(public coords: Coord[] = [], public href: string, public title: string,
+		public id: number) {
 		super(coords, href, title, id, true);
 		if (this.coords.length > 0 && this.coords.length < 4) {
 			let coord = this.firstCoord();
@@ -331,7 +339,7 @@ export class AreaRect extends AreaPoly {
 		}
 	}
 
-	updateLastCoord(coord) {
+	updateLastCoord(coord: Coord): void {
 		this.coords[1].x = coord.x
 		this.coords[2] = coord;
 		this.coords[3].y = coord.y;
@@ -344,10 +352,12 @@ export class AreaDefault extends Area {
 	 * Constructor
 	 * @param {string} href the link this area is going to point to
 	 */
-	constructor(href, title) {
+	constructor(public href: string, public title: string) {
 		super("default", [], href, title);
 		this.isDefault = true;
 	}
+
+	isDefault: boolean;
 
 	isDrawable() {
 		return true;
@@ -359,13 +369,13 @@ export class AreaDefault extends Area {
 
 	/**
 	 * draw the area to the given p5 instance
-	 * @param {p5} p5 
+	 * @param {p5} p5
 	 */
-	display(p5) {
+	display(p5: p5) {
 		p5.rect(0, 0, p5.getMap().width - 1, p5.getMap().height - 1);
 	}
 
-	svgArea(scale) {
+	svgArea(scale: number): string {
 		return '<rect x="0" y="0" width="100%" height="100%" />';
 	}
 }

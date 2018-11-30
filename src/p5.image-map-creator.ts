@@ -15,7 +15,7 @@ import '../lib/contextmenu/contextmenu.css';
 /**
  */
 export class imageMapCreator {
-	constructor(width = 600, height = 450) {
+	constructor(public width = 600, public height = 450) {
 		this.width = width;
 		this.height = height;
 		this.tool = "polygon";
