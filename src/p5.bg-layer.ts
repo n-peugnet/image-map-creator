@@ -1,4 +1,5 @@
 import { imageMapCreator } from "./p5.image-map-creator";
+import p5 = require("p5");
 
 /**
  * Class representing the semi transparent layer which can appear on top of the background
@@ -16,6 +17,11 @@ export class BgLayer {
 		this.over = false;
 		this.p5 = iMap.p5;
 	}
+
+	alpha: number;
+	over: boolean;
+	p5: p5;
+
 	appear() {
 		this.over = true;
 	}

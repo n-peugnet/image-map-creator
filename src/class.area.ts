@@ -24,7 +24,7 @@ export class Area implements IMovable {
 
 	static fromObject(o:Area) {
 		switch (o.shape) {
-			case "rect":
+			case 'rect':
 				return new AreaRect(o.coords.map(Coord.fromObject), o.href, o.title, o.id);
 			case 'circle':
 				return new AreaCircle(o.coords.map(Coord.fromObject), o.radius, o.href, o.title, o.id);
@@ -184,7 +184,7 @@ export class AreaCircle extends Area {
 	 * @param {string} href the link this area is going to point to
 	 * @param {int} id the unique id
 	 */
-	constructor(coords = [], public radius = 0, public href: string, public title: string, public id: number) {
+	constructor(public coords: Coord[] = [], public radius = 0, public href: string, public title: string, public id: number) {
 		super("circle", coords, href, title, id);
 		this.radius = radius;
 	}

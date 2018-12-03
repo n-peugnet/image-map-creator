@@ -90,7 +90,7 @@ export class ImageMap {
 	 * @param {number} id
 	 * @param {number} direction
 	 */
-	moveArea(id: number, direction: number): number {
+	moveArea(id: number, direction: number): number | boolean {
 		let index = this.areaIndex(id);
 		let area = this.areas[index];
 		let nextIndex = index + direction;

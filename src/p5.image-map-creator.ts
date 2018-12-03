@@ -12,9 +12,18 @@ import p5 from "p5";
 import ContextMenu from "../lib/contextmenu/contextmenu";
 import '../lib/contextmenu/contextmenu.css';
 
+export type Tool = "polygon" | "rectangle" | "circle";
+
 /**
  */
 export class imageMapCreator {
+	bgLayer?: BgLayer;
+	tool: Tool;
+	drawingTools: Tool[];
+	tempArea: Area;
+	selected: Selection;
+	hoveredArea: boolean;
+	hoveredPoint: boolean;
 	constructor(public width = 600, public height = 450) {
 		this.width = width;
 		this.height = height;
@@ -66,11 +75,13 @@ export class imageMapCreator {
 
 	//---------------------------- p5 Sketch ----------------------------------
 
+	p5: p5;
+
 	/**
 	 * Override p5 methods
 	 * @param {p5} p5
 	 */
-	sketch(p5) {
+	sketch(p5: p5) {
 		this.p5 = p5;
 		this.bgLayer = new BgLayer(this);
 
@@ -230,7 +241,7 @@ export class imageMapCreator {
 
 	//---------------------------- Functions ----------------------------------
 
-	trueX(coord) {
+	trueX(coord: number) {
 		return (coord - this.view.transX) / this.view.scale;
 	}
 
