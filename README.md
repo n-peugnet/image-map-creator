@@ -1,5 +1,7 @@
 # [Image Map Creator](https://n-peugnet.github.io/image-map-creator/)
 
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fn-peugnet%2Fimage-map-creator.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fn-peugnet%2Fimage-map-creator?ref=badge_shield)
+
 This is a simple map creator tool made with the p5.js library. I want it
 to be easy to use for both the end user and the developper. This work is
 still in beta so a lot of things are about to change (including the save
@@ -134,3 +136,6 @@ your local machine for development and testing purposes.
 
 See also the list of [contributors](https://github.com/n-peugnet/image-map-creator/contributors)
 who participated in this project.
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fn-peugnet%2Fimage-map-creator.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fn-peugnet%2Fimage-map-creator?ref=badge_large)
