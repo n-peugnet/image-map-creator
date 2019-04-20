@@ -2,8 +2,10 @@
 	"compilerOptions": {
 		"strict": true,
 		"module": "es6",
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
 		"target": "es5",
-		// "allowJs": true,
+		"allowJs": true,
 		"sourceMap": true,
 	}
 }

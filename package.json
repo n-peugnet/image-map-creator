@@ -20,7 +20,8 @@
   },
   "homepage": "https://github.com/n-peugnet/image-map-creator#readme",
   "devDependencies": {
-    "@types/p5": "^0.7.1",
+    "@types/downloadjs": "^1.4.1",
+    "@types/p5": "^0.7.2",
     "css-loader": "^1.0.1",
     "style-loader": "^0.23.1",
     "ts-loader": "^5.3.3",

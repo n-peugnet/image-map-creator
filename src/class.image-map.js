@@ -1,3 +1,5 @@
+//@ts-check
+
 import { Area, AreaDefault } from "./class.area";
 
 export class ImageMap {

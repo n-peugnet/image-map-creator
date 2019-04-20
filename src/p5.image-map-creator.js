@@ -1,3 +1,5 @@
+//@ts-check
+
 import { version } from "../package.json";
 import { ImageMap } from "./class.image-map";
 import { BgLayer } from "./p5.bg-layer";
@@ -5,11 +7,11 @@ import { Area, AreaCircle, AreaRect, AreaPoly } from "./class.area";
 import { Coord } from "./class.coord";
 import { Selection } from "./class.selection";
 import { openWindow } from './utils';
-import download from "downloadjs";
+import * as download from "downloadjs";
 import UndoManager from "undo-manager";
 import QuickSettings from "quicksettings";
-import p5 from "p5";
-import ContextMenu from "../lib/contextmenu/contextmenu";
+import * as p5 from "p5";
+import * as ContextMenu from "../lib/contextmenu/contextmenu";
 import '../lib/contextmenu/contextmenu.css';
 
 /**

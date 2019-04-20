@@ -1,3 +1,5 @@
+//@ts-check
+
 import { Area } from "./class.area";
 import { Coord } from "./class.coord";
 

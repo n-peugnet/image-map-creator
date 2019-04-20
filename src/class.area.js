@@ -1,6 +1,8 @@
-import { between, round } from "./utils";
+//@ts-check
+
+import { round } from "./utils";
 import { Coord } from "./class.coord";
-import p5 from "p5";
+import * as p5 from "p5";
 
 export class Area {
 	/**

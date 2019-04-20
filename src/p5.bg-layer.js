@@ -1,3 +1,5 @@
+//@ts-check
+
 import { imageMapCreator } from "./p5.image-map-creator";
 
 /**
