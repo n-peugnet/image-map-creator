@@ -1,22 +1,25 @@
-//@ts-check
-
 import { round } from "./utils";
+
+type Axle = "x"|"y";
 
 /**
  * Class representing a 2d xy coordinate
 */
 export class Coord {
-	constructor(x, y) {
-		this.set(x, y);
-	}
-
-	set(x, y) {
+	public x: number;
+	public y: number;
+	constructor(x: number, y: number) {
 		this.x = x;
 		this.y = y;
 	}
 
-	static fromObject(obj) {
-		return new Coord(obj.x, obj.y);
+	set(x: number, y: number) {
+		this.x = x;
+		this.y = y;
+	}
+
+	static fromObject(obj: Object) {
+		return new Coord((<Coord>obj).x, (<Coord>obj).y);
 	}
 
 	/**
@@ -24,7 +27,7 @@ export class Coord {
 	 * @param {Coord} coord1 
 	 * @param {Coord} coord2 
 	 */
-	static dist(coord1, coord2) {
+	static dist(coord1: Coord, coord2: Coord) {
 		return Math.sqrt(Math.pow(coord1.x - coord2.x, 2) + Math.pow(coord1.y - coord2.y, 2));
 	}
 
@@ -32,9 +35,9 @@ export class Coord {
 	 *exchange a value between two xy coordinates
 	 * @param {Coord} coord1 
 	 * @param {Coord} coord2 
-	 * @param {string} val
+	 * @param {Axle} val
 	 */
-	static swap(coord1, coord2, val) {
+	static swap(coord1: Coord, coord2: Coord, val: Axle) {
 		let tmp = coord1[val];
 		coord1[val] = coord2[val];
 		coord2[val] = tmp;
@@ -52,7 +55,7 @@ export class Coord {
 	 * returns the sum of two xy coordinates
 	 * @param {Coord} coord 
 	 */
-	sum(coord) {
+	sum(coord: Coord) {
 		return new Coord(this.x + coord.x, this.y + coord.y);
 	}
 
@@ -60,7 +63,7 @@ export class Coord {
 	 * Add the value of the given coordinate to the current one
 	 * @param {Coord} coord 
 	 */
-	add(coord) {
+	add(coord: Coord) {
 		this.x += coord.x;
 		this.y += coord.y;
 	}
@@ -69,7 +72,7 @@ export class Coord {
 	 * returns the difference of two xy coordinates
 	 * @param {Coord} coord 
 	 */
-	diff(coord) {
+	diff(coord: Coord) {
 		return new Coord(this.x - coord.x, this.y - coord.y);
 	}
 
@@ -77,7 +80,7 @@ export class Coord {
 	 * Substract the value of the given coordinate to the current one
 	 * @param {Coord} coord 
 	 */
-	sub(coord) {
+	sub(coord: Coord) {
 		this.x -= coord.x;
 		this.y -= coord.y;
 	}
@@ -87,7 +90,7 @@ export class Coord {
 	 * Alias of add
 	 * @param {Coord} coord
 	 */
-	move(coord) {
+	move(coord: Coord) {
 		this.add(coord);
 	}
 
@@ -95,7 +98,7 @@ export class Coord {
 		return this;
 	}
 
-	setPosition(coord) {
+	setPosition(coord: Coord) {
 		this.set(coord.x, coord.y);
 	}
 	//------------------------- End Interface Movable --------------------------------
@@ -108,11 +111,11 @@ export class Coord {
 		return new Coord(- this.x, -this.y);
 	}
 
-	toStr(dec, val, scale) {
+	toStr(dec: number, val: Axle, scale: number) {
 		return round(this[val] * scale, dec)
 	}
 
-	toHtml(dec, scale = 1) {
+	toHtml(dec: number, scale = 1) {
 		return this.toStr(dec, "x", scale) + "," + this.toStr(dec, "y", scale);
 	}
 
