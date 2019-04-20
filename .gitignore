@@ -4,3 +4,4 @@ jsconfig.json
 
 ### Project Files ###
 node_modules/*
+*.log
