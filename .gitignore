@@ -4,4 +4,6 @@ jsconfig.json
 
 ### Project Files ###
 node_modules/*
+dist/*
 *.log
+.env

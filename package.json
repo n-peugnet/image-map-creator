@@ -6,11 +6,23 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack --env dev --watch",
-    "build": "webpack --env prod"
+    "build": "webpack --env prod",
+    "release": "npm run build && dotenv release-it"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/n-peugnet/image-map-creator.git"
+  },
+  "release-it": {
+    "npm": {
+      "publish": false
+    },
+    "github": {
+      "release": true,
+      "assets": [
+        "dist/*.js"
+      ]
+    }
   },
   "keywords": [],
   "author": "",
@@ -23,6 +35,8 @@
     "@types/downloadjs": "^1.4.1",
     "@types/p5": "^0.7.2",
     "css-loader": "^1.0.1",
+    "dotenv-cli": "^2.0.0",
+    "release-it": "^10.4.3",
     "style-loader": "^0.23.1",
     "ts-loader": "^5.3.3",
     "typescript": "^3.4.4",
