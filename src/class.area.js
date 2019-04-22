@@ -157,14 +157,10 @@ export class Area {
 
 	toHtml(scale = 1) {
 		let htmlCoords = this.htmlCoords(0, scale);
-		let title = "";
-		if (htmlCoords != "") {
-			htmlCoords = `coords="${htmlCoords}"`;
-		}
-		if (this.title) {
-			title = `title="${this.title}"`;
-		}
-		return `<area shape="${this.shape}" ${htmlCoords} href="${this.href}" alt="${this.href}" ${title} />`;
+		htmlCoords = htmlCoords ? `coords="${htmlCoords}"` : "";
+		const href = this.href ? `href="${this.href}"` : "nohref";
+		const title = this.title ? `title="${this.title}"` : "";
+		return `<area shape="${this.shape}" ${htmlCoords} ${href} alt="${this.href}" ${title} />`;
 	}
 
 	svgArea(scale) { }
@@ -345,8 +341,9 @@ export class AreaDefault extends Area {
 	/**
 	 * Constructor
 	 * @param {string} href the link this area is going to point to
+	 * @param {string} title the title on hover
 	 */
-	constructor(href, title) {
+	constructor(href = null, title = null) {
 		super("default", [], href, title);
 		this.isDefault = true;
 	}

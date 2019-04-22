@@ -1,8 +1,9 @@
-//@ts-check
-
 import { Area, AreaDefault } from "./class.area";
 
 export class ImageMap {
+
+	protected dArea: Area = new AreaDefault();
+	protected lastId: number = 0;
 
 	/**
 	 * Contructor
@@ -10,43 +11,36 @@ export class ImageMap {
 	 * @param {string} name 
 	* @param {boolean} hasDefaultArea
 	 */
-	constructor(width, height, areas = [], name, hasDefaultArea = false) {
-		this.name = name;
-		this.width = width;
-		this.height = height;
-		this.areas = areas;
-		this.dArea = new AreaDefault();
-		this.hasDefaultArea = hasDefaultArea;
-		this.lastId = 0;
+	constructor(
+		protected width: number,
+		protected height: number,
+		protected areas: Area[] = [],
+		protected name: string = "",
+		protected hasDefaultArea: boolean = false
+	) {}
+
+	setFromObject(obj: Object) {
+		const iMap = obj as ImageMap;
+		this.width = iMap.width;
+		this.height = iMap.height;
+		this.areas = iMap.areas.map(Area.fromObject);
+		this.name = iMap.name;
+		this.hasDefaultArea = iMap.hasDefaultArea;
+		this.dArea = AreaDefault.fromObject(iMap.dArea);
 	}
 
-	setFromObject(obj) {
-		for (const key in obj) {
-			if (obj.hasOwnProperty(key)) {
-				let value = obj[key];
-				if (key == 'areas') {
-					this.areas = value.map(Area.fromObject);
-				} else if (key == 'dArea') {
-					this.dArea = Area.fromObject(value);
-				} else if (Object.keys(this).includes(key)) {
-					this[key] = value;
-				}
-			}
-		}
-	}
-
-	setName(name) {
+	setName(name: string) {
 		if (name) {
 			this.name = name.replace(/\s+/g, "");
 		}
 	}
 
-	setSize(width, height) {
+	setSize(width: number, height: number) {
 		this.width = width;
 		this.height = height;
 	}
 
-	setDefaultArea(bool) {
+	setDefaultArea(bool: boolean) {
 		this.hasDefaultArea = bool;
 	}
 
@@ -55,7 +49,7 @@ export class ImageMap {
 	 * @param {boolean} all with the default area (if exist) or not (default: true)
 	 * @returns {Area[]} a copy of the areas
 	 */
-	getAreas(all = true) {
+	getAreas(all: boolean = true): Area[] {
 		let areas = this.areas.slice();
 		if (all && this.hasDefaultArea) areas.push(this.dArea);
 		return areas;
@@ -69,14 +63,14 @@ export class ImageMap {
 	 * Adds an Area at the end of the areas array, and returns the last inserted Area's id
 	 * @param {Area} area an area
 	 */
-	addArea(area, setId = true) {
+	addArea(area: Area, setId = true) {
 		if (setId)
 			area.setId(this.getNewId());
 		this.areas.unshift(area);
 		return area.id;
 	}
 
-	rmvArea(id) {
+	rmvArea(id: number) {
 		let index = this.areaIndex(id);
 		this.areas.splice(index, 1);
 		return index;
@@ -87,7 +81,7 @@ export class ImageMap {
 	 * @param {number} id 
 	 * @param {number} direction 
 	 */
-	moveArea(id, direction) {
+	moveArea(id: number, direction: number) {
 		let index = this.areaIndex(id);
 		let area = this.areas[index];
 		let nextIndex = index + direction;
@@ -106,21 +100,21 @@ export class ImageMap {
 		return this.areas.pop();
 	}
 
-	insertArea(area, index) {
+	insertArea(area: Area, index: number) {
 		this.areas.splice(index, 0, area);
 	}
 
-	areaIndex(id) {
+	areaIndex(id: number) {
 		return this.areas.findIndex(a => {
 			return a.id == id;
 		});
 	}
 
-	isFirstArea(id) {
+	isFirstArea(id: number) {
 		return this.areaIndex(id) == 0;
 	}
 
-	isLastArea(id) {
+	isLastArea(id: number) {
 		return this.areaIndex(id) == this.areas.length - 1;
 	}
 
@@ -130,7 +124,7 @@ export class ImageMap {
 	}
 
 	toHtml(scale = 1) {
-		let areas = [];
+		let areas: string[] = [];
 		this.getAreas().forEach(a => {
 			if (a.isValidShape()) {
 				areas.push('\t' + a.toHtml(scale));
@@ -140,7 +134,7 @@ export class ImageMap {
 	}
 
 	toSvg(scale = 1) {
-		let areas = [];
+		let areas: string[] = [];
 		this.getAreas(false).forEach(a => {
 			if (a.isValidShape()) {
 				areas.push('\t' + a.toSvg(scale));
@@ -157,7 +151,7 @@ export class ImageMap {
 		this.areas = [];
 	}
 
-	setAreas(areas) {
+	setAreas(areas: Area[]) {
 		this.areas = areas;
 	}
 
