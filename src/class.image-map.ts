@@ -2,24 +2,24 @@ import { Area, AreaDefault } from "./class.area";
 
 export class ImageMap {
 
-	protected dArea: Area = new AreaDefault();
+	protected dArea: Area = new AreaDefault(this);
 	protected lastId: number = 0;
 
 	/**
 	 * Contructor
 	 * @param {Area[]} areas 
 	 * @param {string} name 
-	* @param {boolean} hasDefaultArea
+	 * @param {boolean} hasDefaultArea
 	 */
 	constructor(
-		protected width: number,
-		protected height: number,
+		public width: number,
+		public height: number,
 		protected areas: Area[] = [],
 		protected name: string = "",
 		protected hasDefaultArea: boolean = false
 	) {}
 
-	setFromObject(obj: Object) {
+	setFromObject(obj: Object): this {
 		const iMap = obj as ImageMap;
 		this.width = iMap.width;
 		this.height = iMap.height;
@@ -27,21 +27,25 @@ export class ImageMap {
 		this.name = iMap.name;
 		this.hasDefaultArea = iMap.hasDefaultArea;
 		this.dArea = AreaDefault.fromObject(iMap.dArea);
+		return this;
 	}
 
-	setName(name: string) {
+	setName(name: string): this {
 		if (name) {
 			this.name = name.replace(/\s+/g, "");
 		}
+		return this;
 	}
 
-	setSize(width: number, height: number) {
+	setSize(width: number, height: number): this {
 		this.width = width;
 		this.height = height;
+		return this;
 	}
 
-	setDefaultArea(bool: boolean) {
+	setDefaultArea(bool: boolean): this {
 		this.hasDefaultArea = bool;
+		return this;
 	}
 
 	/**
@@ -55,7 +59,7 @@ export class ImageMap {
 		return areas;
 	}
 
-	isEmpty() {
+	isEmpty(): boolean {
 		return this.getAreas().length == 0;
 	}
 
@@ -63,14 +67,14 @@ export class ImageMap {
 	 * Adds an Area at the end of the areas array, and returns the last inserted Area's id
 	 * @param {Area} area an area
 	 */
-	addArea(area: Area, setId = true) {
+	addArea(area: Area, setId = true): number {
 		if (setId)
 			area.setId(this.getNewId());
 		this.areas.unshift(area);
 		return area.id;
 	}
 
-	rmvArea(id: number) {
+	rmvArea(id: number): number {
 		let index = this.areaIndex(id);
 		this.areas.splice(index, 1);
 		return index;
@@ -81,7 +85,7 @@ export class ImageMap {
 	 * @param {number} id 
 	 * @param {number} direction 
 	 */
-	moveArea(id: number, direction: number) {
+	moveArea(id: number, direction: number): number|false {
 		let index = this.areaIndex(id);
 		let area = this.areas[index];
 		let nextIndex = index + direction;
@@ -92,38 +96,39 @@ export class ImageMap {
 		return nextIndex;
 	}
 
-	shiftArea() {
+	shiftArea(): Area|undefined {
 		return this.areas.shift();
 	}
 
-	popArea() {
+	popArea(): Area|undefined {
 		return this.areas.pop();
 	}
 
-	insertArea(area: Area, index: number) {
+	insertArea(area: Area, index: number): number {
 		this.areas.splice(index, 0, area);
+		return this.areas.length;
 	}
 
-	areaIndex(id: number) {
+	areaIndex(id: number): number {
 		return this.areas.findIndex(a => {
 			return a.id == id;
 		});
 	}
 
-	isFirstArea(id: number) {
+	isFirstArea(id: number): boolean {
 		return this.areaIndex(id) == 0;
 	}
 
-	isLastArea(id: number) {
+	isLastArea(id: number): boolean {
 		return this.areaIndex(id) == this.areas.length - 1;
 	}
 
-	getNewId() {
+	getNewId(): number {
 		this.lastId++;
 		return this.lastId;
 	}
 
-	toHtml(scale = 1) {
+	toHtml(scale = 1): string {
 		let areas: string[] = [];
 		this.getAreas().forEach(a => {
 			if (a.isValidShape()) {
@@ -133,7 +138,7 @@ export class ImageMap {
 		return '<map name="' + this.name + '" id="' + this.name + '">\n' + areas.join('\n') + '\n</map>';
 	}
 
-	toSvg(scale = 1) {
+	toSvg(scale = 1): string {
 		let areas: string[] = [];
 		this.getAreas(false).forEach(a => {
 			if (a.isValidShape()) {
@@ -147,12 +152,14 @@ export class ImageMap {
 	}
 
 	/** Removes every areas from the areas array */
-	clearAreas() {
+	clearAreas(): this {
 		this.areas = [];
+		return this;
 	}
 
-	setAreas(areas: Area[]) {
+	setAreas(areas: Area[]): this {
 		this.areas = areas;
+		return this;
 	}
 
 }

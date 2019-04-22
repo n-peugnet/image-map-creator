@@ -3,7 +3,7 @@
 import { version } from "../package.json";
 import { ImageMap } from "./class.image-map";
 import { BgLayer } from "./p5.bg-layer";
-import { Area, AreaCircle, AreaRect, AreaPoly } from "./class.area";
+import { Area, AreaCircle, AreaRect, AreaPoly, AreaEmpty } from "./class.area";
 import { Coord } from "./class.coord";
 import { Selection } from "./class.selection";
 import { openWindow } from './utils';
@@ -44,7 +44,7 @@ export class imageMapCreator {
 				label: "Move Backward",
 			}
 		};
-		this.tempArea = new Area();
+		this.tempArea = new AreaEmpty();
 		this.selected = new Selection();
 		this.hoveredArea = false;
 		this.hoveredPoint = false;
@@ -135,7 +135,7 @@ export class imageMapCreator {
 								this.tempArea.close();
 								if (this.tempArea.isValidShape())
 									this.createArea(this.tempArea);
-								this.tempArea = new Area();
+								this.tempArea = new AreaEmpty();
 							} else {
 								this.tempArea.addCoord(this.mCoord());
 							}
@@ -176,7 +176,7 @@ export class imageMapCreator {
 				case "circle":
 					if (this.tempArea.isValidShape())
 						this.createArea(this.tempArea);
-					this.tempArea = new Area();
+					this.tempArea = new AreaEmpty();
 					break;
 				case "select":
 					let select = this.selected.value();
@@ -225,7 +225,7 @@ export class imageMapCreator {
 				}
 				return false;
 			} else if (this.tool == "polygon" && e.keyCode == this.p5.ESCAPE) {
-				this.tempArea = new Area();
+				this.tempArea = new AreaEmpty();
 			}
 		}
 	}
@@ -409,7 +409,7 @@ export class imageMapCreator {
 
 	setTool(value) {
 		this.tool = value;
-		this.tempArea = new Area();
+		this.tempArea = new AreaEmpty();
 	}
 
 	setCursor() {
