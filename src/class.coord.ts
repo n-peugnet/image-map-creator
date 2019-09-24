@@ -8,12 +8,11 @@ type Axle = "x"|"y";
  * Class representing a 2d xy coordinate
 */
 export class Coord implements Movable {
-	public x: number;
-	public y: number;
-	constructor(x: number, y: number) {
-		this.x = x;
-		this.y = y;
-	}
+
+	constructor(
+		public x: number,
+		public y: number
+	) {}
 
 	set(x: number, y: number): this {
 		this.x = x;
@@ -66,9 +65,10 @@ export class Coord implements Movable {
 	 * Add the value of the given coordinate to the current one
 	 * @param {Coord} coord 
 	 */
-	add(coord: Coord): void {
+	add(coord: Coord): this {
 		this.x += coord.x;
 		this.y += coord.y;
+		return this;
 	}
 
 	/**
@@ -83,9 +83,10 @@ export class Coord implements Movable {
 	 * Substract the value of the given coordinate to the current one
 	 * @param {Coord} coord 
 	 */
-	sub(coord: Coord): void {
+	sub(coord: Coord): this {
 		this.x -= coord.x;
 		this.y -= coord.y;
+		return this;
 	}
 
 	//------------------------ Start Interface Movable -------------------------------
@@ -93,9 +94,8 @@ export class Coord implements Movable {
 	 * Alias of add
 	 * @param {Coord} coord
 	 */
-	move(coord: Coord): this {
+	move(coord: Coord): void {
 		this.add(coord);
-		return this;
 	}
 
 	getPosition(): Coord {

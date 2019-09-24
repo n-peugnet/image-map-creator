@@ -8,22 +8,21 @@ import { imageMapCreator } from "./p5.image-map-creator";
  */
 export class BgLayer {
 
-	/**
-	 * @param {imageMapCreator} iMap
-	 * @param {number} speed
-	 */
-	constructor(iMap, speed = 15) {
-		this.speed = speed;
-		this.alpha = 0;
-		this.over = false;
-		this.p5 = iMap.p5;
-	}
+	constructor(
+		protected iMap: imageMapCreator,
+		protected speed = 15,
+		protected alpha = 0,
+		protected over = false
+	) {}
+
 	appear() {
 		this.over = true;
 	}
+
 	disappear() {
 		this.over = false;
 	}
+
 	display() {
 		if (this.over) {
 			if (this.alpha < 100)
@@ -33,13 +32,13 @@ export class BgLayer {
 			if (this.alpha > 0)
 				this.alpha -= this.speed;
 		}
-		this.p5.noStroke();
-		this.p5.fill(255, 255, 255, this.alpha);
-		this.p5.rect(
-			iMap.trueX(0),
-			iMap.trueY(0),
-			this.p5.width / iMap.view.scale,
-			this.p5.height / iMap.view.scale
+		this.iMap.p5.noStroke();
+		this.iMap.p5.fill(255, 255, 255, this.alpha);
+		this.iMap.p5.rect(
+			this.iMap.trueX(0),
+			this.iMap.trueY(0),
+			this.iMap.p5.width / this.iMap.view.scale,
+			this.iMap.p5.height / this.iMap.view.scale
 		);
 	}
 }
