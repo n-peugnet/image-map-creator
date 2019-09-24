@@ -146,9 +146,17 @@ export abstract class Area {
 		return this.href;
 	}
 
+	getHrefVerbose(): string {
+		return this.href === "" ? "undefined" : this.href;
+	}
+
 	setTitle(title: string): this {
 		this.title = title;
 		return this;
+	}
+
+	getTitle(): string {
+		return this.title;
 	}
 
 	setId(id: number): this {
