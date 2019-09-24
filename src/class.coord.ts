@@ -10,8 +10,8 @@ type Axle = "x"|"y";
 export class Coord implements Movable {
 
 	constructor(
-		public x: number,
-		public y: number
+		public x: number = 0,
+		public y: number = 0
 	) {}
 
 	set(x: number, y: number): this {

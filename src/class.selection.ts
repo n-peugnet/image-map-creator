@@ -4,22 +4,16 @@ import { Area } from "./class.area";
 import { Coord } from "./class.coord";
 
 export class Selection {
+	protected origin: Coord;
 
-	/**
-	 * @param {Area} area  area
-	 * @param {Coord} point  point
-	 */
-	constructor(area = null, point = null) {
-		this.area = area;
-		this.point = point;
-		this.setOrigin(new Coord);
+	constructor(
+		public area: Area|null = null,
+		public point: Coord|null = null
+	) {
+		this.origin = new Coord;
 	}
 
-	/**
-	 * 
-	 * @param {Coord} coord 
-	 */
-	setOrigin(coord = null) {
+	setOrigin(coord: Coord) {
 		this.origin = coord.clone();
 	}
 
@@ -29,32 +23,27 @@ export class Selection {
 		}
 	}
 
-	/**
-	 * 
-	 * @param {Area} area 
-	 * @param {Coord} point 
-	 * @param {Coord} origin 
-	 */
-	update(area, point) {
+	update(area: Area|null = null, point: Coord|null = null) {
 		this.area = area;
 		this.point = point;
 		this.autosetOrigin();
 	}
 
-	getArea() {
-		return this.area ? this.area : false;
+	getArea(): Area|null {
+		return this.area;
 	}
 
-	getPoint() {
-		return this.point ? this.point : false;
+	getPoint(): Coord|null {
+		return this.point;
 	}
 
-	value() {
-		if (this.point) {
+	value(): Coord|Area|null {
+		if (this.point !== null) {
 			return this.getPoint();
-		} else {
+		} else if (this.area !== null) {
 			return this.getArea();
 		}
+		return null;
 	}
 
 	getMove() {
@@ -72,26 +61,27 @@ export class Selection {
 	}
 
 	//------------------------ Start Interface Movable -------------------------------
-	move(coord) {
-		if (this.point) {
+	move(coord: Coord) {
+		if (this.point !== null) {
 			this.point.move(coord);
-		} else {
+		} else if(this.area !== null) {
 			this.area.move(coord);
 		}
 	}
 
-	getPosition() {
-		if (this.point) {
+	getPosition(): Coord {
+		if (this.point !== null) {
 			return this.point.getPosition();
-		} else {
+		} else if(this.area !== null) {
 			return this.area.getPosition();
 		}
+		return this.origin;
 	}
 
-	setPosition(coord) {
-		if (this.point) {
+	setPosition(coord: Coord) {
+		if (this.point !== null) {
 			this.point.setPosition(coord);
-		} else {
+		} else if(this.area !== null) {
 			this.area.setPosition(coord);
 		}
 	}

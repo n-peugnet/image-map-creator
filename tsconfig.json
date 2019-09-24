@@ -6,6 +6,6 @@
 		"resolveJsonModule": true,
 		"target": "es5",
 		"allowJs": true,
-		"sourceMap": true,
+		"sourceMap": true
 	}
 }

@@ -5,7 +5,7 @@ module.exports = (env) => {
 		devtool: env == 'dev' ? 'inline-source-map' : 'none',
 
 		// Constant
-		entry: './src/p5.image-map-creator.js',
+		entry: './src/p5.image-map-creator.ts',
 		output: {
 			filename: 'image-map-creator.bundle.js',
 			libraryTarget: 'window'

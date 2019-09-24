@@ -28,18 +28,17 @@
 
 	<!-- A <script> to enable the tool on the disired div -->
 	<script type="text/javascript">
-		let iMap = new imageMapCreator();
-		let sketch = new p5(iMap.sketch.bind(iMap), "div-1");  // for more details on the instantiation of a p5 sketch see https://p5js.org/examples/instance-mode-instance-container.html
+		let imcreator = new imageMapCreator("div-1");
 	</script>
 
 	<!-- Another <script> (optionnal) for the optionnal buttons -->
 	<script type="text/javascript">
 		function logMap() {
-			console.log(iMap.map);
+			console.log(imcreator.map);
 		}
 
 		function logP5() {
-			console.log(sketch);
+			console.log(imcreator.p5);
 		}
 	</script>
 

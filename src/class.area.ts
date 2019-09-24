@@ -16,8 +16,8 @@ export abstract class Area {
 	constructor(
 		protected shape: Shape,
 		protected coords: Coord[] = [],
-		protected href: string | null = null,
-		protected title: string | null = null,
+		protected href: string = "",
+		protected title: string = "",
 		public id: number = 0) {
 	}
 
@@ -43,6 +43,10 @@ export abstract class Area {
 	setShape(shape: Shape): this {
 		this.shape = shape;
 		return this;
+	}
+
+	getShape(): Shape {
+		return this.shape;
 	}
 
 	/**
@@ -138,6 +142,10 @@ export abstract class Area {
 		return this;
 	}
 
+	getHref(): string {
+		return this.href;
+	}
+
 	setTitle(title: string): this {
 		this.title = title;
 		return this;
@@ -205,9 +213,9 @@ export class AreaCircle extends Area {
 	constructor(
 		coords: Coord[] = [],
 		public radius: number = 0,
-		href: string | null,
-		title: string | null,
-		id: number
+		href: string = "",
+		title: string = "",
+		id: number = 0
 	) {
 		super("circle", coords, href, title, id);
 	}
@@ -262,9 +270,9 @@ export class AreaPoly extends Area {
 	 */
 	constructor(
 		coords: Coord[] = [],
-		href: string | null,
-		title: string | null,
-		id: number,
+		href: string = "",
+		title: string = "",
+		id: number = 0,
 		public closed = false
 	) {
 		super("poly", coords, href, title, id);
@@ -349,9 +357,9 @@ export class AreaRect extends AreaPoly {
 	 */
 	constructor(
 		coords: Coord[] = [],
-		href: string | null,
-		title: string | null,
-		id: number
+		href: string = "",
+		title: string = "",
+		id: number = 0
 	) {
 		super(coords, href, title, id, true);
 		if (this.coords.length > 0 && this.coords.length < 4) {
@@ -383,8 +391,8 @@ export class AreaDefault extends Area {
 	 */
 	constructor(
 		public iMap: ImageMap,
-		href: string | null = null,
-		title: string | null = null
+		href: string = "",
+		title: string = ""
 	) {
 		super("default", [], href, title);
 	}

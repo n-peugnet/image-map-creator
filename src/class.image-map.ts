@@ -16,7 +16,7 @@ export class ImageMap {
 		public height: number,
 		protected areas: Area[] = [],
 		protected name: string = "",
-		protected hasDefaultArea: boolean = false
+		public hasDefaultArea: boolean = false
 	) {}
 
 	setFromObject(obj: Object): this {
@@ -35,6 +35,10 @@ export class ImageMap {
 			this.name = name.replace(/\s+/g, "");
 		}
 		return this;
+	}
+
+	getName(): string {
+		return this.name;
 	}
 
 	setSize(width: number, height: number): this {
