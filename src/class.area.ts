@@ -40,6 +40,10 @@ export abstract class Area {
 		}
 	}
 
+	getId(): number {
+		return this.id;
+	}
+
 	setShape(shape: Shape): this {
 		this.shape = shape;
 		return this;
@@ -57,12 +61,13 @@ export abstract class Area {
 		return this.coords.push(coord);
 	}
 
-	/**
-	 * @param {Coord[]} coords 
-	 */
 	setCoords(coords: Coord[]): this {
 		this.coords = coords;
 		return this;
+	}
+
+	getCoords(): Coord[] {
+		return this.coords;
 	}
 
 	/**

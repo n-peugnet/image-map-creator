@@ -4,86 +4,75 @@ import { Area } from "./class.area";
 import { Coord } from "./class.coord";
 
 export class Selection {
-	protected origin: Coord;
+	protected origin: Coord = new Coord();
+	protected position: Coord = this.origin.clone();
+	protected areas: Map<number, Area> = new Map;
+	protected points: Map<Coord, number> = new Map;
 
-	constructor(
-		public area: Area|null = null,
-		public point: Coord|null = null
-	) {
-		this.origin = new Coord;
-	}
+	constructor() {}
 
-	setOrigin(coord: Coord) {
+	resetOrigin(coord: Coord = new Coord()): void {
 		this.origin = coord.clone();
+		this.position = coord;
+		this.addPoint(coord);
 	}
 
-	autosetOrigin() {
-		if (!this.isEmpty()) {
-			this.setOrigin(this.getPosition());
-		}
+	/**
+	 * Register an Area as a part of the selection
+	 */
+	registerArea(area: Area): void {
+		this.areas.set(area.getId(), area);
 	}
 
-	update(area: Area|null = null, point: Coord|null = null) {
-		this.area = area;
-		this.point = point;
-		this.autosetOrigin();
+	/**
+	 * Add Area and its points to the selection
+	 */
+	addArea(area: Area): void {
+		this.registerArea(area);
+		area.getCoords().forEach((p: Coord) => this.addPoint(p));
 	}
 
-	getArea(): Area|null {
-		return this.area;
+	addPoint(point: Coord): void {
+		const prev = this.points.get(point) || 0;
+		this.points.set(point, prev + 1);
 	}
 
-	getPoint(): Coord|null {
-		return this.point;
+	containsArea(area: Area): boolean {
+		return this.areas.has(area.getId());
 	}
 
-	value(): Coord|Area|null {
-		if (this.point !== null) {
-			return this.getPoint();
-		} else if (this.area !== null) {
-			return this.getArea();
-		}
-		return null;
+	containsPoint(point: Coord): boolean {
+		return this.points.has(point);
 	}
 
-	getMove() {
+	distToOrigin(): Coord {
 		return this.getPosition().diff(this.origin);
 	}
 
-	clear() {
-		this.area = null;
-		this.point = null;
+	clear(): void {
+		this.areas.clear();
+		this.points.clear();
 		this.origin = new Coord();
 	}
 
-	isEmpty() {
-		return !this.area && !this.point;
+	isEmpty(): boolean {
+		return this.points.size == 0;
 	}
 
 	//------------------------ Start Interface Movable -------------------------------
-	move(coord: Coord) {
-		if (this.point !== null) {
-			this.point.move(coord);
-		} else if(this.area !== null) {
-			this.area.move(coord);
-		}
+	move(coord: Coord): void {
+		this.points.forEach((nb: number, c: Coord): void => {
+			c.move(coord);
+		});
 	}
 
 	getPosition(): Coord {
-		if (this.point !== null) {
-			return this.point.getPosition();
-		} else if(this.area !== null) {
-			return this.area.getPosition();
-		}
-		return this.origin;
+		return this.position;
 	}
 
-	setPosition(coord: Coord) {
-		if (this.point !== null) {
-			this.point.setPosition(coord);
-		} else if(this.area !== null) {
-			this.area.setPosition(coord);
-		}
+	setPosition(coord: Coord): void {
+		const move = coord.diff(this.position);
+		this.move(move);
 	}
 	//------------------------- End Interface Movable --------------------------------
 }
