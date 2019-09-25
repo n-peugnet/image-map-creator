@@ -19,12 +19,14 @@ import p5 = require("p5");
 export type Tool = "polygon" | "rectangle" | "circle" | "select" | "delete" | "test";
 export type Image = {
 	data: p5.Image|null,
-	file: p5.File|null
+	file: p5.File|null,
 };
 export type ToolLabel = {
 	key: string,
-	value: Tool
+	value: Tool,
 };
+export type View = { scale: number, transX: number, transY: number, };
+export type Zoom = { min: number, max: number, sensativity: number, };
 
 /**
  */
@@ -62,8 +64,8 @@ export class imageMapCreator {
 	public map: ImageMap;
 	protected undoManager: any;
 	protected img: Image;
-	public view: { scale: number; transX: number; transY: number; };
-	protected zoomParams: { min: number; max: number; sensativity: number; };
+	public view: View;
+	protected zoomParams: Zoom;
 	protected magnetism: boolean;
 	protected fusion: boolean;
 	protected tolerance: number;
@@ -114,10 +116,9 @@ export class imageMapCreator {
 	 * Override p5 methods
 	 * @param {p5} p5
 	 */
-	sketch(p5: p5) {
-		// this.p5 = p5;
+	sketch(p5: p5): void {
 
-		p5.setup = () => {
+		p5.setup = (): void => {
 			let canvas = p5.createCanvas(this.width, this.height);
 			canvas.drop(this.handeFile.bind(this)).dragLeave(this.onLeave.bind(this)).dragOver(this.onOver.bind(this));
 			//@ts-ignore p5 types does not specify the canvas attribute
@@ -141,7 +142,7 @@ export class imageMapCreator {
 			document.getElementById("Output").setAttribute("onFocus", "this.select();");
 		}
 
-		p5.draw = () => {
+		p5.draw = (): void => {
 			this.updateTempArea();
 			this.updateHovered();
 			this.setCursor();
@@ -157,7 +158,7 @@ export class imageMapCreator {
 
 		//------------------------------ p5 Events -----------------------------------
 
-		p5.mousePressed = () => {
+		p5.mousePressed = (): void => {
 			if (this.mouseIsHoverSketch()) {
 				let coord = this.drawingCoord();
 				if (p5.mouseButton == p5.LEFT && !ContextMenu.isOpen()) {
@@ -187,7 +188,7 @@ export class imageMapCreator {
 			}
 		}
 
-		p5.mouseDragged = () => {
+		p5.mouseDragged = (): void => {
 			if (this.mouseIsHoverSketch() && !ContextMenu.isOpen()) {
 				if (p5.mouseButton == p5.LEFT) {
 					switch (this.tool) {
@@ -203,7 +204,7 @@ export class imageMapCreator {
 			}
 		}
 
-		p5.mouseReleased = (e: MouseEvent) => {
+		p5.mouseReleased = (e: MouseEvent): void => {
 			switch (this.tool) {
 				case "rectangle":
 				case "circle":
@@ -230,16 +231,17 @@ export class imageMapCreator {
 			this.bgLayer.disappear();
 		}
 
-		p5.mouseWheel = (e: MouseWheelEvent) => {
+		p5.mouseWheel = (e: MouseWheelEvent): boolean => {
 			if (this.mouseIsHoverSketch()) {
 				let coefZoom = this.view.scale * this.zoomParams.sensativity * - e.deltaY;
 				this.zoom(coefZoom);
 				return false;
 			}
+			return true;
 		}
 
 		//@ts-ignore p5 types didn't specify the KeyBoardEvent
-		p5.keyPressed = (e: KeyboardEvent) => {
+		p5.keyPressed = (e: KeyboardEvent): boolean => {
 			if (e.composed && e.ctrlKey) {
 				switch (e.key) {
 					case 's':
@@ -261,31 +263,32 @@ export class imageMapCreator {
 				e.keyCode == this.p5.ESCAPE
 			) {
 				this.tempArea = new AreaEmpty();
+				return false;
 			}
+			return true;
 		}
 	}
 
 	//---------------------------- Functions ----------------------------------
 
-	trueX(coord: number) {
+	trueX(coord: number): number {
 		return (coord - this.view.transX) / this.view.scale;
 	}
 
-	trueY(coord: number) {
+	trueY(coord: number): number {
 		return (coord - this.view.transY) / this.view.scale;
 	}
 
-	mX() {
+	mX(): number {
 		return this.trueX(this.p5.mouseX);
 	}
 
-	mY() {
+	mY(): number {
 		return this.trueY(this.p5.mouseY);
 	}
 
 	/**
 	 * Get the true coordinate of the mouse relative to the imageMap
-	 * @returns {Coord}
 	 */
 	mCoord(): Coord {
 		return new Coord(this.mX(), this.mY());
@@ -293,7 +296,6 @@ export class imageMapCreator {
 
 	/**
 	 * Get the coordinate of the mouse for drawing
-	 * @returns {Coord}
 	 */
 	drawingCoord(): Coord {
 		let coord = this.mCoord();
@@ -304,17 +306,17 @@ export class imageMapCreator {
 		return coord;
 	}
 
-	mouseIsHoverSketch() {
+	mouseIsHoverSketch(): boolean {
 		return this.p5.mouseX <= this.p5.width && this.p5.mouseX >= 0 && this.p5.mouseY <= this.p5.height && this.p5.mouseY >= 0;
 	}
 
 	/**
 	 * Sets hoveredPoint and hoveredArea excluding currently selected Area
 	 */
-	updateHovered() {
+	updateHovered(): void {
 		this.hoveredPoint = null;
 		let allAreas = this.map.getAreas();
-		let area = allAreas.find(a => {
+		let area = allAreas.find((a: Area): boolean => {
 			let selectedArea = this.selected.getArea()
 			if (selectedArea !== null && a.equals(selectedArea)) {
 				return false;
@@ -334,7 +336,7 @@ export class imageMapCreator {
 		this.hoveredArea = area ? area : null;
 	}
 
-	onClick(event: MouseEvent) {
+	onClick(event: MouseEvent): void {
 		if (this.mouseIsHoverSketch()) {
 			if (this.hoveredArea) {
 				if (this.p5.mouseButton == this.p5.RIGHT) {
@@ -345,7 +347,7 @@ export class imageMapCreator {
 						position: "click",
 						data: this.hoveredArea
 					});
-					return false; // doesn't work as expected
+					// return false; // doesn't work as expected
 				} else if (this.p5.mouseButton == this.p5.LEFT && !ContextMenu.isOpen()) {
 					switch (this.tool) {
 						case "test":
@@ -361,16 +363,16 @@ export class imageMapCreator {
 		this.selected.clear();
 	}
 
-	onOver(evt: MouseEvent) {
+	onOver(evt: MouseEvent): void {
 		this.bgLayer.appear();
 		evt.preventDefault();
 	}
 
-	onLeave() {
+	onLeave(): void {
 		this.bgLayer.disappear();
 	}
 
-	handeFile(file: p5.File) {
+	handeFile(file: p5.File): void {
 		if (file.type == "image") {
 			this.img.data = this.p5.loadImage(file.data, img => this.resetView(img));
 			this.img.file = file.file;
@@ -395,7 +397,7 @@ export class imageMapCreator {
 		this.bgLayer.disappear();
 	}
 
-	resetView(img: p5.Image) {
+	resetView(img: p5.Image): void {
 		this.view.scale = 1;
 		this.view.transX = 0;
 		this.view.transY = 0;
@@ -408,7 +410,7 @@ export class imageMapCreator {
 		this.map.setSize(img.width, img.height);
 	}
 
-	zoom(coef: number) {
+	zoom(coef: number): void {
 		let newScale = this.view.scale + coef;
 		if (newScale > this.zoomParams.min && newScale < this.zoomParams.max) {
 			let mouseXToOrigin = this.mX();
@@ -422,12 +424,12 @@ export class imageMapCreator {
 		}
 	}
 
-	drawImage() {
+	drawImage(): void {
 		if (this.img.data !== null)
 			this.p5.image(this.img.data, 0, 0, this.img.data.width, this.img.data.height);
 	}
 
-	drawAreas() {
+	drawAreas(): void {
 		let allAreas = [this.tempArea].concat(this.map.getAreas());
 		for (let i = allAreas.length; i--;) {
 			let area = allAreas[i];
@@ -443,12 +445,12 @@ export class imageMapCreator {
 		}
 	}
 
-	setTool(value: Tool) {
+	setTool(value: Tool): void {
 		this.tool = value;
 		this.tempArea = new AreaEmpty();
 	}
 
-	setCursor() {
+	setCursor(): void {
 		if (this.drawingTools.includes(this.tool)) {
 			switch (this.tool) {
 				case "polygon":
@@ -478,7 +480,7 @@ export class imageMapCreator {
 		}
 	}
 
-	setOutput() {
+	setOutput(): void {
 		switch (this.tool) {
 			case "test":
 			case "select":
@@ -490,7 +492,7 @@ export class imageMapCreator {
 		}
 	}
 
-	setBackground() {
+	setBackground(): void {
 		this.p5.background(200);
 		if (!this.img.data) {
 			this.p5.noStroke();
@@ -505,7 +507,7 @@ export class imageMapCreator {
 	/**
 	 * Set the title of the canvas from an area
 	 */
-	setTitle(area: Area|null) {
+	setTitle(area: Area|null): void {
 		if (this.tool == "test" && area !== null && area.getTitle()) {
 			//@ts-ignore p5 types does not specify the canvas attribute
 			this.p5.canvas.setAttribute("title", area.getTitle());
@@ -515,7 +517,7 @@ export class imageMapCreator {
 		}
 	}
 
-	setAreaStyle(area: Area) {
+	setAreaStyle(area: Area): void {
 		let color = this.p5.color(255, 255, 255, 178);
 		if (this.tool == "test") {
 			color = this.p5.color(255, 0);
@@ -535,7 +537,7 @@ export class imageMapCreator {
 		}
 	}
 
-	setTempArea(coord: Coord) {
+	setTempArea(coord: Coord): void {
 		let coords = [coord];
 		switch (this.tool) {
 			case "rectangle":
@@ -551,27 +553,27 @@ export class imageMapCreator {
 		}
 	}
 
-	updateTempArea() {
+	updateTempArea(): void {
 		let coord = this.drawingCoord();
 		if (!this.tempArea.isEmpty()) {
 			this.tempArea.updateLastCoord(coord);
 		}
 	}
 
-	exportMap() {
+	exportMap(): string {
 		return JSON.stringify({
 			version: version,
 			map: this.map
 		});
 	}
 
-	save() {
+	save(): void {
 		//@ts-ignore encoding options for Chrome
 		let blob = new Blob([this.exportMap()], { encoding: "UTF-8", type: "text/plain;charset=UTF-8" })
 		download(blob, `${this.map.getName()}.map.json`, 'application/json')
 	}
 
-	importMap(json: string) {
+	importMap(json: string): void {
 		let object = JSON.parse(json);
 		let objectMap = object.map;
 		this.map.setFromObject(objectMap);
@@ -582,9 +584,8 @@ export class imageMapCreator {
 
 	/**
 	 * Add an area to the imageMap object
-	 * @param {Area} area
 	 */
-	createArea(area: Area) {
+	createArea(area: Area): void {
 		this.map.addArea(area);
 		this.undoManager.add({
 			undo: () => {
@@ -598,9 +599,8 @@ export class imageMapCreator {
 
 	/**
 	 * remove an area from the imageMap object
-	 * @param {Area} area
 	 */
-	deleteArea(area: Area) {
+	deleteArea(area: Area): void {
 		let id = area.id;
 		if (id === 0) {
 			this.settings.setValue("Default Area", false);
@@ -619,9 +619,8 @@ export class imageMapCreator {
 
 	/**
 	 * Move an area forward or backward
-	 * @param {Area} area
 	 */
-	moveArea(area: Area, direction: number) {
+	moveArea(area: Area, direction: number): void {
 		if (this.map.moveArea(area.id, direction) !== false) {
 			this.undoManager.add({
 				undo: () => {
@@ -636,9 +635,8 @@ export class imageMapCreator {
 
 	/**
 	 * Set the url of an area
-	 * @param {Area} area
 	 */
-	setAreaUrl(area: Area) {
+	setAreaUrl(area: Area): void {
 		let href = area.getHref();
 		let input = prompt("Enter the pointing url of this area", href ? href : "http://");
 		if (input !== null) {
@@ -656,9 +654,8 @@ export class imageMapCreator {
 
 	/**
 	 * Set the title of an area
-	 * @param {Area} area
 	 */
-	setAreaTitle(area: Area) {
+	setAreaTitle(area: Area): void {
 		let title = area.getTitle();
 		let input = prompt("Enter the title of this area", title ? title : "");
 		if (input !== null) {
@@ -674,7 +671,7 @@ export class imageMapCreator {
 		}
 	}
 
-	setDefaultArea(bool: boolean) {
+	setDefaultArea(bool: boolean): void {
 		this.map.setDefaultArea(bool);
 		this.undoManager.add({
 			undo: () => {
@@ -688,7 +685,7 @@ export class imageMapCreator {
 		});
 	}
 
-	clearAreas() {
+	clearAreas(): void {
 		let areas = this.map.getAreas(false);
 		this.map.clearAreas();
 		this.undoManager.add({
@@ -701,7 +698,7 @@ export class imageMapCreator {
 		});
 	}
 
-	reset() {
+	reset(): void {
 		this.undoManager.clear();
 	}
 }
