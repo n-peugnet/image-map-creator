@@ -116,157 +116,167 @@ export class imageMapCreator {
 	 * Override p5 methods
 	 * @param {p5} p5
 	 */
-	sketch(p5: p5): void {
+	private sketch(p5: p5): void {
+		p5.setup = this.setup.bind(this);
+		p5.draw = this.draw.bind(this);
 
-		p5.setup = (): void => {
-			let canvas = p5.createCanvas(this.width, this.height);
-			canvas.drop(this.handeFile.bind(this)).dragLeave(this.onLeave.bind(this)).dragOver(this.onOver.bind(this));
-			//@ts-ignore p5 types does not specify the canvas attribute
-			this.settings = QuickSettings.create(p5.width + 5, 0, "Image-map Creator", p5.canvas.parentElement)
-				.setDraggable(false)
-				.addText("Map Name", "", (v: string) => { this.map.setName(v) })
-				.addDropDown("Tool", ["polygon", "rectangle", "circle", "select", "delete", "test"], (v: ToolLabel) => { this.setTool(v.value) })
-				.addBoolean("Default Area", this.map.hasDefaultArea, (v: boolean) => { this.setDefaultArea(v) })
-				.addButton("Undo", this.undoManager.undo)
-				.addButton("Redo", this.undoManager.redo)
-				.addButton("Clear", this.clearAreas.bind(this))
-				.addButton("Generate Html", () => { this.settings.setValue("Output", this.map.toHtml()) })
-				.addButton("Generate Svg", () => { this.settings.setValue("Output", this.map.toSvg()) })
-				.addTextArea("Output")
-				.addButton("Save", this.save.bind(this));
-			//@ts-ignore Fix for oncontextmenu
-			p5.canvas.addEventListener("contextmenu", (e) => { e.preventDefault(); });
-			//@ts-ignore Fix for middle click mouse down triggers scroll on windows
-			p5.canvas.addEventListener("mousedown", (e) => { e.preventDefault(); });
-			//@ts-ignore Select all onclick on the Output field
-			document.getElementById("Output").setAttribute("onFocus", "this.select();");
-		}
+		p5.mousePressed = this.mousePressed.bind(this);
+		p5.mouseDragged = this.mouseDragged.bind(this);
+		p5.mouseReleased = this.mouseReleased.bind(this);
+		p5.mouseWheel = this.mouseWheel.bind(this);
+		//@ts-ignore p5 types didn't specify the KeyBoardEvent nor the boolean return type
+		p5.keyPressed = this.keyPressed.bind(this);
+	}
 
-		p5.draw = (): void => {
-			this.updateTempArea();
-			this.updateHovered();
-			this.setCursor();
-			this.setOutput();
-			this.setBackground();
-			this.setTitle(this.hoveredArea);
-			p5.translate(this.view.transX, this.view.transY);
-			p5.scale(this.view.scale);
-			this.drawImage();
-			this.bgLayer.display();
-			this.drawAreas();
-		}
+	//---------------------------- p5 Functions ----------------------------------
 
-		//------------------------------ p5 Events -----------------------------------
+	private setup(): void {
+		let canvas = this.p5.createCanvas(this.width, this.height);
+		canvas.drop(this.handeFile.bind(this)).dragLeave(this.onLeave.bind(this)).dragOver(this.onOver.bind(this));
+		//@ts-ignore p5 types does not specify the canvas attribute
+		this.settings = QuickSettings.create(this.p5.width + 5, 0, "Image-map Creator", this.p5.canvas.parentElement)
+			.setDraggable(false)
+			.addText("Map Name", "", (v: string) => { this.map.setName(v) })
+			.addDropDown("Tool", ["polygon", "rectangle", "circle", "select", "delete", "test"], (v: ToolLabel) => { this.setTool(v.value) })
+			.addBoolean("Default Area", this.map.hasDefaultArea, (v: boolean) => { this.setDefaultArea(v) })
+			.addButton("Undo", this.undoManager.undo)
+			.addButton("Redo", this.undoManager.redo)
+			.addButton("Clear", this.clearAreas.bind(this))
+			.addButton("Generate Html", () => { this.settings.setValue("Output", this.map.toHtml()) })
+			.addButton("Generate Svg", () => { this.settings.setValue("Output", this.map.toSvg()) })
+			.addTextArea("Output")
+			.addButton("Save", this.save.bind(this));
+		//@ts-ignore Fix for oncontextmenu
+		this.p5.canvas.addEventListener("contextmenu", (e) => { e.preventDefault(); });
+		//@ts-ignore Fix for middle click mouse down triggers scroll on windows
+		this.p5.canvas.addEventListener("mousedown", (e) => { e.preventDefault(); });
+		//@ts-ignore Select all onclick on the Output field
+		document.getElementById("Output").setAttribute("onFocus", "this.select();");
+	}
 
-		p5.mousePressed = (): void => {
-			if (this.mouseIsHoverSketch()) {
-				let coord = this.drawingCoord();
-				if (p5.mouseButton == p5.LEFT && !ContextMenu.isOpen()) {
-					switch (this.tool) {
-						case "circle":
-						case "rectangle":
+	private draw(): void {
+		this.updateTempArea();
+		this.updateHovered();
+		this.setCursor();
+		this.setOutput();
+		this.setBackground();
+		this.setTitle(this.hoveredArea);
+		this.p5.translate(this.view.transX, this.view.transY);
+		this.p5.scale(this.view.scale);
+		this.drawImage();
+		this.bgLayer.display();
+		this.drawAreas();
+	}
+
+	//------------------------------ p5 Events -----------------------------------
+
+	private mousePressed(): void {
+		if (this.mouseIsHoverSketch()) {
+			let coord = this.drawingCoord();
+			if (this.p5.mouseButton == this.p5.LEFT && !ContextMenu.isOpen()) {
+				switch (this.tool) {
+					case "circle":
+					case "rectangle":
+						this.setTempArea(coord);
+						break;
+					case "polygon":
+						let areaPoly = this.tempArea as AreaPoly;
+						if (areaPoly.isEmpty()) {
 							this.setTempArea(coord);
-							break;
-						case "polygon":
-							let areaPoly = this.tempArea as AreaPoly;
-							if (areaPoly.isEmpty()) {
-								this.setTempArea(coord);
-							} else if (areaPoly.isClosable(this.mCoord(), this.tolerance / this.view.scale)) {
-								areaPoly.close();
-								if (areaPoly.isValidShape())
-									this.createArea(areaPoly);
-								this.tempArea = new AreaEmpty();
-							} else {
-								this.tempArea.addCoord(this.mCoord());
-							}
-							break;
-						case "select":
-							this.selected.update(this.hoveredArea, this.hoveredPoint);
-							break;
-					}
+						} else if (areaPoly.isClosable(this.mCoord(), this.tolerance / this.view.scale)) {
+							areaPoly.close();
+							if (areaPoly.isValidShape())
+								this.createArea(areaPoly);
+							this.tempArea = new AreaEmpty();
+						} else {
+							this.tempArea.addCoord(this.mCoord());
+						}
+						break;
+					case "select":
+						this.selected.update(this.hoveredArea, this.hoveredPoint);
+						break;
 				}
 			}
 		}
+	}
 
-		p5.mouseDragged = (): void => {
-			if (this.mouseIsHoverSketch() && !ContextMenu.isOpen()) {
-				if (p5.mouseButton == p5.LEFT) {
-					switch (this.tool) {
-						case "select":
-							let mvmt = new Coord(this.mX() - this.trueX(p5.pmouseX), this.mY() - this.trueY(p5.pmouseY));
-							this.selected.move(mvmt);
-							break;
-					}
-				} else if (p5.mouseButton == p5.CENTER) {
-					this.view.transX += p5.mouseX - p5.pmouseX;
-					this.view.transY += p5.mouseY - p5.pmouseY;
+	private mouseDragged(): void {
+		if (this.mouseIsHoverSketch() && !ContextMenu.isOpen()) {
+			if (this.p5.mouseButton == this.p5.LEFT) {
+				switch (this.tool) {
+					case "select":
+						let mvmt = new Coord(this.mX() - this.trueX(this.p5.pmouseX), this.mY() - this.trueY(this.p5.pmouseY));
+						this.selected.move(mvmt);
+						break;
 				}
+			} else if (this.p5.mouseButton == this.p5.CENTER) {
+				this.view.transX += this.p5.mouseX - this.p5.pmouseX;
+				this.view.transY += this.p5.mouseY - this.p5.pmouseY;
 			}
 		}
+	}
 
-		p5.mouseReleased = (e: MouseEvent): void => {
-			switch (this.tool) {
-				case "rectangle":
-				case "circle":
-					if (this.tempArea.isValidShape())
-						this.createArea(this.tempArea);
-					this.tempArea = new AreaEmpty();
-					break;
-				case "select":
-					let select = this.selected.value();
-					if (select !== null) {
-						let move = this.selected.getMove();
-						this.undoManager.add({
-							undo: () => {
-								select!.move(move.invert());
-							},
-							redo: () => {
-								select!.move(move);
-							}
-						});
-					}
-					break;
-			}
-			this.onClick(e);
-			this.bgLayer.disappear();
-		}
-
-		p5.mouseWheel = (e: MouseWheelEvent): boolean => {
-			if (this.mouseIsHoverSketch()) {
-				let coefZoom = this.view.scale * this.zoomParams.sensativity * - e.deltaY;
-				this.zoom(coefZoom);
-				return false;
-			}
-			return true;
-		}
-
-		//@ts-ignore p5 types didn't specify the KeyBoardEvent
-		p5.keyPressed = (e: KeyboardEvent): boolean => {
-			if (e.composed && e.ctrlKey) {
-				switch (e.key) {
-					case 's':
-						this.save();
-						break;
-					case 'z':
-						this.undoManager.undo();
-						break;
-					case 'y':
-						this.undoManager.redo();
-						break;
-					default:
-						return true;
-				}
-				return false;
-			} else if (
-				this.tool == "polygon" &&
-				//@ts-ignore
-				e.keyCode == this.p5.ESCAPE
-			) {
+	private mouseReleased(e: MouseEvent): void {
+		switch (this.tool) {
+			case "rectangle":
+			case "circle":
+				if (this.tempArea.isValidShape())
+					this.createArea(this.tempArea);
 				this.tempArea = new AreaEmpty();
-				return false;
-			}
-			return true;
+				break;
+			case "select":
+				let select = this.selected.value();
+				if (select !== null) {
+					let move = this.selected.getMove();
+					this.undoManager.add({
+						undo: () => {
+							select!.move(move.invert());
+						},
+						redo: () => {
+							select!.move(move);
+						}
+					});
+				}
+				break;
 		}
+		this.onClick(e);
+		this.bgLayer.disappear();
+	}
+
+	private mouseWheel(e: MouseWheelEvent): boolean {
+		if (this.mouseIsHoverSketch()) {
+			let coefZoom = this.view.scale * this.zoomParams.sensativity * - e.deltaY;
+			this.zoom(coefZoom);
+			return false;
+		}
+		return true;
+	}
+
+	private keyPressed(e: KeyboardEvent): boolean {
+		if (e.composed && e.ctrlKey) {
+			switch (e.key) {
+				case 's':
+					this.save();
+					break;
+				case 'z':
+					this.undoManager.undo();
+					break;
+				case 'y':
+					this.undoManager.redo();
+					break;
+				default:
+					return true;
+			}
+			return false;
+		} else if (
+			this.tool == "polygon" &&
+			//@ts-ignore p5 types didn't specify the ESCAPE keycode
+			e.keyCode == this.p5.ESCAPE
+		) {
+			this.tempArea = new AreaEmpty();
+			return false;
+		}
+		return true;
 	}
 
 	//---------------------------- Functions ----------------------------------
