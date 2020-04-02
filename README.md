@@ -86,17 +86,14 @@ Import `p5.js`, `p5.dom.js` and the javascript bundle from `/dist` :
 Add a `<div>` with an id, then instantiate the p5 object like this :
 
 ```js
-let iMap = new imageMapCreator();
-let sketch = new p5(iMap.sketch.bind(iMap), "div-id");
+let iMap = new imageMapCreator("div-id");
 ```
 
-The contructor of imageMapCreator accepts parameters :
+The contructor of imageMapCreator accepts these parameters :
 
 ```js
-new imageMapCreator([ width = 600 [, height = 450 ]]);
+new imageMapCreator(elementId [, width = 600 [, height = 450 ]]);
 ```
-
-For more details on the instance mode of p5 see [the p5 documentation](https://p5js.org/examples/instance-mode-instance-container.html).
 
 You can also see the detailled example in the [`/demos`](demos) folder.
 
