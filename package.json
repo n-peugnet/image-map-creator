@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack --env dev --watch",
-    "build": "webpack --env prod",
+    "build": "webpack --env dev",
+    "dist": "webpack --env prod",
     "release": "dotenv release-it"
   },
   "repository": {
@@ -15,7 +16,7 @@
   },
   "release-it": {
     "scripts": {
-      "beforeStage": "npm run build"
+      "beforeStage": "npm run dist"
     },
     "npm": {
       "publish": false
