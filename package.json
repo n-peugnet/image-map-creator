@@ -2,7 +2,7 @@
   "name": "image-map-creator",
   "version": "1.0.0",
   "description": "This is a simple map creator tool made with the p5.js library. I want it\r to be easy to use for both the end user and the developper.",
-  "main": "webpack.config.js",
+  "main": "dist/image-map-creator.bundle.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack --env dev --watch",
@@ -19,7 +19,7 @@
       "beforeStage": "npm run dist"
     },
     "npm": {
-      "publish": false
+      "publish": true
     },
     "github": {
       "release": true,

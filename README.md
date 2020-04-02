@@ -62,8 +62,20 @@ _the others are the ones I plan to add in the future._
 
 ## Integration
 
-You just need to import `p5.js`, `p5.dom.js` and the javascript bundle
-from `/dist` :
+There are multiple ways to get image-map-creator:
+
+- Download the bundle from [the latest release](https://github.com/n-peugnet/image-map-creator/releases/latest).
+- Compile the bundle from sources (see [development informations](#development)).
+- Get the package from npm:
+  ```
+  npm install image-map-creator
+  ```
+  ```javascript
+  // script.js
+  import "image-map-creator";
+  ```
+
+Import `p5.js`, `p5.dom.js` and the javascript bundle from `/dist` :
 
 ```html
 <script src="dist/image-map-creator.bundle.js"></script>
