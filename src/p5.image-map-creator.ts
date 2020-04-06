@@ -1,4 +1,5 @@
-import { version } from "../package.json";
+//import { version } from "../package.json";
+let version: string = "3.4.5";
 import { ImageMap } from "./class.image-map";
 import { BgLayer } from "./p5.bg-layer";
 import { Area, AreaCircle, AreaRect, AreaPoly, AreaEmpty } from "./class.area";
@@ -13,7 +14,8 @@ import QuickSettings from "quicksettings";
 //@ts-ignore no types for this lib
 import * as ContextMenu from "../lib/contextmenu/contextmenu";
 import "../lib/contextmenu/contextmenu.css";
-import * as p5 from "p5";
+//@ts-ignore strange way to import but it's working
+import p5 = require("p5");
 
 export type Tool = "polygon" | "rectangle" | "circle" | "select" | "delete" | "test";
 export type Image = {
