@@ -9,7 +9,7 @@ to be easy to use for both the end user and the developper. This work is
 still in beta so a lot of things are about to change (including the save
 file's structure).
 
-![demo gif](docs/image-map-creator.gif)
+![demo gif](https://github.com/n-peugnet/image-map-creator/raw/master/docs/image-map-creator.gif)
 
 ## Live demo
 
