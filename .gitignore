@@ -3,8 +3,7 @@ jsconfig.json
 .vscode
 
 ### Project Files ###
-node_modules/*
-dist/*
+node_modules
+dist
 *.log
 .env
-*.d.ts
