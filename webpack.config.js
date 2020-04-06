@@ -2,13 +2,13 @@ module.exports = (env) => {
 	return {
 		// Environment dependent
 		mode: env == 'dev' ? 'development' : 'production',
-		devtool: env == 'dev' ? 'cheap-module-eval-source-map' : 'none',
+		devtool: env == 'dev' ? 'eval-cheap-module-source-map' : 'source-map',
 
 		// Constant
 		entry: './src/p5.image-map-creator.ts',
 		output: {
 			filename: 'image-map-creator.bundle.js',
-			libraryTarget: 'window'
+			libraryTarget: 'umd',
 		},
 		externals: [
 			'p5',

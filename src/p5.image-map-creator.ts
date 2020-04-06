@@ -13,8 +13,7 @@ import QuickSettings from "quicksettings";
 //@ts-ignore no types for this lib
 import * as ContextMenu from "../lib/contextmenu/contextmenu";
 import "../lib/contextmenu/contextmenu.css";
-//@ts-ignore strange way to import but it's working
-import p5 = require("p5");
+import * as p5 from "p5";
 
 export type Tool = "polygon" | "rectangle" | "circle" | "select" | "delete" | "test";
 export type Image = {

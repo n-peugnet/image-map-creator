@@ -1,6 +1,5 @@
 import { round } from "./utils";
 import { Movable } from "./interface.movable";
-import { relative } from "path";
 
 type Axle = "x"|"y";
 
