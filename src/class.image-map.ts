@@ -2,7 +2,7 @@ import { Area, AreaDefault } from "./class.area";
 
 export class ImageMap {
 
-	protected dArea: Area = new AreaDefault(this);
+	protected dArea: AreaDefault = new AreaDefault(this);
 	protected lastId: number = 0;
 
 	/**
@@ -21,12 +21,13 @@ export class ImageMap {
 
 	setFromObject(obj: Object): this {
 		const iMap = obj as ImageMap;
+		iMap.dArea.iMap = this;
 		this.width = iMap.width;
 		this.height = iMap.height;
 		this.areas = iMap.areas.map(Area.fromObject);
 		this.name = iMap.name;
 		this.hasDefaultArea = iMap.hasDefaultArea;
-		this.dArea = AreaDefault.fromObject(iMap.dArea);
+		this.dArea = Area.fromObject(iMap.dArea) as AreaDefault;
 		return this;
 	}
 
