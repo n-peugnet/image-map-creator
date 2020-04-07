@@ -28,6 +28,10 @@ export type ToolLabel = {
 export type View = { scale: number, transX: number, transY: number, };
 export type Zoom = { min: number, max: number, sensativity: number, };
 
+export class Save {
+	constructor (public version: string, public map: ImageMap) {}
+}
+
 /**
  */
 export class imageMapCreator {
@@ -575,9 +579,11 @@ export class imageMapCreator {
 	}
 
 	exportMap(): string {
-		return JSON.stringify({
-			version: version,
-			map: this.map
+		return JSON.stringify(new Save(version, this.map), function (key, value) {
+			if (value instanceof ImageMap && !(this instanceof Save)) {
+				return value.getName();
+			}
+			return value;
 		});
 	}
 
