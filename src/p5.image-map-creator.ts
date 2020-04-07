@@ -1,5 +1,4 @@
-//import { version } from "../package.json";
-let version: string = "3.4.5";
+import { version } from "../package.json";
 import { ImageMap } from "./class.image-map";
 import { BgLayer } from "./p5.bg-layer";
 import { Area, AreaCircle, AreaRect, AreaPoly, AreaEmpty } from "./class.area";
