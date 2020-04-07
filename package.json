@@ -8,8 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack --env dev --watch",
     "build": "webpack --env dev",
-    "dist": "webpack --env prod",
-    "clean": "rm -r dist",
+    "dist": "npm run clean && webpack --env prod",
+    "clean": "rm -rf dist",
     "release": "dotenv release-it"
   },
   "repository": {
@@ -17,8 +17,8 @@
     "url": "git+https://github.com/n-peugnet/image-map-creator.git"
   },
   "release-it": {
-    "scripts": {
-      "beforeStage": "npm run dist"
+    "hooks": {
+      "after:bump": "npm run dist"
     },
     "npm": {
       "publish": true
