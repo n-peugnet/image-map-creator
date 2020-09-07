@@ -73,8 +73,8 @@ export class imageMapCreator {
 	protected magnetism: boolean;
 	protected fusion: boolean;
 	protected tolerance: number;
-	public p5: p5;
 	protected bgLayer: BgLayer;
+	public p5: p5;
 
 	/**
 	 * Constructor
@@ -110,8 +110,9 @@ export class imageMapCreator {
 		this.magnetism = true;
 		this.fusion = false;
 		this.tolerance = 6;
-		this.p5 = new p5(this.sketch.bind(this), element);
 		this.bgLayer = new BgLayer(this);
+		// Must be the last instruction of the constructor.
+		this.p5 = new p5(this.sketch.bind(this), element);
 	}
 
 	//---------------------------- p5 Sketch ----------------------------------
@@ -121,6 +122,9 @@ export class imageMapCreator {
 	 * @param {p5} p5
 	 */
 	private sketch(p5: p5): void {
+		// Set this.p5 also in sketch() (fix for #30).
+		this.p5 = p5;
+
 		p5.setup = this.setup.bind(this);
 		p5.draw = this.draw.bind(this);
 
