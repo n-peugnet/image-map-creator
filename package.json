@@ -38,16 +38,16 @@
   },
   "homepage": "https://github.com/n-peugnet/image-map-creator#readme",
   "devDependencies": {
-    "@types/downloadjs": "^1.4.1",
-    "@types/p5": "^0.7.2",
+    "@types/downloadjs": "^1.4.2",
+    "@types/p5": "^0.7.3",
     "css-loader": "^1.0.1",
-    "dotenv-cli": "^2.0.0",
-    "release-it": "^12.4.1",
+    "dotenv-cli": "^2.0.1",
+    "release-it": "^14.0.2",
     "style-loader": "^0.23.1",
-    "ts-loader": "^5.3.3",
-    "typescript": "^3.4.4",
-    "webpack": "^4.24.0",
-    "webpack-cli": "^3.1.2"
+    "ts-loader": "^5.4.5",
+    "typescript": "^3.9.7",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
   },
   "dependencies": {
     "downloadjs": "^1.4.7",
