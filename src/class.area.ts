@@ -386,6 +386,14 @@ export class AreaRect extends AreaPoly {
 		}
 	}
 
+	isValidShape(): boolean {
+		return super.isValidShape() && !this.isNullArea();
+	}
+
+	private isNullArea(): boolean {
+		return this.coords[0].x == this.coords[1].x || this.coords[0].y == this.coords[3].y;
+	}
+
 	updateLastCoord(coord: Coord): this {
 		this.coords[1].x = coord.x
 		this.coords[2] = coord;
