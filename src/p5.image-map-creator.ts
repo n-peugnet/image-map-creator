@@ -1,4 +1,4 @@
-import { version } from "../package.json";
+const version = require('../package.json').version;
 import { ImageMap } from "./class.image-map";
 import { BgLayer } from "./p5.bg-layer";
 import { Area, AreaCircle, AreaRect, AreaPoly, AreaEmpty } from "./class.area";
@@ -254,7 +254,7 @@ export class imageMapCreator {
 		this.bgLayer.disappear();
 	}
 
-	private mouseWheel(e: MouseWheelEvent): boolean {
+	private mouseWheel(e: WheelEvent): boolean {
 		if (this.mouseIsHoverSketch()) {
 			let coefZoom = this.view.scale * this.zoomParams.sensativity * - e.deltaY;
 			this.zoom(coefZoom);
