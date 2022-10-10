@@ -10,7 +10,10 @@
     "build": "webpack --env dev",
     "dist": "npm run clean && webpack --env prod",
     "clean": "rm -rf dist",
-    "release-patch": "TAG=$(npm version patch --tag-version-prefix=) && npm run dist && git push --tags && gh release create $TAG && gh release upload $TAG dist/*.js && npm publish"
+    "release:patch": "npm version patch --tag-version-prefix= && npm run release:publish",
+    "release:minor": "npm version minor --tag-version-prefix= && npm run release:publish",
+    "release:major": "npm version major --tag-version-prefix= && npm run release:publish",
+    "release:publish": "export TAG=$(git describe --tags --abbrev=0) && npm run dist && git push && git push --tags && gh release create $TAG && gh release upload $TAG dist/*.js && npm publish"
   },
   "repository": {
     "type": "git",
