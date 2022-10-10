@@ -10,25 +10,11 @@
     "build": "webpack --env dev",
     "dist": "npm run clean && webpack --env prod",
     "clean": "rm -rf dist",
-    "release": "dotenv release-it"
+    "release-patch": "TAG=$(npm version patch --tag-version-prefix=) && npm run dist && git push --tags && gh release create $TAG && gh release upload $TAG dist/*.js && npm publish"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/n-peugnet/image-map-creator.git"
-  },
-  "release-it": {
-    "hooks": {
-      "after:bump": "npm run dist"
-    },
-    "npm": {
-      "publish": true
-    },
-    "github": {
-      "release": true,
-      "assets": [
-        "dist/*.js"
-      ]
-    }
   },
   "keywords": [],
   "author": "",
@@ -41,8 +27,6 @@
     "@types/downloadjs": "^1.4.2",
     "@types/p5": "^1.4.2",
     "css-loader": "^6.7.1",
-    "dotenv-cli": "^5.1.0",
-    "release-it": "^15.0.0",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.3.0",
     "typescript": "^4.6.4",
