@@ -5,15 +5,7 @@
   "main": "dist/image-map-creator.bundle.js",
   "types": "dist/p5.image-map-creator.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "webpack --env dev --watch",
-    "build": "webpack --env dev",
-    "dist": "npm run clean && webpack --env prod",
-    "clean": "rm -rf dist",
-    "release:patch": "npm version patch --tag-version-prefix= && npm run release:publish",
-    "release:minor": "npm version minor --tag-version-prefix= && npm run release:publish",
-    "release:major": "npm version major --tag-version-prefix= && npm run release:publish",
-    "release:publish": "export TAG=$(git describe --tags --abbrev=0) && npm run dist && git push && git push --tags && gh release create $TAG && gh release upload $TAG dist/*.js && npm publish"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",

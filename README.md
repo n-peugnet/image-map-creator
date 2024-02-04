@@ -105,7 +105,8 @@ your local machine for development and testing purposes.
 ### Prerequisites
 
 1.  Git
-2.  Nodejs & NPM
+2.  Make
+3.  Nodejs & NPM
 
 ### Install & Run
 
@@ -117,11 +118,11 @@ your local machine for development and testing purposes.
     ```
 2.  install dependencies :
     ```shell
-    npm install
+    make node_modules
     ```
 3.  launch webpack in watch mode to build the dev bundle :
     ```shell
-    npm run watch
+    make watch
     ```
 4.  navigate to [`demos/index.html`](demos/index.html) with you browser
 
