@@ -4,10 +4,11 @@
 		"strict": true,
 		"module": "es6",
 		"moduleResolution": "node",
+		"esModuleInterop": true,
 		"resolveJsonModule": true,
 		"declaration": true,             // Generates corresponding '.d.ts' file.
 		// "declarationMap": true,       // Generates a sourcemap for each corresponding '.d.ts' file.
-		"target": "es5",
+		"target": "es2016",
 		"sourceMap": true
 	}
 }

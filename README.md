@@ -64,8 +64,8 @@ _the others are the ones I plan to add in the future._
 
 There are multiple ways to get image-map-creator:
 
-- Download the bundle from [the latest release](https://github.com/n-peugnet/image-map-creator/releases/latest).
-- Compile the bundle from sources (see [development informations](#development)).
+- Download the bundles from [the latest release](https://github.com/n-peugnet/image-map-creator/releases/latest).
+- Compile the bundles from sources (see [development informations](#development)).
 - Get the package from npm:
   ```
   npm install image-map-creator
@@ -78,6 +78,7 @@ There are multiple ways to get image-map-creator:
 Import `p5.js`, `p5.dom.js` and the javascript bundle from `/dist` :
 
 ```html
+<link rel="stylesheet" href="dist/image-map-creator.bundle.css" />
 <script src="dist/image-map-creator.bundle.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.min.js"></script>
