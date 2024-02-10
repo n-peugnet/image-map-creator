@@ -1,17 +1,29 @@
+ESBUILD ?= esbuild
+
+define ESBUILDCMD
+$(ESBUILD) src/p5.image-map-creator.ts \
+	--outfile=dist/image-map-creator.bundle.js \
+	--external:p5 \
+	--bundle
+endef
+
 build: node_modules
-	webpack --env dev
+	$(ESBUILDCMD)
 
 dist: node_modules
-	webpack --env prod
+	$(ESBUILDCMD) --minify --sourcemap
+
+types: node_modules
+	node_modules/.bin/tsc --emitDeclarationOnly
 
 watch: node_modules
-	webpack --env dev --watch
+	$(ESBUILDCMD) --watch
 
 node_modules: package.json package-lock.json
 	npm install
 	touch $@
 
-release-patch release-minor release-major: release-%: dist
+release-patch release-minor release-major: release-%: dist types
 	npm version $* --tag-version-prefix=
 	git push
 	git push --tags
@@ -21,4 +33,4 @@ release-patch release-minor release-major: release-%: dist
 clean:
 	rm -rf dist node_modules
 
-.PHONY: build dist watch clean
+.PHONY: build dist types watch clean
