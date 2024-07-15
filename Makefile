@@ -3,7 +3,7 @@ ESBUILD ?= esbuild
 define ESBUILDCMD
 $(ESBUILD) src/p5.image-map-creator.ts \
 	--outfile=dist/image-map-creator.bundle.js \
-	--bundle --sourcemap
+	--bundle --sourcemap --target=es2016
 endef
 
 define ESBUILDNPMCMD
@@ -18,7 +18,7 @@ build: node_modules
 	$(ESBUILDCMD)
 
 dist: node_modules
-	$(ESBUILDCMD) --minify --sourcemap
+	$(ESBUILDCMD) --minify
 	$(ESBUILDNPMCMD)
 	$(ESBUILDNPMCMD) --format=esm --out-extension:.js=.mjs
 
