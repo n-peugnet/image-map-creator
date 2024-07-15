@@ -13,12 +13,12 @@ import QuickSettings from "quicksettings";
 //@ts-ignore no types for this lib
 import * as ContextMenu from "../lib/contextmenu/contextmenu";
 import "../lib/contextmenu/contextmenu.css";
-import type p5js from "p5";
+import type P5 from "p5";
 
 export type Tool = "polygon" | "rectangle" | "circle" | "select" | "delete" | "test";
 export type Image = {
-	data: p5js.Image|null,
-	file: p5js.File|null,
+	data: P5.Image|null,
+	file: P5.File|null,
 };
 export type ToolLabel = {
 	key: string,
@@ -73,7 +73,7 @@ export class imageMapCreator {
 	protected fusion: boolean;
 	protected tolerance: number;
 	protected bgLayer: BgLayer;
-	public p5: p5js;
+	public p5: P5;
 
 	/**
 	 * Constructor
@@ -119,9 +119,9 @@ export class imageMapCreator {
 
 	/**
 	 * Override p5 methods
-	 * @param {p5js} p5
+	 * @param {P5} p5
 	 */
-	private sketch(p5: p5js): void {
+	private sketch(p5: P5): void {
 		// Set this.p5 also in sketch() (fix for #30).
 		this.p5 = p5;
 
@@ -393,7 +393,7 @@ export class imageMapCreator {
 		this.bgLayer.disappear();
 	}
 
-	handeFile(file: p5js.File): void {
+	handeFile(file: P5.File): void {
 		if (file.type == "image") {
 			this.img.data = this.p5.loadImage(file.data, img => this.resetView(img));
 			this.img.file = file.file;
@@ -418,7 +418,7 @@ export class imageMapCreator {
 		this.bgLayer.disappear();
 	}
 
-	resetView(img: p5js.Image): void {
+	resetView(img: P5.Image): void {
 		this.view.scale = 1;
 		this.view.transX = 0;
 		this.view.transY = 0;

@@ -1,7 +1,7 @@
 import { round } from "./utils";
 import { Coord } from "./class.coord";
 import { ImageMap } from "./class.image-map";
-import * as p5 from "p5";
+import type P5 from "p5";
 
 export type Shape = "empty" | "rect" | "circle" | "poly" | "default";
 
@@ -194,7 +194,7 @@ export abstract class Area {
 	abstract isDrawable(): boolean;
 	abstract svgArea(scale: number): string;
 	abstract isOver(coord: Coord): boolean;
-	abstract display(p: p5): void;
+	abstract display(p: P5): void;
 }
 
 export class AreaEmpty extends Area {
@@ -213,7 +213,7 @@ export class AreaEmpty extends Area {
 		return false;
 	}
 
-	display(p: p5): void {}
+	display(p: P5): void {}
 }
 
 export class AreaCircle extends Area {
@@ -258,9 +258,9 @@ export class AreaCircle extends Area {
 
 	/**
 	 * draw the area to the given p5 instance
-	 * @param {p5} p5 
+	 * @param {P5} p5 
 	 */
-	display(p5: p5): void {
+	display(p5: P5): void {
 		p5.ellipse(this.getCenter().x, this.getCenter().y, this.radius * 2);
 	}
 
@@ -346,9 +346,9 @@ export class AreaPoly extends Area {
 
 	/**
 	 * draw the area to the given p5 instance
-	 * @param {p5} p5 
+	 * @param {P5} p5 
 	 */
-	display(p5: p5): void {
+	display(p5: P5): void {
 		p5.beginShape();
 		this.drawingCoords().forEach(c => p5.vertex(c.x, c.y));
 		p5.endShape();
@@ -428,9 +428,9 @@ export class AreaDefault extends Area {
 
 	/**
 	 * draw the area to the given p5 instance
-	 * @param {p5} p5 
+	 * @param {P5} p5 
 	 */
-	display(p5: p5): void {
+	display(p5: P5): void {
 		p5.rect(0, 0, this.iMap.width - 1, this.iMap.height - 1);
 	}
 
