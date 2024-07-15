@@ -6,11 +6,21 @@ $(ESBUILD) src/p5.image-map-creator.ts \
 	--bundle --sourcemap
 endef
 
+define ESBUILDNPMCMD
+$(ESBUILD) src/p5.image-map-creator.ts \
+	--outdir=dist --bundle \
+	--external:downloadjs \
+	--external:quicksettings \
+	--external:undo-manager
+endef
+
 build: node_modules
 	$(ESBUILDCMD)
 
 dist: node_modules
 	$(ESBUILDCMD) --minify --sourcemap
+	$(ESBUILDNPMCMD)
+	$(ESBUILDNPMCMD) --format=esm --out-extension:.js=.mjs
 
 types: node_modules
 	node_modules/.bin/tsc --emitDeclarationOnly
