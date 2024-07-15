@@ -3,7 +3,7 @@ ESBUILD ?= esbuild
 define ESBUILDCMD
 $(ESBUILD) src/p5.image-map-creator.ts \
 	--outfile=dist/image-map-creator.bundle.js \
-	--bundle
+	--bundle --sourcemap
 endef
 
 build: node_modules
