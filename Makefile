@@ -15,7 +15,7 @@ release-patch release-minor release-major: release-%: dist
 	npm version $* --tag-version-prefix=
 	git push
 	git push --tags
-	TAG=$$(git describe --tags --abbrev=0) gh release create $$TAG && gh release upload $$TAG dist/*.js
+	TAG=$$(git describe --tags --abbrev=0); gh release create $$TAG && gh release upload $$TAG dist/*.js
 	npm publish
 
 clean:
