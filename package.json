@@ -1,6 +1,6 @@
 {
   "name": "image-map-creator",
-  "version": "1.1.13",
+  "version": "2.0.0",
   "description": "This is a simple map creator tool made with the p5.js library. I want it\r to be easy to use for both the end user and the developper.",
   "module": "dist/p5.image-map-creator.mjs",
   "main": "dist/p5.image-map-creator.js",
