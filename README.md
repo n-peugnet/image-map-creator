@@ -72,6 +72,7 @@ There are multiple ways to get image-map-creator:
   ```
   ```javascript
   // script.js
+  import "image-map-creator/dist/p5.image-map-creator.css";
   import { imageMapCreator } from "image-map-creator";
   ```
 
