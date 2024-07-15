@@ -75,7 +75,7 @@ There are multiple ways to get image-map-creator:
   import { imageMapCreator } from "image-map-creator";
   ```
 
-Import `p5.js`, `p5.dom.js` and the javascript bundle from `/dist` :
+Import `p5.js`, `p5.dom.js` and the css & javascript bundles from `/dist` :
 
 ```html
 <link rel="stylesheet" href="dist/image-map-creator.bundle.css" />
