@@ -40,7 +40,10 @@ release-patch release-minor release-major: release-%: dist types
 	TAG=$$(git describe --tags --abbrev=0); gh release create $$TAG && gh release upload $$TAG dist/*.bundle.*
 	npm publish
 
+check: node_modules
+	node_modules/.bin/tsc --noEmit
+
 clean:
 	rm -rf dist node_modules
 
-.PHONY: build dist types watch clean
+.PHONY: build dist types watch check clean
