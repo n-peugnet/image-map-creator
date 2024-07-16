@@ -1,4 +1,5 @@
 ESBUILD ?= node_modules/.bin/esbuild
+TSC     ?= node_modules/.bin/tsc
 
 define ESBUILDCMD
 $(ESBUILD) src/p5.image-map-creator.ts \
@@ -23,7 +24,7 @@ dist: node_modules
 	$(ESBUILDNPMCMD) --format=esm --out-extension:.js=.mjs
 
 types: node_modules
-	node_modules/.bin/tsc --emitDeclarationOnly
+	$(TSC) --emitDeclarationOnly
 
 watch: node_modules
 	$(ESBUILDCMD) --watch
@@ -41,7 +42,7 @@ release-patch release-minor release-major: release-%: dist types
 	npm publish
 
 check: node_modules
-	node_modules/.bin/tsc --noEmit
+	$(TSC) --noEmit
 
 clean:
 	rm -rf dist node_modules
