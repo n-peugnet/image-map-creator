@@ -1,4 +1,4 @@
-ESBUILD ?= esbuild
+ESBUILD ?= node_modules/.bin/esbuild
 
 define ESBUILDCMD
 $(ESBUILD) src/p5.image-map-creator.ts \
